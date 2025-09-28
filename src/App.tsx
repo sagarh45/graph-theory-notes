@@ -6,7 +6,7 @@ function GraphTheoryNotes()  {
   const [activeTab, setActiveTab] = useState('definitions');
 
   const tabs = [
-    { id: 'definitions', label: 'Definitions & Types' },
+    { id: 'definitions', label: 'Definitions' },
     { id: 'terminology', label: 'Terminology' },
     { id: 'types', label: 'Types of Graph' },
     { id: 'representation', label: 'Computer Representation' },
