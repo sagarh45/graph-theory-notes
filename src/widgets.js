@@ -1,7 +1,7 @@
 import { makeGraph, preset, PRESETS, adj, degrees, properties, edgesToText, parseEdges, circleLayout, cloneGraph, ek, sortIds } from './graph.js';
 import { svgGraph, esc, adjMatrixHTML, adjListHTML, incidenceHTML, edgeListHTML } from './render.js';
 import { Player, graphStage } from './player.js';
-import { bfsFrames, dfsFrames, primFrames, kruskalFrames, dijkstraFrames, topoFrames } from './algos.js';
+import { bfsFrames, dfsFrames, dfsStackFrames, primFrames, kruskalFrames, dijkstraFrames, topoFrames } from './algos.js';
 import { bfsSide, dfsSide, primSide, kruskalSide, dijkstraSide, topoSide, bellmanSide, floydSide, cycleSide, bipSide, compSide, bridgeSide, sccSide, eulerSide, colourSide } from './sides.js';
 import { bellmanFrames, floydFrames, cycleFrames, bipartiteFrames, componentsFrames, bridgeFrames, sccFrames, eulerFrames, colourFrames } from './algos2.js';
 
@@ -38,6 +38,7 @@ export function mountFig(el) {
 const ALG = {
   bfs: { run: (g, s) => bfsFrames(g, s), side: bfsSide, name: 'BFS', needsStart: true },
   dfs: { run: (g, s) => dfsFrames(g, s), side: dfsSide, name: 'DFS', needsStart: true },
+  dfsstack: { run: (g, s) => dfsStackFrames(g, s), side: dfsSide, name: 'DFS (stack)', needsStart: true },
   prim: { run: (g, s) => primFrames(g, s), side: primSide, name: "Prim's MST", needsStart: true, undirected: true, weighted: true },
   kruskal: { run: (g) => kruskalFrames(g), side: kruskalSide, name: "Kruskal's MST", undirected: true, weighted: true },
   dijkstra: { run: (g, s) => dijkstraFrames(g, s), side: dijkstraSide, name: 'Dijkstra', needsStart: true, weighted: true },
@@ -55,6 +56,7 @@ const ALG = {
 const LEGEND = {
   bfs: [['cur', 'being processed'], ['front', 'in the queue'], ['done', 'printed'], ['e-tree', 'BFS tree edge']],
   dfs: [['cur', 'current call'], ['front', 'on the stack'], ['done', 'finished'], ['e-tree', 'tree edge'], ['e-back', 'back edge (cycle)']],
+  dfsstack: [['cur', 'just popped'], ['front', 'waiting on the stack'], ['done', 'printed'], ['e-tree', 'DFS tree edge']],
   prim: [['cur', 'just added'], ['front', 'reachable (finite key)'], ['done', 'in the tree'], ['e-tree', 'MST edge'], ['e-cand', 'being checked']],
   kruskal: [['cur', 'ends of current edge'], ['done', 'touched by MST'], ['e-tree', 'taken'], ['e-rej', 'rejected (cycle)']],
   dijkstra: [['cur', 'just fixed'], ['front', 'tentative dist'], ['done', 'final'], ['e-tree', 'shortest-path tree'], ['e-cand', 'being relaxed']],
@@ -157,7 +159,7 @@ const LAB_PRESETS = {
 };
 export function mountLab(el) {
   const kind = el.dataset.lab; // trav | algo
-  const algs = kind === 'trav' ? ['bfs', 'dfs'] : kind === 'adv' ? ['bellman', 'floyd', 'cycle', 'bip', 'comps', 'bridge', 'scc', 'euler', 'colour'] : ['dijkstra', 'prim', 'kruskal', 'topo'];
+  const algs = kind === 'trav' ? ['bfs', 'dfs', 'dfsstack'] : kind === 'adv' ? ['bellman', 'floyd', 'cycle', 'bip', 'comps', 'bridge', 'scc', 'euler', 'colour'] : ['dijkstra', 'prim', 'kruskal', 'topo'];
   let alg = el.dataset.alg || algs[0];
   let g = cloneGraph(preset(LAB_PRESETS[kind][0][0]));
   el.innerHTML = `<p class="lab-title"><span class="pill">Try it</span>${kind === 'trav' ? 'Traversal lab — build any graph and run BFS or DFS' : kind === 'adv' ? 'Advanced lab — pick an algorithm, edit the graph, watch every step' : 'Algorithm lab — shortest path, MST and topological sort'}</p>
@@ -382,6 +384,48 @@ export function mountChecker(el) {
   el.querySelector('.cg').onclick = check;
   ci.addEventListener('keydown', (e) => { if (e.key === 'Enter') check(); });
   check();
+}
+
+
+/* ---------- edge-present checker (adjacency matrix) ---------- */
+export function mountEdgeCheck(el) {
+  const g = graphFromEl(el);
+  const V = g.nodes.map((n) => n.id);
+  el.innerHTML = `<p class="lab-title"><span class="pill">Try it</span>Is there an edge? Pick two vertices — the matrix cell lights up</p>
+    <div class="lab-bar">
+      <label class="ord">From <select class="eu">${V.map((v) => `<option>${esc(v)}</option>`).join('')}</select></label>
+      <label class="ord">To <select class="ev">${V.map((v) => `<option>${esc(v)}</option>`).join('')}</select></label>
+    </div>
+    <div class="ec-view"></div><p class="ec-msg" aria-live="polite"></p>
+    <p class="hint">This is exactly <code>if (adj[u][v] == 1)</code>. One array read, so the check is O(1).</p>`;
+  const eu = el.querySelector('.eu'), ev = el.querySelector('.ev');
+  if (V.length > 1) ev.selectedIndex = 1;
+  const draw = () => {
+    const u = eu.value, v = ev.value;
+    const has = g.edges.some((e) => (e.u === u && e.v === v) || (!g.directed && e.u !== e.v && e.u === v && e.v === u));
+    const hl = { [u + ',' + v]: 'hit' };
+    if (!g.directed && u !== v) hl[v + ',' + u] = 'hit';
+    const nc = { [u]: 'cur' };
+    if (v !== u) nc[v] = has ? 'front' : 'bad';
+    const ec = {};
+    g.edges.forEach((e, i) => {
+      const hit = (e.u === u && e.v === v) || (!g.directed && e.u === v && e.v === u);
+      if (hit) ec['#' + i] = 'hot';
+    });
+    el.querySelector('.ec-view').innerHTML = `<div class="rep-pair"><div class="scroll">${svgGraph(g, { nc, ec })}</div><div class="scroll-x">${adjMatrixHTML(g, hl)}</div></div>`;
+    const msg = el.querySelector('.ec-msg');
+    if (u === v && !has) {
+      msg.className = 'ec-msg no';
+      msg.innerHTML = `A[${esc(u)}][${esc(v)}] = <b>0</b>. No self-loop, so ${esc(u)} is not joined to itself.`;
+    } else if (has) {
+      msg.className = 'ec-msg yes';
+      msg.innerHTML = `<b>Edge exists</b> between ${esc(u)} and ${esc(v)}. A[${esc(u)}][${esc(v)}] = 1.`;
+    } else {
+      msg.className = 'ec-msg no';
+      msg.innerHTML = `<b>No edge</b> between ${esc(u)} and ${esc(v)}. A[${esc(u)}][${esc(v)}] = 0.`;
+    }
+  };
+  eu.onchange = draw; ev.onchange = draw; draw();
 }
 
 /* ---------- handshake lab ---------- */

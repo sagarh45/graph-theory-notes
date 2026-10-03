@@ -103,7 +103,53 @@
 <tr><td><b>Multiple edges</b></td><td>More than one edge between the same two vertices.</td></tr>
 <tr><td><b>Connected</b></td><td>A path exists between every pair of vertices.</td></tr>
 <tr><td><b>Weight</b></td><td>A number on an edge: distance, cost or time.</td></tr>
+<tr><td><b>Distance</b></td><td>Length of the shortest path between two vertices.</td></tr>
+<tr><td><b>Reachable</b></td><td>v is reachable from u if some directed path goes from u to v.</td></tr>
+<tr><td><b>Predecessor / successor</b></td><td>In a digraph, u is a predecessor of v if the arrow u → v exists. Then v is a successor of u.</td></tr>
 </tbody></table></div>
+
+
+<h3 id="t-ex"><span class="n">2.8</span>Many worked examples</h3>
+<p>Every example below uses this one graph, called <b>G</b>. Write the answer in words first, then check the picture.</p>
+<figure data-fig="intro" data-cap="Example graph G. Edges: A–B, A–C, B–C, B–D, C–E, D–E, D–F, E–F."></figure>
+<div class="tbl"><table class="t">
+<thead><tr><th>#</th><th>Question</th><th>Answer</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Which vertices are adjacent to B?</td><td>A, C and D. A–E is not an edge, so A and E are not adjacent.</td></tr>
+<tr><td>2</td><td>Name two adjacent edges, and two edges that are not adjacent.</td><td>(A, B) and (B, D) are adjacent — they share B. (A, B) and (E, F) are not adjacent — no common vertex.</td></tr>
+<tr><td>3</td><td>Which edges are incident on D?</td><td>(B, D), (D, E) and (D, F). So deg(D) = 3.</td></tr>
+<tr><td>4</td><td>Write the degree of every vertex. Check the handshake rule.</td><td>A2, B3, C3, D3, E3, F2. Sum = 16 = 2 × 8 edges.</td></tr>
+<tr><td>5</td><td>Give a walk from A to F that is not a path.</td><td>A–B–C–A–B–D–F. Vertex A and edge A–B repeat, so it is only a walk.</td></tr>
+<tr><td>6</td><td>Give a trail that is not a path.</td><td>A–B–D–E–C–B: no edge repeats, but B repeats, so it is a trail and not a path. It does not have to end at F.</td></tr>
+<tr><td>7</td><td>Give two different simple paths from A to F, and their lengths.</td><td>A–B–D–F, length 3. A–C–E–F, length 3. Length counts edges, not vertices.</td></tr>
+<tr><td>8</td><td>List three cycles and their lengths.</td><td>A–B–C–A (length 3). B–D–E–C–B (length 4). D–E–F–D (length 3).</td></tr>
+<tr><td>9</td><td>What is the distance from A to F?</td><td>3. No path uses fewer than 3 edges. BFS from A finds this.</td></tr>
+<tr><td>10</td><td>Is G connected? How many components?</td><td>Yes, one component. There is a path between every pair.</td></tr>
+<tr><td>11</td><td>Name a subgraph that is not spanning, and one that is spanning.</td><td>Vertices {D, E, F} with their three edges is a subgraph (a triangle). Any spanning tree of G keeps all 6 vertices and 5 edges.</td></tr>
+<tr><td>12</td><td>Is (D, E) a bridge?</td><td>No. After deleting D–E, D–F–E still joins D and E, so the graph stays in one piece.</td></tr>
+</tbody></table></div>
+
+<h4>Example 13 — a loop adds 2</h4>
+<div class="terms-grid">
+  <figure data-fig="A-B A-B B-C C-C" data-pos="A 40 110, B 160 40, C 280 120" data-nl="A=2 B=3 C=3" data-cap="Two parallel edges A–B, and a loop at C."></figure>
+  <div>
+    <p>deg(A) = 2, because both parallel edges touch A. deg(B) = 3 (two A–B edges plus B–C). The loop at C counts <b>twice</b>, plus B–C, so deg(C) = 3.</p>
+    <p>Sum of degrees = 2 + 3 + 3 = 8. Edges = 2 parallel + B–C + 1 loop = 4. And 2 × 4 = 8. The rule still holds.</p>
+  </div>
+</div>
+
+<h4>Example 14 — directed: in-degree and out-degree</h4>
+<figure data-fig="A>B A>C B>C C>D D>B D>E F>E" data-pos="A 40 100, B 150 40, C 150 170, D 260 100, E 360 100, F 360 200" data-nl="A=0/2 B=2/1 C=2/1 D=1/2 E=2/0 F=0/1" data-cap="Label = in / out. Compute both before you add them."></figure>
+<div class="tbl"><table class="t">
+<thead><tr><th>Vertex</th><th>in</th><th>out</th><th>What to call it</th></tr></thead>
+<tbody>
+<tr><td>A</td><td class="num">0</td><td class="num">2</td><td>Source. Edges leave A; none enter.</td></tr>
+<tr><td>B</td><td class="num">2</td><td class="num">1</td><td>deg = 3. Predecessor of C, successor of A and D.</td></tr>
+<tr><td>E</td><td class="num">2</td><td class="num">0</td><td>Sink. Arrows come in from D and F; nothing leaves.</td></tr>
+<tr><td>F</td><td class="num">0</td><td class="num">1</td><td>Also a source.</td></tr>
+</tbody></table></div>
+<p>Sum of in-degrees = 0+2+2+1+2+0 = 7. Sum of out-degrees = 2+1+1+2+0+1 = 7. Both equal the number of arrows.</p>
+<div class="exam"><b>Exam habit:</b> On any terminology question, draw the graph, label degrees on the vertices, and only then write the definition. One labelled picture is worth more than a paragraph with no example.</div>
 
 <div class="recap"><p class="t">Remember from Part 2</p><ul>
 <li>Degree counts edges at a vertex; a loop adds 2.</li>
@@ -111,6 +157,7 @@
 <li>Cycle = path that returns to its start.</li>
 <li>Isolated = degree 0, pendant = degree 1, source = in-degree 0, sink = out-degree 0.</li>
 <li>Connected = one piece. Each piece of a disconnected graph is a component.</li>
+<li>Walk may repeat. Trail repeats no edge. Path repeats no vertex. Length = number of edges.</li>
 </ul></div>
 <div class="quiz" data-quiz="terms"></div>
 </section>

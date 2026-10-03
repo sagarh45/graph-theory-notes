@@ -15,6 +15,13 @@
 </div>
 <div class="exam"><b>Order rule used in these notes and in most exams:</b> when a vertex has several unvisited neighbours, take them in <b>alphabetical (or numerical) order</b>, which is the order in the adjacency matrix row. A different neighbour order gives a different but still correct traversal — always state your order.</div>
 
+
+<div class="cols2">
+  <div class="card"><h5>Queue — used by BFS</h5><p>First in, first out. The vertex that has waited longest leaves first (the <b>front</b>). A new vertex joins at the <b>rear</b>.</p><p class="formula">enqueue A → [ A ]<br>dequeue A, enqueue B, C → [ B C ]</p></div>
+  <div class="card"><h5>Stack — used by DFS</h5><p>Last in, first out. The vertex pushed last sits on <b>top</b> and is the next one popped. Recursion uses the same idea: the call stack.</p><p class="formula">push A → [ A ]<br>pop A, push C then B → [ C B ]<br>pop B (B was last)</p></div>
+</div>
+<div class="law">Mark a vertex visited when it first enters the queue (BFS) or when you print it after a pop (stack DFS). If you wait too long, the same vertex is stored twice.</div>
+
 <h3 id="tr-bfs"><span class="n">5.2</span>Breadth First Search (BFS)</h3>
 <pre class="algo">BFS(G, s)
 1. Set visited[v] = 0 for every vertex v.
@@ -59,6 +66,11 @@
 </div>
 <p>The label under each vertex shows <b>discovery / finish</b> time: when DFS first reached the vertex and when it finished all its neighbours. The side panel shows the call stack.</p>
 <div class="lab" data-play="dfs" data-g="trav" data-s="A" data-title="DFS from A"></div>
+
+<h4>DFS with a stack you can see</h4>
+<p>The player above uses recursion. This one uses an array as a stack, which is what you write in a dry-run table. Rule used here: pop the top; if it is new, print it and <b>push its unvisited neighbours from Z down to A</b>, so A comes out first. On this graph the order is the same as the recursive DFS: <b>A B D E F C G</b>.</p>
+<div class="lab" data-play="dfsstack" data-g="trav" data-s="A" data-title="DFS with an explicit stack from A"></div>
+
 <h4>Dry run table (stack version)</h4>
 <div data-dry="dfs" data-g="trav" data-s="A"></div>
 <p>Both versions print <b>A B D E F C G</b> here. Some vertices are pushed twice in the stack version (C and G above), which is why the pop step checks visited[] first and skips them.</p>
@@ -88,6 +100,16 @@
 <div data-dry="dfs" data-g="exam" data-s="A"></div>
 <p><b>Answer:</b> DFS order = <b>A B C F E D</b>.</p>
 <div class="lab" data-play="dfs" data-g="exam" data-s="A" data-title="Check Problem 2 in the player"></div>
+
+
+<h4>Practical-style example — vertices 0, 1, 2, 3</h4>
+<p>Same graph as the adjacency-matrix program in Part 4. Start BFS at 0. The queue holds vertex <b>numbers</b>, not letters.</p>
+<figure data-fig="0-1 0-2 1-3 2-3" data-pos="0 40 40, 1 220 40, 2 40 180, 3 220 180" data-cap="Edges 0–1, 0–2, 1–3, 2–3."></figure>
+<div data-dry="bfs" data-g="0-1 0-2 1-3 2-3" data-s="0"></div>
+<p><b>BFS order = 0 1 2 3.</b> After 0 is dequeued, 1 and 2 enter the queue. 3 is a neighbour of both, but it is marked visited when 1 enqueues it, so 2 does not enqueue it again.</p>
+<div data-dry="dfs" data-g="0-1 0-2 1-3 2-3" data-s="0"></div>
+<p><b>DFS order = 0 1 3 2.</b> Pop 0, push 2 then 1 (reverse order, so 1 is on top). Pop 1, push 3. Pop 3. Pop 2.</p>
+<div class="lab" data-play="bfs" data-g="0-1 0-2 1-3 2-3" data-pos="0 40 40, 1 220 40, 2 40 180, 3 220 180" data-s="0" data-title="BFS from 0 on the practical graph"></div>
 
 <h3 id="tr-cmp"><span class="n">5.6</span>BFS vs DFS</h3>
 <div class="tbl"><table class="t">
@@ -225,7 +247,7 @@ int main() {
 DFS (stack)    : A B D E F C G</pre></div></details>
 
 <div class="recap"><p class="t">Remember from Part 5</p><ul>
-<li>BFS = queue, level by level. DFS = stack/recursion, deep first.</li>
+<li>BFS = queue (front out, rear in), level by level. DFS = stack (top out) or recursion, deep first.</li>
 <li>Mark visited when you enqueue (BFS) or when you first reach the vertex (DFS).</li>
 <li>Both take O(V + E) with an adjacency list, O(V²) with a matrix.</li>
 <li>BFS gives the fewest-edges path. A DFS back edge means a cycle.</li>

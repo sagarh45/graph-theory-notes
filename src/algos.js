@@ -98,6 +98,51 @@ export function dfsFrames(g, s, opt = {}) {
   return F;
 }
 
+
+/* ---------------- DFS with an explicit stack (same order as the recursive version) ---------------- */
+export function dfsStackFrames(g, s, opt = {}) {
+  const A = adj(g), V = g.nodes.map((n) => n.id), F = [];
+  const vis = {}, out = [], tree = {};
+  let stack = []; // {v, p}
+  const fromPush = {};
+  const snap = (cur, msg, extra = {}) => {
+    const nc = {};
+    V.forEach((v) => { if (vis[v]) nc[v] = 'done'; else if (stack.some((x) => x.v === v)) nc[v] = 'front'; });
+    if (cur != null) nc[cur] = 'cur';
+    Object.assign(nc, extra.nc || {});
+    F.push({
+      nc, ec: { ...tree, ...(extra.ec || {}) }, nl: {}, msg, keyStep: extra.key,
+      side: { stack: stack.map((x) => x.v), out: out.slice(), vis: { ...vis }, V, d: {}, fin: {} },
+    });
+  };
+  snap(null, `${b('DFS with a stack')} from ${b(s)}. A stack is ${b('last in, first out')}: the vertex pushed last sits on top and comes out first. Push neighbours in ${b('reverse alphabetical order')} so the smallest letter is on top.`);
+  const starts = [s].concat(opt.all === false ? [] : sortIds(V).filter((v) => v !== s));
+  let first = true;
+  for (const st of starts) {
+    if (vis[st]) continue;
+    if (!first) snap(null, `Stack empty, but ${b(V.filter((v) => !vis[v]).join(', '))} not visited. Start again: ${b('PUSH ' + st)}.`);
+    first = false;
+    stack.push({ v: st, p: null });
+    snap(st, `${b('PUSH ' + st)}. Stack, bottom → top: ${stack.map((x) => x.v).join(' ')}.`, { nc: { [st]: 'front' } });
+    while (stack.length) {
+      const item = stack.pop();
+      const u = item.v;
+      if (vis[u]) {
+        snap(u, `${b('POP ' + u)}. Already visited → skip this copy. It was pushed more than once.`, { ec: item.p != null ? { [ek(g, item.p, u)]: tree[ek(g, item.p, u)] || 'skip' } : {} });
+        continue;
+      }
+      vis[u] = 1; out.push(u);
+      if (item.p != null) tree[ek(g, item.p, u)] = 'tree';
+      const nbrs = A[u].map((x) => x.v).filter((v) => !vis[v]);
+      const rev = nbrs.slice().reverse();
+      rev.forEach((v) => { fromPush[v] = u; stack.push({ v, p: u }); });
+      snap(u, `${b('POP ' + u)} — not visited, so ${b('print ' + u)}. Unvisited neighbours: ${nbrs.length ? nbrs.join(', ') : 'none'}. ${b('PUSH')} them in reverse order${rev.length ? ' (' + rev.join(', then ') + ')' : ''} so ${nbrs[0] || '—'} is on top.`, { key: 'Visit ' + u });
+    }
+  }
+  snap(null, `Stack empty. ${b('DFS order: ' + out.join(' '))}. Thick edges are the DFS tree. This order matches the recursive DFS when neighbours are taken alphabetically and the stack is pushed in reverse.`, { key: 'Done' });
+  return F;
+}
+
 /* ---------------- Prim ---------------- */
 export function primFrames(g, s) {
   const A = adj(g), V = g.nodes.map((n) => n.id), F = [];

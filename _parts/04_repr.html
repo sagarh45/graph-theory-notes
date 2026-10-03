@@ -3,7 +3,7 @@
   <p class="eyebrow">Unit V · Part 4</p>
   <h2>Representation of Graphs</h2>
   <p class="lede">A computer cannot see a drawing. We must store “who is connected to whom” as numbers. There are four standard ways; two of them are used almost everywhere.</p>
-  <p class="syl"><b>Syllabus:</b> Representation of graphs — adjacency matrix, adjacency list, incidence matrix; their programs and comparison.</p>
+  <p class="syl"><b>Syllabus:</b> Representation of graphs — adjacency matrix (including the program that checks whether an edge is present between two vertices), adjacency list, incidence matrix; programs and comparison.</p>
 </div>
 
 <h3 id="r-mat"><span class="n">4.1</span>Adjacency matrix</h3>
@@ -21,6 +21,97 @@
 <li>Diagonal is all 0 in a simple graph (no self-loops).</li>
 <li>Number of 1s = 2|E| (undirected) or |E| (directed).</li>
 </ul>
+
+<figure data-fig="0-1 0-2 1-3 2-3" data-pos="0 40 40, 1 220 40, 2 40 180, 3 220 180" data-cap="Practical graph: vertices <b>0, 1, 2, 3</b> and edges 0–1, 0–2, 1–3, 2–3. There is <b>no</b> edge 0–3."></figure>
+<div class="lab" data-edgecheck data-g="0-1 0-2 1-3 2-3" data-pos="0 40 40, 1 220 40, 2 40 180, 3 220 180"></div>
+<details class="prog" open><summary>Program — adjacency matrix, and find if an edge is present between two nodes</summary><div class="inner">
+<p>This is the practical program: numbered vertices, an n × n matrix, then one question — does the edge (u, v) exist? The answer is a single read of <code>adj[u][v]</code>.</p>
+<div class="code-wrap"><pre class="c">/* Adjacency matrix: create, display, and check if an edge is present
+   between two vertices. Vertices are numbered 0, 1, 2, ...
+   (conio.h from the old listing is not used, so it is omitted.) */
+#include &lt;stdio.h&gt;
+#define MAX 20
+
+int adj[MAX][MAX], n, edges;
+
+void createGraph() {
+    int i, j, u, v;
+
+    printf(&quot;Enter number of vertices: &quot;);
+    scanf(&quot;%d&quot;, &amp;n);
+
+    for (i = 0; i &lt; n; i++) {
+        for (j = 0; j &lt; n; j++) {
+            adj[i][j] = 0;
+        }
+    }
+
+    printf(&quot;Enter number of edges: &quot;);
+    scanf(&quot;%d&quot;, &amp;edges);
+
+    printf(&quot;Enter edges (u v):\n&quot;);
+    for (i = 0; i &lt; edges; i++) {
+        scanf(&quot;%d %d&quot;, &amp;u, &amp;v);
+        adj[u][v] = 1;
+        adj[v][u] = 1; /* undirected graph: both ways */
+    }
+}
+
+void displayMatrix() {
+    int i, j;
+    printf(&quot;\nAdjacency Matrix:\n   &quot;);
+
+    for (i = 0; i &lt; n; i++) {
+        printf(&quot;%d &quot;, i);
+    }
+    printf(&quot;\n&quot;);
+
+    for (i = 0; i &lt; n; i++) {
+        printf(&quot;%d: &quot;, i);
+        for (j = 0; j &lt; n; j++) {
+            printf(&quot;%d &quot;, adj[i][j]);
+        }
+        printf(&quot;\n&quot;);
+    }
+}
+
+void checkEdge() {
+    int u, v;
+    printf(&quot;\nEnter vertices to check edge (u v): &quot;);
+    scanf(&quot;%d %d&quot;, &amp;u, &amp;v);
+
+    if (adj[u][v] == 1) {
+        printf(&quot;Edge exists between %d and %d\n&quot;, u, v);
+    } else {
+        printf(&quot;No edge between %d and %d\n&quot;, u, v);
+    }
+}
+
+int main() {
+    createGraph();
+    displayMatrix();
+    checkEdge();
+    return 0;
+}</pre></div>
+<p class="lbl">Input</p><pre class="io">4
+4
+0 1
+0 2
+1 3
+2 3
+0 1</pre>
+<p class="lbl">Output — edge is present</p><pre class="io">Adjacency Matrix:
+   0 1 2 3
+0: 0 1 1 0
+1: 1 0 0 1
+2: 1 0 0 1
+3: 0 1 1 0
+
+Edge exists between 0 and 1</pre>
+<p class="lbl">Same graph, check 0 and 3</p><pre class="io">No edge between 0 and 3</pre>
+<div class="exam"><b>How to read the answer:</b> Row 0, column 1 is 1, so the edge exists. Row 0, column 3 is 0, so it does not. For an undirected graph the matrix is symmetric, so checking (1, 0) gives the same answer as (0, 1).</div>
+</div></details>
+
 <details class="prog"><summary>Program 1 — adjacency matrix: create, display, degrees</summary><div class="inner">
 <div class="code-wrap"><pre class="c">/* Adjacency matrix: create, display, degree of every vertex */
 #include &lt;stdio.h&gt;

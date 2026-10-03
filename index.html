@@ -257,7 +257,53 @@
 <tr><td><b>Multiple edges</b></td><td>More than one edge between the same two vertices.</td></tr>
 <tr><td><b>Connected</b></td><td>A path exists between every pair of vertices.</td></tr>
 <tr><td><b>Weight</b></td><td>A number on an edge: distance, cost or time.</td></tr>
+<tr><td><b>Distance</b></td><td>Length of the shortest path between two vertices.</td></tr>
+<tr><td><b>Reachable</b></td><td>v is reachable from u if some directed path goes from u to v.</td></tr>
+<tr><td><b>Predecessor / successor</b></td><td>In a digraph, u is a predecessor of v if the arrow u → v exists. Then v is a successor of u.</td></tr>
 </tbody></table></div>
+
+
+<h3 id="t-ex"><span class="n">2.8</span>Many worked examples</h3>
+<p>Every example below uses this one graph, called <b>G</b>. Write the answer in words first, then check the picture.</p>
+<figure data-fig="intro" data-cap="Example graph G. Edges: A–B, A–C, B–C, B–D, C–E, D–E, D–F, E–F."></figure>
+<div class="tbl"><table class="t">
+<thead><tr><th>#</th><th>Question</th><th>Answer</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Which vertices are adjacent to B?</td><td>A, C and D. A–E is not an edge, so A and E are not adjacent.</td></tr>
+<tr><td>2</td><td>Name two adjacent edges, and two edges that are not adjacent.</td><td>(A, B) and (B, D) are adjacent — they share B. (A, B) and (E, F) are not adjacent — no common vertex.</td></tr>
+<tr><td>3</td><td>Which edges are incident on D?</td><td>(B, D), (D, E) and (D, F). So deg(D) = 3.</td></tr>
+<tr><td>4</td><td>Write the degree of every vertex. Check the handshake rule.</td><td>A2, B3, C3, D3, E3, F2. Sum = 16 = 2 × 8 edges.</td></tr>
+<tr><td>5</td><td>Give a walk from A to F that is not a path.</td><td>A–B–C–A–B–D–F. Vertex A and edge A–B repeat, so it is only a walk.</td></tr>
+<tr><td>6</td><td>Give a trail that is not a path.</td><td>A–B–D–E–C–B: no edge repeats, but B repeats, so it is a trail and not a path. It does not have to end at F.</td></tr>
+<tr><td>7</td><td>Give two different simple paths from A to F, and their lengths.</td><td>A–B–D–F, length 3. A–C–E–F, length 3. Length counts edges, not vertices.</td></tr>
+<tr><td>8</td><td>List three cycles and their lengths.</td><td>A–B–C–A (length 3). B–D–E–C–B (length 4). D–E–F–D (length 3).</td></tr>
+<tr><td>9</td><td>What is the distance from A to F?</td><td>3. No path uses fewer than 3 edges. BFS from A finds this.</td></tr>
+<tr><td>10</td><td>Is G connected? How many components?</td><td>Yes, one component. There is a path between every pair.</td></tr>
+<tr><td>11</td><td>Name a subgraph that is not spanning, and one that is spanning.</td><td>Vertices {D, E, F} with their three edges is a subgraph (a triangle). Any spanning tree of G keeps all 6 vertices and 5 edges.</td></tr>
+<tr><td>12</td><td>Is (D, E) a bridge?</td><td>No. After deleting D–E, D–F–E still joins D and E, so the graph stays in one piece.</td></tr>
+</tbody></table></div>
+
+<h4>Example 13 — a loop adds 2</h4>
+<div class="terms-grid">
+  <figure data-fig="A-B A-B B-C C-C" data-pos="A 40 110, B 160 40, C 280 120" data-nl="A=2 B=3 C=3" data-cap="Two parallel edges A–B, and a loop at C."></figure>
+  <div>
+    <p>deg(A) = 2, because both parallel edges touch A. deg(B) = 3 (two A–B edges plus B–C). The loop at C counts <b>twice</b>, plus B–C, so deg(C) = 3.</p>
+    <p>Sum of degrees = 2 + 3 + 3 = 8. Edges = 2 parallel + B–C + 1 loop = 4. And 2 × 4 = 8. The rule still holds.</p>
+  </div>
+</div>
+
+<h4>Example 14 — directed: in-degree and out-degree</h4>
+<figure data-fig="A>B A>C B>C C>D D>B D>E F>E" data-pos="A 40 100, B 150 40, C 150 170, D 260 100, E 360 100, F 360 200" data-nl="A=0/2 B=2/1 C=2/1 D=1/2 E=2/0 F=0/1" data-cap="Label = in / out. Compute both before you add them."></figure>
+<div class="tbl"><table class="t">
+<thead><tr><th>Vertex</th><th>in</th><th>out</th><th>What to call it</th></tr></thead>
+<tbody>
+<tr><td>A</td><td class="num">0</td><td class="num">2</td><td>Source. Edges leave A; none enter.</td></tr>
+<tr><td>B</td><td class="num">2</td><td class="num">1</td><td>deg = 3. Predecessor of C, successor of A and D.</td></tr>
+<tr><td>E</td><td class="num">2</td><td class="num">0</td><td>Sink. Arrows come in from D and F; nothing leaves.</td></tr>
+<tr><td>F</td><td class="num">0</td><td class="num">1</td><td>Also a source.</td></tr>
+</tbody></table></div>
+<p>Sum of in-degrees = 0+2+2+1+2+0 = 7. Sum of out-degrees = 2+1+1+2+0+1 = 7. Both equal the number of arrows.</p>
+<div class="exam"><b>Exam habit:</b> On any terminology question, draw the graph, label degrees on the vertices, and only then write the definition. One labelled picture is worth more than a paragraph with no example.</div>
 
 <div class="recap"><p class="t">Remember from Part 2</p><ul>
 <li>Degree counts edges at a vertex; a loop adds 2.</li>
@@ -265,6 +311,7 @@
 <li>Cycle = path that returns to its start.</li>
 <li>Isolated = degree 0, pendant = degree 1, source = in-degree 0, sink = out-degree 0.</li>
 <li>Connected = one piece. Each piece of a disconnected graph is a component.</li>
+<li>Walk may repeat. Trail repeats no edge. Path repeats no vertex. Length = number of edges.</li>
 </ul></div>
 <div class="quiz" data-quiz="terms"></div>
 </section>
@@ -301,6 +348,17 @@
 <article class="type"><figure data-fig="A-B A-C A-D B-C B-D C-D" data-pos="A 30 30, B 160 30, C 160 150, D 30 150"></figure>
 <div class="type-body"><h4>Complete graph <span class="aka">(K<sub>n</sub>)</span></h4><p>Every vertex is joined to <b>every other</b> vertex by exactly one edge. K<sub>n</sub> has n(n − 1)/2 edges and is (n − 1)-regular. Every complete graph is regular, but not every regular graph is complete.</p><span class="rule">|E| = n(n − 1)/2</span></div></article>
 <div class="lab" data-kn></div>
+
+
+<h3 id="ty-named"><span class="n">3.3b</span>Path, cycle, star and wheel</h3>
+<article class="type"><figure data-fig="A-B B-C C-D D-E" data-pos="A 20 80, B 90 80, C 160 80, D 230 80, E 300 80" data-nl="A=1 B=2 C=2 D=2 E=1"></figure>
+<div class="type-body"><h4>Path graph <span class="aka">P<sub>n</sub></span></h4><p>n vertices in a single line. The two ends have degree 1 (pendant). Every other vertex has degree 2. P<sub>5</sub> is shown. A path graph is a tree, so it has n − 1 edges.</p><span class="rule">Pₙ has n − 1 edges</span></div></article>
+<article class="type"><figure data-fig="A-B B-C C-D D-E E-A" data-pos="A 110 20, B 200 80, C 170 170, D 50 170, E 20 80" data-nl="A=2 B=2 C=2 D=2 E=2"></figure>
+<div class="type-body"><h4>Cycle graph <span class="aka">C<sub>n</sub></span></h4><p>A single cycle through all n vertices. Every degree is 2, so C<sub>n</sub> is 2-regular, but it is not complete (unless n = 3). C<sub>3</sub> = K<sub>3</sub>. An even cycle is bipartite; an odd cycle is not.</p><span class="rule">Cₙ has n edges · 2-regular</span></div></article>
+<article class="type"><figure data-fig="A-B A-C A-D A-E" data-pos="A 120 100, B 30 30, C 210 30, D 30 180, E 210 180" data-nl="A=4 B=1 C=1 D=1 E=1"></figure>
+<div class="type-body"><h4>Star <span class="aka">K<sub>1,n</sub></span></h4><p>One centre joined to every other vertex, and no other edges. Shown: K<sub>1,4</sub>. It is a complete bipartite graph and a tree. The centre has degree n; every leaf has degree 1.</p><span class="rule">n leaves · centre degree n</span></div></article>
+<article class="type"><figure data-fig="A-B B-C C-D D-A A-E B-E C-E D-E" data-pos="A 40 40, B 200 40, C 200 180, D 40 180, E 120 110"></figure>
+<div class="type-body"><h4>Wheel <span class="aka">W<sub>n</sub></span></h4><p>A cycle with one extra vertex joined to all of them. Shown: a 4-cycle plus a hub, sometimes called W<sub>5</sub> (5 vertices). The hub has degree n − 1. Wheels are used as the standard colouring example: an odd rim needs 4 colours.</p><span class="rule">cycle + one hub</span></div></article>
 
 <h3 id="ty-bip"><span class="n">3.4</span>Bipartite graphs</h3>
 <article class="type"><figure data-fig="A-X A-Y B-Y C-X C-Z" data-pos="A 30 30, B 30 100, C 30 170, X 180 30, Y 180 100, Z 180 170" data-bip="ABC XYZ"></figure>
@@ -364,12 +422,30 @@
 <tr><td>DAG</td><td>Directed, no directed cycle</td><td class="num">≤ n(n−1)/2</td></tr>
 </tbody></table></div>
 
+
+<h3 id="ty-spot"><span class="n">3.10</span>Name the graph — ten examples</h3>
+<p>Cover the right column and try each one. A graph can have more than one name: K<sub>3</sub> is also C<sub>3</sub>, a complete graph, and 2-regular.</p>
+<div class="cols2">
+  <div class="card"><figure data-fig="A B C" data-pos="A 30 60, B 110 60, C 190 60"></figure><h5>1. Three vertices, no edges</h5><p>Null graph on 3 vertices. Every vertex is isolated. It is also 0-regular.</p></div>
+  <div class="card"><figure data-fig="A-B B-C C-A" data-pos="A 40 140, B 140 30, C 240 140"></figure><h5>2. Triangle</h5><p>K<sub>3</sub> and C<sub>3</sub>. Complete, 2-regular, a cycle, and not bipartite (odd cycle).</p></div>
+  <div class="card"><figure data-fig="A-B B-C C-D D-A" data-pos="A 30 30, B 150 30, C 150 140, D 30 140"></figure><h5>3. Square</h5><p>C<sub>4</sub>. 2-regular, bipartite (groups {A, C} and {B, D}), not complete.</p></div>
+  <div class="card"><figure data-fig="A-B A-C A-D" data-pos="A 40 90, B 180 30, C 180 90, D 180 150" data-bip="A BCD"></figure><h5>4. One centre, three leaves</h5><p>Star K<sub>1,3</sub>. A tree (3 edges, 4 vertices). Bipartite. Not regular.</p></div>
+  <div class="card"><figure data-fig="A-B A-B B-C" data-pos="A 30 80, B 140 80, C 250 80"></figure><h5>5. Two edges between A and B</h5><p>Multigraph, not simple. deg(A) = 2, deg(B) = 3, deg(C) = 1.</p></div>
+  <div class="card"><figure data-fig="A-A B-C" data-pos="A 50 80, B 170 40, C 170 130"></figure><h5>6. A loop and a separate edge</h5><p>Pseudograph (the loop). Two components: {A} and {B, C}. deg(A) = 2.</p></div>
+  <div class="card"><figure data-fig="A>B B>C C>A" data-pos="A 40 140, B 140 30, C 240 140"></figure><h5>7. A directed triangle</h5><p>Strongly connected: follow the arrows all the way round. Also a directed cycle.</p></div>
+  <div class="card"><figure data-fig="A>B A>C B>C" data-pos="A 40 90, B 200 30, C 200 150"></figure><h5>8. Arrows, no way back</h5><p>A DAG (no directed cycle). Weakly connected. A is a source, C is a sink. Topological order A, B, C.</p></div>
+  <div class="card"><figure data-fig="A-B:5 B-C:1 C-D:8" data-pos="A 20 80, B 110 80, C 200 80, D 290 80"></figure><h5>9. Numbers on the edges</h5><p>Weighted path. Total weight A to D = 5 + 1 + 8 = 14. Still a tree.</p></div>
+  <div class="card"><figure data-fig="A-B A-C B-D C-D D-E" data-pos="A 40 40, B 40 140, C 140 40, D 140 140, E 240 140"></figure><h5>10. Connected, one extra edge</h5><p>Not a tree: 5 vertices and 5 edges, so exactly one cycle (A–B–D–C–A). E is pendant. D is a cut vertex; D–E is a bridge.</p></div>
+</div>
+<div class="trap"><b>Do not mix the names.</b> Regular does not mean complete. Connected does not mean strongly connected. A cycle graph is 2-regular, but a 3-regular graph need not be a cycle. Always state the rule you used.</div>
+
 <div class="recap"><p class="t">Remember from Part 3</p><ul>
 <li>Simple = no loops and no parallel edges. Multigraph allows parallel edges; pseudograph allows loops too.</li>
 <li>Complete K<sub>n</sub>: n(n − 1)/2 edges, (n − 1)-regular.</li>
 <li>Bipartite ⇔ no odd cycle.</li>
 <li>Strongly connected: follow arrows from anyone to anyone. Weakly: only if you ignore arrows.</li>
 <li>Isomorphic = same structure; prove with a vertex mapping.</li>
+<li>Pₙ is a path (n − 1 edges). Cₙ is a cycle (n edges, 2-regular). A star is K<sub>1,n</sub>.</li>
 </ul></div>
 <div class="quiz" data-quiz="types"></div>
 </section>
@@ -379,7 +455,7 @@
   <p class="eyebrow">Unit V · Part 4</p>
   <h2>Representation of Graphs</h2>
   <p class="lede">A computer cannot see a drawing. We must store “who is connected to whom” as numbers. There are four standard ways; two of them are used almost everywhere.</p>
-  <p class="syl"><b>Syllabus:</b> Representation of graphs — adjacency matrix, adjacency list, incidence matrix; their programs and comparison.</p>
+  <p class="syl"><b>Syllabus:</b> Representation of graphs — adjacency matrix (including the program that checks whether an edge is present between two vertices), adjacency list, incidence matrix; programs and comparison.</p>
 </div>
 
 <h3 id="r-mat"><span class="n">4.1</span>Adjacency matrix</h3>
@@ -397,6 +473,97 @@
 <li>Diagonal is all 0 in a simple graph (no self-loops).</li>
 <li>Number of 1s = 2|E| (undirected) or |E| (directed).</li>
 </ul>
+
+<figure data-fig="0-1 0-2 1-3 2-3" data-pos="0 40 40, 1 220 40, 2 40 180, 3 220 180" data-cap="Practical graph: vertices <b>0, 1, 2, 3</b> and edges 0–1, 0–2, 1–3, 2–3. There is <b>no</b> edge 0–3."></figure>
+<div class="lab" data-edgecheck data-g="0-1 0-2 1-3 2-3" data-pos="0 40 40, 1 220 40, 2 40 180, 3 220 180"></div>
+<details class="prog" open><summary>Program — adjacency matrix, and find if an edge is present between two nodes</summary><div class="inner">
+<p>This is the practical program: numbered vertices, an n × n matrix, then one question — does the edge (u, v) exist? The answer is a single read of <code>adj[u][v]</code>.</p>
+<div class="code-wrap"><pre class="c">/* Adjacency matrix: create, display, and check if an edge is present
+   between two vertices. Vertices are numbered 0, 1, 2, ...
+   (conio.h from the old listing is not used, so it is omitted.) */
+#include &lt;stdio.h&gt;
+#define MAX 20
+
+int adj[MAX][MAX], n, edges;
+
+void createGraph() {
+    int i, j, u, v;
+
+    printf(&quot;Enter number of vertices: &quot;);
+    scanf(&quot;%d&quot;, &amp;n);
+
+    for (i = 0; i &lt; n; i++) {
+        for (j = 0; j &lt; n; j++) {
+            adj[i][j] = 0;
+        }
+    }
+
+    printf(&quot;Enter number of edges: &quot;);
+    scanf(&quot;%d&quot;, &amp;edges);
+
+    printf(&quot;Enter edges (u v):\n&quot;);
+    for (i = 0; i &lt; edges; i++) {
+        scanf(&quot;%d %d&quot;, &amp;u, &amp;v);
+        adj[u][v] = 1;
+        adj[v][u] = 1; /* undirected graph: both ways */
+    }
+}
+
+void displayMatrix() {
+    int i, j;
+    printf(&quot;\nAdjacency Matrix:\n   &quot;);
+
+    for (i = 0; i &lt; n; i++) {
+        printf(&quot;%d &quot;, i);
+    }
+    printf(&quot;\n&quot;);
+
+    for (i = 0; i &lt; n; i++) {
+        printf(&quot;%d: &quot;, i);
+        for (j = 0; j &lt; n; j++) {
+            printf(&quot;%d &quot;, adj[i][j]);
+        }
+        printf(&quot;\n&quot;);
+    }
+}
+
+void checkEdge() {
+    int u, v;
+    printf(&quot;\nEnter vertices to check edge (u v): &quot;);
+    scanf(&quot;%d %d&quot;, &amp;u, &amp;v);
+
+    if (adj[u][v] == 1) {
+        printf(&quot;Edge exists between %d and %d\n&quot;, u, v);
+    } else {
+        printf(&quot;No edge between %d and %d\n&quot;, u, v);
+    }
+}
+
+int main() {
+    createGraph();
+    displayMatrix();
+    checkEdge();
+    return 0;
+}</pre></div>
+<p class="lbl">Input</p><pre class="io">4
+4
+0 1
+0 2
+1 3
+2 3
+0 1</pre>
+<p class="lbl">Output — edge is present</p><pre class="io">Adjacency Matrix:
+   0 1 2 3
+0: 0 1 1 0
+1: 1 0 0 1
+2: 1 0 0 1
+3: 0 1 1 0
+
+Edge exists between 0 and 1</pre>
+<p class="lbl">Same graph, check 0 and 3</p><pre class="io">No edge between 0 and 3</pre>
+<div class="exam"><b>How to read the answer:</b> Row 0, column 1 is 1, so the edge exists. Row 0, column 3 is 0, so it does not. For an undirected graph the matrix is symmetric, so checking (1, 0) gives the same answer as (0, 1).</div>
+</div></details>
+
 <details class="prog"><summary>Program 1 — adjacency matrix: create, display, degrees</summary><div class="inner">
 <div class="code-wrap"><pre class="c">/* Adjacency matrix: create, display, degree of every vertex */
 #include &lt;stdio.h&gt;
@@ -622,6 +789,13 @@ int main() {
 </div>
 <div class="exam"><b>Order rule used in these notes and in most exams:</b> when a vertex has several unvisited neighbours, take them in <b>alphabetical (or numerical) order</b>, which is the order in the adjacency matrix row. A different neighbour order gives a different but still correct traversal — always state your order.</div>
 
+
+<div class="cols2">
+  <div class="card"><h5>Queue — used by BFS</h5><p>First in, first out. The vertex that has waited longest leaves first (the <b>front</b>). A new vertex joins at the <b>rear</b>.</p><p class="formula">enqueue A → [ A ]<br>dequeue A, enqueue B, C → [ B C ]</p></div>
+  <div class="card"><h5>Stack — used by DFS</h5><p>Last in, first out. The vertex pushed last sits on <b>top</b> and is the next one popped. Recursion uses the same idea: the call stack.</p><p class="formula">push A → [ A ]<br>pop A, push C then B → [ C B ]<br>pop B (B was last)</p></div>
+</div>
+<div class="law">Mark a vertex visited when it first enters the queue (BFS) or when you print it after a pop (stack DFS). If you wait too long, the same vertex is stored twice.</div>
+
 <h3 id="tr-bfs"><span class="n">5.2</span>Breadth First Search (BFS)</h3>
 <pre class="algo">BFS(G, s)
 1. Set visited[v] = 0 for every vertex v.
@@ -666,6 +840,11 @@ int main() {
 </div>
 <p>The label under each vertex shows <b>discovery / finish</b> time: when DFS first reached the vertex and when it finished all its neighbours. The side panel shows the call stack.</p>
 <div class="lab" data-play="dfs" data-g="trav" data-s="A" data-title="DFS from A"></div>
+
+<h4>DFS with a stack you can see</h4>
+<p>The player above uses recursion. This one uses an array as a stack, which is what you write in a dry-run table. Rule used here: pop the top; if it is new, print it and <b>push its unvisited neighbours from Z down to A</b>, so A comes out first. On this graph the order is the same as the recursive DFS: <b>A B D E F C G</b>.</p>
+<div class="lab" data-play="dfsstack" data-g="trav" data-s="A" data-title="DFS with an explicit stack from A"></div>
+
 <h4>Dry run table (stack version)</h4>
 <div data-dry="dfs" data-g="trav" data-s="A"></div>
 <p>Both versions print <b>A B D E F C G</b> here. Some vertices are pushed twice in the stack version (C and G above), which is why the pop step checks visited[] first and skips them.</p>
@@ -695,6 +874,16 @@ int main() {
 <div data-dry="dfs" data-g="exam" data-s="A"></div>
 <p><b>Answer:</b> DFS order = <b>A B C F E D</b>.</p>
 <div class="lab" data-play="dfs" data-g="exam" data-s="A" data-title="Check Problem 2 in the player"></div>
+
+
+<h4>Practical-style example — vertices 0, 1, 2, 3</h4>
+<p>Same graph as the adjacency-matrix program in Part 4. Start BFS at 0. The queue holds vertex <b>numbers</b>, not letters.</p>
+<figure data-fig="0-1 0-2 1-3 2-3" data-pos="0 40 40, 1 220 40, 2 40 180, 3 220 180" data-cap="Edges 0–1, 0–2, 1–3, 2–3."></figure>
+<div data-dry="bfs" data-g="0-1 0-2 1-3 2-3" data-s="0"></div>
+<p><b>BFS order = 0 1 2 3.</b> After 0 is dequeued, 1 and 2 enter the queue. 3 is a neighbour of both, but it is marked visited when 1 enqueues it, so 2 does not enqueue it again.</p>
+<div data-dry="dfs" data-g="0-1 0-2 1-3 2-3" data-s="0"></div>
+<p><b>DFS order = 0 1 3 2.</b> Pop 0, push 2 then 1 (reverse order, so 1 is on top). Pop 1, push 3. Pop 3. Pop 2.</p>
+<div class="lab" data-play="bfs" data-g="0-1 0-2 1-3 2-3" data-pos="0 40 40, 1 220 40, 2 40 180, 3 220 180" data-s="0" data-title="BFS from 0 on the practical graph"></div>
 
 <h3 id="tr-cmp"><span class="n">5.6</span>BFS vs DFS</h3>
 <div class="tbl"><table class="t">
@@ -832,7 +1021,7 @@ int main() {
 DFS (stack)    : A B D E F C G</pre></div></details>
 
 <div class="recap"><p class="t">Remember from Part 5</p><ul>
-<li>BFS = queue, level by level. DFS = stack/recursion, deep first.</li>
+<li>BFS = queue (front out, rear in), level by level. DFS = stack (top out) or recursion, deep first.</li>
 <li>Mark visited when you enqueue (BFS) or when you first reach the vertex (DFS).</li>
 <li>Both take O(V + E) with an adjacency list, O(V²) with a matrix.</li>
 <li>BFS gives the fewest-edges path. A DFS back edge means a cycle.</li>

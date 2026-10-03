@@ -1,5 +1,5 @@
 import './style.css';
-import { mountFig, mountPlay, mountLab, mountRepr, mountExplorer, mountKn, mountChecker, mountHandshake, mountCode, mountRep, mountDry } from './widgets.js';
+import { mountFig, mountPlay, mountLab, mountRepr, mountExplorer, mountKn, mountChecker, mountHandshake, mountCode, mountRep, mountDry, mountEdgeCheck } from './widgets.js';
 import { mountQuiz } from './quiz.js';
 import { esc } from './render.js';
 import { REDUCED } from './player.js';
@@ -18,6 +18,7 @@ function mountUnit(id) {
   run('[data-kn]', mountKn);
   run('[data-checker]', mountChecker);
   run('[data-handshake]', mountHandshake);
+  run('[data-edgecheck]', mountEdgeCheck);
   run('[data-rep]', mountRep);
   run('[data-dry]', mountDry);
   run('[data-quiz]', mountQuiz);

@@ -2,3 +2,13 @@ node_modules
 dist
 *.out
 .DS_Store
+
+# compiled C programs
+c/01_adj_matrix
+c/02_adj_list
+c/03_bfs
+c/04_dfs
+c/05_prim
+c/06_kruskal
+c/07_dijkstra
+c/08_topo
