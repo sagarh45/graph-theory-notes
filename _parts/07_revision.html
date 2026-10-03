@@ -1,0 +1,79 @@
+<section id="revision" class="unit" hidden>
+<div class="unit-head">
+  <p class="eyebrow">Unit V · Revision</p>
+  <h2>Revision &amp; Exam</h2>
+  <p class="lede">Everything on one page the night before the exam: formulas, complexities, traps, model answers and a mixed quiz.</p>
+</div>
+
+<h3 id="rv-sheet"><span class="n">R.1</span>Formula sheet</h3>
+<div class="tbl"><table class="t">
+<thead><tr><th>Fact</th><th>Formula</th></tr></thead>
+<tbody>
+<tr><td>Graph</td><td class="formula">G = (V, E), order n = |V|, size e = |E|</td></tr>
+<tr><td>Handshake lemma</td><td class="formula">Σ deg(v) = 2e</td></tr>
+<tr><td>Digraph degrees</td><td class="formula">Σ in(v) = Σ out(v) = e</td></tr>
+<tr><td>Odd-degree vertices</td><td>Always an even number of them</td></tr>
+<tr><td>Max edges, simple undirected</td><td class="formula">n(n − 1) / 2</td></tr>
+<tr><td>Max edges, simple directed</td><td class="formula">n(n − 1)</td></tr>
+<tr><td>Complete graph K<sub>n</sub></td><td class="formula">n(n − 1)/2 edges, every degree n − 1</td></tr>
+<tr><td>k-regular graph</td><td class="formula">nk / 2 edges</td></tr>
+<tr><td>Complete bipartite K<sub>m,n</sub></td><td class="formula">m · n edges</td></tr>
+<tr><td>Tree / spanning tree</td><td class="formula">n − 1 edges</td></tr>
+<tr><td>Forest with c trees</td><td class="formula">n − c edges</td></tr>
+<tr><td>Spanning trees of K<sub>n</sub> (Cayley)</td><td class="formula">n<sup>n − 2</sup></td></tr>
+<tr><td>Adjacency matrix ones</td><td class="formula">2e (undirected), e (directed)</td></tr>
+<tr><td>Adjacency list nodes</td><td class="formula">2e (undirected), e (directed)</td></tr>
+</tbody></table></div>
+
+<h3 id="rv-cx"><span class="n">R.2</span>Complexity table</h3>
+<div class="tbl"><table class="t">
+<thead><tr><th>Algorithm</th><th>Matrix</th><th>List / heap</th><th>Uses</th></tr></thead>
+<tbody>
+<tr><td>BFS</td><td class="num">O(n²)</td><td class="num">O(n + e)</td><td>Queue</td></tr>
+<tr><td>DFS</td><td class="num">O(n²)</td><td class="num">O(n + e)</td><td>Stack / recursion</td></tr>
+<tr><td>Prim</td><td class="num">O(n²)</td><td class="num">O(e log n)</td><td>Priority queue</td></tr>
+<tr><td>Kruskal</td><td>—</td><td class="num">O(e log e)</td><td>Sort + union-find</td></tr>
+<tr><td>Dijkstra</td><td class="num">O(n²)</td><td class="num">O((n + e) log n)</td><td>Priority queue</td></tr>
+<tr><td>Topological sort</td><td class="num">O(n²)</td><td class="num">O(n + e)</td><td>Queue of in-degree 0</td></tr>
+</tbody></table></div>
+
+<h3 id="rv-trap"><span class="n">R.3</span>Common mistakes</h3>
+<div class="trap"><b>1.</b> Path length is the number of <b>edges</b>, not vertices.</div>
+<div class="trap"><b>2.</b> A self-loop adds <b>2</b> to the degree in an undirected graph.</div>
+<div class="trap"><b>3.</b> In BFS mark a vertex visited when it is <b>enqueued</b>, or it may enter the queue twice.</div>
+<div class="trap"><b>4.</b> BFS/DFS order depends on the neighbour order. State “neighbours taken in alphabetical order”.</div>
+<div class="trap"><b>5.</b> For a disconnected graph, one BFS/DFS does not reach everything — restart from an unvisited vertex.</div>
+<div class="trap"><b>6.</b> Weakly connected is <b>not</b> strongly connected. Check that arrows allow travel both ways.</div>
+<div class="trap"><b>7.</b> Same vertex count, edge count and degrees do <b>not</b> prove two graphs are isomorphic. Give the mapping.</div>
+<div class="trap"><b>8.</b> Dijkstra fails with negative weights; topological sort fails on any directed cycle.</div>
+
+<h3 id="rv-qa"><span class="n">R.4</span>Model answers</h3>
+<details class="qa"><summary><span class="qn">Q1</span>Define a graph. Differentiate between directed and undirected graphs. (5 marks)</summary><div class="ans">
+<p>A graph G = (V, E) is a non-linear data structure made of a finite non-empty set V of vertices and a set E of edges, where each edge connects a pair of vertices.</p>
+<p>In an <b>undirected</b> graph each edge is an unordered pair (u, v) = (v, u) and can be travelled both ways; its adjacency matrix is symmetric; each vertex has one degree; maximum edges n(n − 1)/2. In a <b>directed</b> graph each edge is an ordered pair &lt;u, v&gt; from tail u to head v and can be travelled one way only; its matrix need not be symmetric; each vertex has an in-degree and an out-degree; maximum edges n(n − 1). Draw one small example of each.</p></div></details>
+<details class="qa"><summary><span class="qn">Q2</span>Explain the following terms with an example: degree, path, cycle, loop, multiple edges, connected graph.</summary><div class="ans">
+<p>Use Figure 1 of Part 1. <b>Degree</b> = edges at a vertex, deg(B) = 3. <b>Path</b> = sequence of adjacent vertices without repetition, A–B–D–F. <b>Cycle</b> = path returning to its start, B–C–E–D–B. <b>Loop</b> = edge (v, v). <b>Multiple edges</b> = two or more edges between the same pair. <b>Connected graph</b> = a path exists between every pair of vertices.</p></div></details>
+<details class="qa"><summary><span class="qn">Q3</span>Prove that the number of odd-degree vertices in any graph is even.</summary><div class="ans">
+<p>By the handshake lemma Σ deg(v) = 2e, which is even. Split the sum into even-degree vertices and odd-degree vertices. The even part is even, so the odd part = 2e − (even) is also even. A sum of odd numbers is even only when there is an even count of them. Hence the number of odd-degree vertices is even. ∎</p></div></details>
+<details class="qa"><summary><span class="qn">Q4</span>Explain any five types of graphs with diagrams.</summary><div class="ans">
+<p>Choose from Part 3: simple, multigraph, weighted, regular, complete, bipartite, strongly/weakly connected, DAG, isomorphic. For each: one-line rule + small diagram + one property (e.g. K<sub>n</sub> has n(n − 1)/2 edges).</p></div></details>
+<details class="qa"><summary><span class="qn">Q5</span>Represent a given graph using an adjacency matrix and an adjacency list. Compare the two.</summary><div class="ans">
+<p>Draw the n × n matrix with 1 where an edge exists (symmetric for undirected), and the array of head pointers with linked lists of neighbours. Comparison: matrix space O(n²) vs list O(n + e); edge check O(1) vs O(deg); neighbour listing O(n) vs O(deg); matrix for dense graphs, list for sparse graphs. Use the table in 4.6.</p></div></details>
+<details class="qa"><summary><span class="qn">Q6</span>Write an algorithm for BFS and trace it on a graph.</summary><div class="ans">
+<p>Write the algorithm in 5.2. Then trace with the dry-run table: columns Step, Dequeue, Enqueue, Queue, Output. Finish with the BFS order and draw the BFS spanning tree. State complexity O(n + e) with lists.</p></div></details>
+<details class="qa"><summary><span class="qn">Q7</span>Write a C function for DFS. What is its time complexity?</summary><div class="ans">
+<p>The recursive dfs() of Program 4: mark visited, print, recurse on each unvisited neighbour. Time O(n²) with an adjacency matrix because each call scans a full row; O(n + e) with an adjacency list. Space O(n) for visited[] and the recursion stack.</p></div></details>
+<details class="qa"><summary><span class="qn">Q8</span>Compare BFS and DFS.</summary><div class="ans"><p>Use the table in 5.6: queue vs stack, level order vs depth order, both O(n + e), BFS gives shortest unweighted path, DFS detects cycles with back edges, applications of each.</p></div></details>
+<details class="qa"><summary><span class="qn">Q9</span>What is a spanning tree? Find the MST of a graph using Prim's / Kruskal's algorithm.</summary><div class="ans"><p>Definition from 6.1. Show the steps: for Prim a table of key/parent per step; for Kruskal the sorted edge list with taken/rejected marks. Draw the final tree and write the total weight. Mention both are greedy and give n − 1 edges.</p></div></details>
+<details class="qa"><summary><span class="qn">Q10</span>Find the shortest path from a source using Dijkstra's algorithm.</summary><div class="ans"><p>Make a table with one column per vertex and one row per step. Each row: the vertex fixed in this step and the updated dist values (∞ at the start). Circle the fixed values. At the end read every path from prev[]. Note the condition: no negative weights.</p></div></details>
+
+<h3 id="rv-quiz"><span class="n">R.5</span>Mixed quiz</h3>
+<div class="quiz" data-quiz="mixed"></div>
+<p class="foot">Every figure, animation and dry-run table in these notes is produced by the same JavaScript engine, and every C program was compiled with gcc and run on the inputs shown, so the figures, the player and the program output agree.</p>
+</section>
+<nav class="pager" id="pager" aria-label="Previous and next part"></nav>
+</main>
+</div>
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,1319 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Unit V · Graphs — Interactive Notes</title>
+<meta name="description" content="Unit V Graphs in simple English: definitions, terminology, types, representations, BFS, DFS, MST (Prim, Kruskal), Dijkstra and topological sort with step-by-step visualizers and tested C programs.">
+<meta name="theme-color" content="#3A45B0">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600;700&display=swap">
+</head>
+<body>
+<header class="top">
+  <div class="top-in">
+    <div class="brand">
+      <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-label="Graphs logo" role="img"><path d="M8 9 L24 7 M8 9 L13 24 M24 7 L13 24 M24 7 L26 22 M13 24 L26 22" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><circle cx="8" cy="9" r="4" fill="#fff" stroke="currentColor" stroke-width="2.4"/><circle cx="24" cy="7" r="4" fill="currentColor"/><circle cx="13" cy="24" r="4" fill="#fff" stroke="currentColor" stroke-width="2.4"/><circle cx="26" cy="22" r="3.2" fill="#fff" stroke="currentColor" stroke-width="2.4"/></svg>
+      <b>Unit V · Graphs</b><span>Data Structures · B.Tech IT · WIT Solapur</span>
+    </div>
+    <nav class="tabs" aria-label="Parts of this unit">
+      <a href="#basics"><span class="no">1</span><span class="tl">Graph Basics</span></a>
+      <a href="#terms"><span class="no">2</span><span class="tl">Terminology</span></a>
+      <a href="#types"><span class="no">3</span><span class="tl">Types of Graph</span></a>
+      <a href="#repr"><span class="no">4</span><span class="tl">Representation</span></a>
+      <a href="#traversal"><span class="no">5</span><span class="tl">Traversal (BFS &amp; DFS)</span></a>
+      <a href="#algos" class="adv"><span class="no">6</span><span class="tl">MST &amp; Shortest Path</span></a>
+      <a href="#revision"><span class="no">✓</span><span class="tl">Revision &amp; Exam</span></a>
+    </nav>
+  </div>
+</header>
+
+<div class="shell">
+<aside id="toc" aria-label="Sections in this part"></aside>
+<main>
+<section id="basics" class="unit">
+<div class="unit-head">
+  <p class="eyebrow">Unit V · Part 1</p>
+  <h2>Graph Basics</h2>
+  <p class="lede">What a graph is, why almost every network in the real world is a graph, and the one counting rule you will use in every answer.</p>
+  <p class="syl"><b>Syllabus:</b> Definition of graph, directed and undirected graphs, basic properties.</p>
+</div>
+
+<h3 id="b-def"><span class="n">1.1</span>What is a graph?</h3>
+<div class="def"><span class="t">Definition (write this in the exam)</span>
+<p>A <b>graph</b> G is a pair of two finite sets, <b>G = (V, E)</b>, where V is a non-empty set of <b>vertices</b> (also called nodes) and E is a set of <b>edges</b>. Each edge is a pair of vertices (u, v) and shows that u and v are connected.</p></div>
+<div class="easy"><span class="t">In simple words</span>
+<p>A graph is <b>dots joined by lines</b>. The dots are vertices, the lines are edges. That is all. A city map (cities and roads), Instagram (people and follows) and the internet (computers and cables) are all graphs.</p></div>
+<div class="terms-grid">
+  <figure data-fig="intro" data-cap="<b>Figure 1.</b> A graph with 6 vertices and 8 edges."></figure>
+  <div>
+    <p class="formula">V = { A, B, C, D, E, F }</p>
+    <p class="formula">E = { (A,B), (A,C), (B,C), (B,D),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(C,E), (D,E), (D,F), (E,F) }</p>
+    <p>|V| = 6 is the <b>order</b> of the graph. |E| = 8 is the <b>size</b> of the graph.</p>
+    <p class="muted" style="font-size:15px">A graph is a <b>non-linear</b> data structure: one vertex can be connected to many others, in any pattern. There is no first or last element and no root.</p>
+  </div>
+</div>
+<div class="law">Graph = vertices + edges. Nothing else matters — not the position of the dots, not the length or shape of the lines.</div>
+<p>The same graph can be drawn in many ways. If you move vertex F to the top of the page, it is still the same graph, because the same pairs are connected. Only the <b>connections</b> matter.</p>
+
+<h3 id="b-life"><span class="n">1.2</span>Graphs around you</h3>
+<p>Whenever things are connected to other things, you have a graph. Learning graphs means learning how Google Maps, social media and the internet work underneath.</p>
+<div class="cols3">
+  <div class="card"><h5>Road map</h5><p>Cities are vertices, roads are edges. The road length is the <b>weight</b>. Google Maps runs a shortest-path algorithm (Part 6).</p>
+    <figure data-fig="P-S:250 P-M:150 S-H:300 M-H:710" data-pos="P 70 100, S 210 100, M 20 20, H 320 30" data-scale="0.7" data-cap="M Mumbai · P Pune · S Solapur · H Hyderabad (km)"></figure></div>
+  <div class="card"><h5>Friends network</h5><p>People are vertices; a friendship is an edge. Friendship goes both ways, so the graph is <b>undirected</b>.</p>
+    <figure data-fig="R-S R-T S-T T-U U-V" data-pos="R 20 60, S 100 10, T 110 100, U 200 60, V 280 60" data-scale="0.7"></figure></div>
+  <div class="card"><h5>Instagram follows</h5><p>If you follow someone, they may not follow you back. Each follow is an arrow, so this graph is <b>directed</b>.</p>
+    <figure data-fig="P>Q Q>P P>R R>S Q>S" data-pos="P 30 60, Q 140 10, R 140 110, S 260 60" data-scale="0.7"></figure></div>
+  <div class="card"><h5>Course prerequisites</h5><p>“C before Data Structures before Algorithms.” Arrows with no loop: a <b>DAG</b>. Topological sort gives a valid study order.</p>
+    <figure data-fig="C>D D>A M>A" data-pos="C 20 30, D 140 30, A 260 70, M 140 110" data-scale="0.7" data-cap="C programming → D (data structures) → A (algorithms) ← M (maths)"></figure></div>
+  <div class="card"><h5>Computer network</h5><p>Routers are vertices and cables are edges. Routing protocols such as OSPF use Dijkstra to send packets on the fastest path.</p></div>
+  <div class="card"><h5>Web pages</h5><p>Each page is a vertex and each hyperlink is a directed edge. Search engines walk this graph with BFS to discover pages.</p></div>
+</div>
+
+<h3 id="b-dir"><span class="n">1.3</span>Undirected and directed graphs</h3>
+<div class="row">
+  <figure data-fig="A-B A-C B-C C-D" data-pos="A 30 30, B 160 30, C 95 130, D 230 130" data-cap="<b>Undirected.</b> Edge (A, B) = edge (B, A). You can travel both ways."></figure>
+  <figure data-fig="A>B A>C B>C D>C" data-pos="A 30 30, B 160 30, C 95 130, D 230 130" data-cap="<b>Directed (digraph).</b> ⟨A, B⟩ means A → B only."></figure>
+</div>
+<div class="tbl"><table class="t">
+<thead><tr><th></th><th>Undirected graph</th><th>Directed graph (digraph)</th></tr></thead>
+<tbody>
+<tr><td><b>Edge</b></td><td>Unordered pair (u, v). (u, v) and (v, u) are the same edge.</td><td>Ordered pair &lt;u, v&gt;. u is the <b>tail</b> (start), v is the <b>head</b> (end).</td></tr>
+<tr><td><b>Drawn as</b></td><td>A plain line</td><td>An arrow</td></tr>
+<tr><td><b>Degree</b></td><td>One number: degree</td><td>Two numbers: in-degree and out-degree</td></tr>
+<tr><td><b>Max edges (simple)</b></td><td>n(n − 1) / 2</td><td>n(n − 1)</td></tr>
+<tr><td><b>Adjacency matrix</b></td><td>Always symmetric</td><td>Usually not symmetric</td></tr>
+<tr><td><b>Example</b></td><td>Facebook friends, roads with two-way traffic</td><td>Instagram follows, one-way streets, web links</td></tr>
+</tbody></table></div>
+<div class="trap"><b>Common mistake:</b> Writing directed edges with round brackets. Use (u, v) for undirected edges and &lt;u, v&gt; for directed edges. The order inside &lt; &gt; matters.</div>
+
+<h3 id="b-hand"><span class="n">1.4</span>Degree and the handshake rule</h3>
+<p>The <b>degree</b> of a vertex is the number of edges touching it. In Figure 1, deg(A) = 2 and deg(B) = 3.</p>
+<div class="law">Handshake lemma: in every undirected graph, the sum of all degrees = 2 × (number of edges).</div>
+<span class="big-f">Σ deg(v) = 2|E|</span>
+<p><b>Why it is true:</b> every edge has two ends. When you add up the degrees, each edge is counted once at each end, so it is counted exactly twice. In Figure 1: 2 + 3 + 3 + 3 + 3 + 2 = 16 = 2 × 8.</p>
+<p><b>Result you get for free:</b> the number of vertices with an <b>odd degree is always even</b>. The total 2|E| is even; the even degrees add up to an even number, so the odd degrees must also add up to an even number, and that needs an even count of them.</p>
+<div class="lab" data-handshake></div>
+<div class="exam"><b>Exam use:</b> “Can a graph have 5 vertices with degrees 3, 3, 3, 3, 3?” No. The sum is 15, which is odd, but the sum of degrees must be 2|E| (even). Equally: it would have 5 odd-degree vertices, which is an odd count.</div>
+<p>For a <b>directed</b> graph the rule becomes: Σ in-degree = Σ out-degree = |E|. Each arrow leaves one vertex and enters one vertex.</p>
+
+<h3 id="b-count"><span class="n">1.5</span>How many edges can a graph have?</h3>
+<p>In a <b>simple</b> graph (no loops, no repeated edges) every pair of vertices can have at most one edge. With n vertices there are n(n − 1)/2 pairs.</p>
+<div class="tbl"><table class="t">
+<thead><tr><th>Graph</th><th>Minimum edges</th><th>Maximum edges</th><th>n = 5</th></tr></thead>
+<tbody>
+<tr><td>Simple undirected</td><td>0</td><td>n(n − 1)/2</td><td class="num">10</td></tr>
+<tr><td>Simple directed</td><td>0</td><td>n(n − 1)</td><td class="num">20</td></tr>
+<tr><td>Connected undirected</td><td>n − 1 (a tree)</td><td>n(n − 1)/2</td><td class="num">4 to 10</td></tr>
+</tbody></table></div>
+<p>A graph with close to the maximum number of edges is <b>dense</b>. A graph with few edges (about n) is <b>sparse</b>. Most real graphs, like road maps, are sparse. This decides which representation to use in Part 4.</p>
+
+<h3 id="b-tree"><span class="n">1.6</span>Graph vs tree</h3>
+<p>In Unit IV you studied trees. A tree is just a special graph: <b>connected and with no cycle</b>.</p>
+<div class="row">
+  <figure data-fig="tree" data-cap="<b>Tree.</b> 6 vertices, 5 edges, exactly one path between any two vertices."></figure>
+  <figure data-fig="A-B A-C B-D B-E C-F E-F D-E" data-pos="A 150 30, B 80 110, C 220 110, D 40 190, E 120 190, F 220 190" data-ec="E-F=hot D-E=hot" data-cap="<b>Graph.</b> Add 2 more edges (red) and you get cycles. Now there are many paths."></figure>
+</div>
+<div class="tbl"><table class="t">
+<thead><tr><th></th><th>Tree</th><th>Graph</th></tr></thead>
+<tbody>
+<tr><td>Root</td><td>One special root</td><td>No root</td></tr>
+<tr><td>Cycles</td><td>Never</td><td>Allowed</td></tr>
+<tr><td>Edges for n vertices</td><td>Exactly n − 1</td><td>0 to n(n − 1)/2</td></tr>
+<tr><td>Path between two vertices</td><td>Exactly one</td><td>Zero, one or many</td></tr>
+<tr><td>Connected?</td><td>Always</td><td>Maybe not</td></tr>
+<tr><td>Model</td><td>Hierarchy (parent–child)</td><td>Network (any relation)</td></tr>
+<tr><td>Traversal needs visited[]?</td><td>No</td><td>Yes, to avoid looping on cycles</td></tr>
+</tbody></table></div>
+<div class="law">Every tree is a graph, but not every graph is a tree.</div>
+
+<h3 id="b-map"><span class="n">1.7</span>Map of this unit</h3>
+<p>Each part builds on the one before. Parts 1–5 are the syllabus; Part 6 takes you beyond it into the algorithms used in real software.</p>
+<div class="gmap">
+  <a href="#terms"><span class="pt">PART 2</span><b>Terminology</b><small>Degree, path, cycle, connected, component.</small></a>
+  <a href="#types"><span class="pt">PART 3</span><b>Types of graph</b><small>Simple, multi, complete, bipartite, DAG, isomorphic…</small></a>
+  <a href="#repr"><span class="pt">PART 4</span><b>Representation</b><small>Matrix, list, incidence matrix, edge list.</small></a>
+  <a href="#traversal"><span class="pt">PART 5</span><b>BFS &amp; DFS</b><small>Visit every vertex once using a queue or a stack.</small></a>
+  <a href="#algos" class="adv"><span class="pt">PART 6 · ADVANCED</span><b>MST &amp; shortest path</b><small>Prim, Kruskal, Dijkstra, topological sort.</small></a>
+  <a href="#revision"><span class="pt">✓</span><b>Revision &amp; exam</b><small>Cheat sheet, model answers, mixed quiz.</small></a>
+</div>
+
+<div class="recap"><p class="t">Remember from Part 1</p><ul>
+<li>G = (V, E): a set of vertices and a set of edges.</li>
+<li>Undirected edge (u, v) goes both ways; directed edge &lt;u, v&gt; goes from u to v only.</li>
+<li>Σ deg = 2|E|, so the number of odd-degree vertices is even.</li>
+<li>Max edges: n(n − 1)/2 undirected, n(n − 1) directed.</li>
+<li>A tree is a connected graph with no cycle and n − 1 edges.</li>
+</ul></div>
+<div class="quiz" data-quiz="basics"></div>
+</section>
+
+<section id="terms" class="unit" hidden>
+<div class="unit-head">
+  <p class="eyebrow">Unit V · Part 2</p>
+  <h2>Graph Terminology</h2>
+  <p class="lede">The words every graph question uses. Each term comes with a picture and a one-line meaning you can write in the exam.</p>
+  <p class="syl"><b>Syllabus:</b> Graph terminology — adjacent vertices and edges, degree, in-degree, out-degree, path, cycle, loop, multiple edges, connected graph.</p>
+</div>
+
+<h3 id="t-adj"><span class="n">2.1</span>Adjacent, incident, neighbour</h3>
+<div class="terms-grid">
+  <figure data-fig="intro" data-nc="B=cur A=front C=front D=front" data-ec="A-B=cand B-C=cand B-D=cand" data-cap="Neighbours of B (green) and the edges incident on B (dashed)."></figure>
+  <div>
+    <p><b>Adjacent vertices:</b> two vertices joined by an edge. A and B are adjacent. A and D are not.</p>
+    <p><b>Neighbours</b> of v: all vertices adjacent to v. Neighbours of B = {A, C, D}.</p>
+    <p><b>Incident edge:</b> an edge is incident on the two vertices at its ends. Edge (B, D) is incident on B and on D.</p>
+    <p><b>Adjacent edges:</b> two edges that share a common vertex. (A, B) and (B, D) are adjacent because both touch B.</p>
+  </div>
+</div>
+
+<h3 id="t-deg"><span class="n">2.2</span>Degree, in-degree and out-degree</h3>
+<div class="row">
+  <figure data-fig="A-B A-C B-C B-D C-E D-E E-F G" data-pos="A 40 60, B 140 30, C 120 150, D 250 50, E 240 170, F 340 190, G 350 60" data-nl="A=2 B=3 C=3 D=2 E=3 F=1 G=0" data-cap="Undirected: the label under each vertex is its degree. F is <b>pendant</b>, G is <b>isolated</b>."></figure>
+  <figure data-fig="A>B A>C B>C C>D D>B D>E F>E" data-pos="A 40 100, B 150 40, C 150 170, D 260 100, E 360 100, F 360 200" data-nl="A=0/2 B=2/1 C=2/1 D=1/2 E=2/0 F=0/1" data-cap="Directed: label = in / out. A and F are <b>sources</b>, E is a <b>sink</b>."></figure>
+</div>
+<div class="tbl"><table class="t">
+<thead><tr><th>Term</th><th>Meaning</th><th>Example above</th></tr></thead>
+<tbody>
+<tr><td><b>Degree</b> deg(v)</td><td>Number of edges touching v. A self-loop counts <b>2</b>.</td><td>deg(B) = 3</td></tr>
+<tr><td><b>In-degree</b> in(v)</td><td>Number of arrows coming <b>into</b> v (directed graph)</td><td>in(E) = 2</td></tr>
+<tr><td><b>Out-degree</b> out(v)</td><td>Number of arrows going <b>out of</b> v</td><td>out(D) = 2</td></tr>
+<tr><td><b>Isolated vertex</b></td><td>Degree 0 — no edges at all</td><td>G</td></tr>
+<tr><td><b>Pendant vertex</b> (leaf)</td><td>Degree exactly 1</td><td>F</td></tr>
+<tr><td><b>Source</b></td><td>In-degree 0 — nothing points to it</td><td>A, F (directed)</td></tr>
+<tr><td><b>Sink</b></td><td>Out-degree 0 — it points to nothing</td><td>E (directed)</td></tr>
+<tr><td><b>Degree of a graph</b></td><td>Maximum degree of any vertex, written Δ(G)</td><td>3 (undirected)</td></tr>
+</tbody></table></div>
+<div class="exam"><b>Quick check:</b> deg(v) = in(v) + out(v) in a directed graph. Total in-degrees = total out-degrees = number of edges. In the digraph above both add up to 7.</div>
+
+<h3 id="t-path"><span class="n">2.3</span>Walk, path and cycle</h3>
+<div class="row">
+  <figure data-fig="intro" data-nc="A=cur B=path D=path F=cur" data-ec="A-B=tree B-D=tree D-F=tree" data-cap="<b>Path</b> A → B → D → F. Length = 3 edges."></figure>
+  <figure data-fig="intro" data-nc="B=cur C=path E=path D=path" data-ec="B-C=back C-E=back D-E=back B-D=back" data-cap="<b>Cycle</b> B → C → E → D → B. Length 4."></figure>
+</div>
+<div class="tbl"><table class="t">
+<thead><tr><th>Term</th><th>Rule</th><th>Example (Figure 1)</th></tr></thead>
+<tbody>
+<tr><td><b>Walk</b></td><td>Any sequence of vertices where each next vertex is adjacent. Vertices and edges may repeat.</td><td>A B C A B D</td></tr>
+<tr><td><b>Trail</b></td><td>A walk with <b>no repeated edge</b> (vertices may repeat)</td><td>A B C E D B</td></tr>
+<tr><td><b>Path</b> (simple path)</td><td>A walk with <b>no repeated vertex</b></td><td>A B D F</td></tr>
+<tr><td><b>Length</b> of a path</td><td>Number of <b>edges</b> on it (one less than the number of vertices)</td><td>A B D F has length 3</td></tr>
+<tr><td><b>Closed walk</b></td><td>Starts and ends at the same vertex</td><td>A B C A</td></tr>
+<tr><td><b>Cycle</b> (circuit)</td><td>A closed path: no repeated vertex except first = last, length ≥ 3</td><td>B C E D B</td></tr>
+<tr><td><b>Shortest path</b></td><td>The path with the fewest edges (or the least total weight)</td><td>A to F: A B D F (3)</td></tr>
+</tbody></table></div>
+<div class="trap"><b>Common mistake:</b> Counting vertices as the length. The path A → B → D → F has 4 vertices but length <b>3</b>. Length is always the number of edges.</div>
+
+<h3 id="t-loop"><span class="n">2.4</span>Loops and multiple edges</h3>
+<div class="terms-grid">
+  <figure data-fig="A-B A-B B-C C-C A-C" data-pos="A 40 120, B 160 40, C 280 120" data-ec="#0=hot #1=hot #3=back" data-cap="Two parallel edges A–B (red) and a self-loop on C (dashed)."></figure>
+  <div>
+    <p><b>Self-loop:</b> an edge that starts and ends at the <b>same</b> vertex, like (C, C). In an undirected graph a loop adds <b>2</b> to the degree, so deg(C) = 4 here.</p>
+    <p><b>Multiple (parallel) edges:</b> two or more edges between the <b>same pair</b> of vertices, like the two A–B edges.</p>
+    <p>A graph with no loops and no multiple edges is called <b>simple</b>. Most algorithms in this unit assume a simple graph.</p>
+  </div>
+</div>
+
+<h3 id="t-conn"><span class="n">2.5</span>Connected, components, subgraph</h3>
+<div class="row">
+  <figure data-fig="comps" data-nc="A=done B=done C=done D=front E=front F=cur" data-cap="Not connected. <b>3 components</b>: {A, B, C}, {D, E}, {F}."></figure>
+  <figure data-fig="A-B B-C A-C C-D D-E E-F D-F" data-pos="A 30 40, B 30 170, C 130 105, D 240 105, E 340 40, F 340 170" data-nc="C=cur D=cur" data-ec="C-D=hot" data-cap="Edge C–D is a <b>bridge</b>. C and D are <b>cut vertices</b>."></figure>
+</div>
+<div class="tbl"><table class="t">
+<thead><tr><th>Term</th><th>Meaning</th></tr></thead>
+<tbody>
+<tr><td><b>Connected graph</b></td><td>There is a path between <b>every</b> pair of vertices. You can reach anyone from anyone.</td></tr>
+<tr><td><b>Disconnected graph</b></td><td>At least one pair of vertices has no path between them.</td></tr>
+<tr><td><b>Connected component</b></td><td>A largest connected piece of the graph. A connected graph has exactly one component.</td></tr>
+<tr><td><b>Subgraph</b></td><td>A graph made from some of the vertices and some of the edges of G (every edge must join chosen vertices).</td></tr>
+<tr><td><b>Spanning subgraph</b></td><td>A subgraph that keeps <b>all</b> vertices of G. A spanning tree is a spanning subgraph that is a tree.</td></tr>
+<tr><td><b>Bridge</b> (cut edge)<span class="adv-tag">Advanced</span></td><td>An edge whose removal increases the number of components.</td></tr>
+<tr><td><b>Cut vertex</b> (articulation point)<span class="adv-tag">Advanced</span></td><td>A vertex whose removal (with its edges) increases the number of components.</td></tr>
+</tbody></table></div>
+<p>Why care? In a computer network a bridge is a single cable whose failure splits the network. Network engineers find bridges with a DFS-based algorithm and add backup links.</p>
+
+<h3 id="t-lab"><span class="n">2.6</span>Term explorer</h3>
+<p>Tap a vertex to see its degree, neighbours and incident edges. Tap a second vertex to see every simple path between them, with the shortest one drawn thick. Switch to <b>Directed</b> to explore in-degree, out-degree, source and sink.</p>
+<div class="lab" data-explorer></div>
+
+<h3 id="t-all"><span class="n">2.7</span>All terms at a glance</h3>
+<div class="tbl"><table class="t">
+<thead><tr><th>Term</th><th>One-line definition</th></tr></thead>
+<tbody>
+<tr><td><b>Vertex</b> (node)</td><td>A point of the graph; stores one item of data.</td></tr>
+<tr><td><b>Edge</b> (arc, link)</td><td>A connection between two vertices.</td></tr>
+<tr><td><b>Order</b> / <b>size</b></td><td>Number of vertices |V| / number of edges |E|.</td></tr>
+<tr><td><b>Adjacent</b></td><td>Two vertices joined by an edge, or two edges sharing a vertex.</td></tr>
+<tr><td><b>Incident</b></td><td>An edge is incident on its two end vertices.</td></tr>
+<tr><td><b>Degree</b></td><td>Number of edges touching a vertex (loop counts 2).</td></tr>
+<tr><td><b>In / out-degree</b></td><td>Arrows entering / leaving a vertex.</td></tr>
+<tr><td><b>Path</b></td><td>Sequence of adjacent vertices with no vertex repeated.</td></tr>
+<tr><td><b>Cycle</b></td><td>A path that comes back to its start.</td></tr>
+<tr><td><b>Loop</b></td><td>An edge from a vertex to itself.</td></tr>
+<tr><td><b>Multiple edges</b></td><td>More than one edge between the same two vertices.</td></tr>
+<tr><td><b>Connected</b></td><td>A path exists between every pair of vertices.</td></tr>
+<tr><td><b>Weight</b></td><td>A number on an edge: distance, cost or time.</td></tr>
+</tbody></table></div>
+
+<div class="recap"><p class="t">Remember from Part 2</p><ul>
+<li>Degree counts edges at a vertex; a loop adds 2.</li>
+<li>Path = no repeated vertex. Length = number of edges.</li>
+<li>Cycle = path that returns to its start.</li>
+<li>Isolated = degree 0, pendant = degree 1, source = in-degree 0, sink = out-degree 0.</li>
+<li>Connected = one piece. Each piece of a disconnected graph is a component.</li>
+</ul></div>
+<div class="quiz" data-quiz="terms"></div>
+</section>
+
+<section id="types" class="unit" hidden>
+<div class="unit-head">
+  <p class="eyebrow">Unit V · Part 3</p>
+  <h2>Types of Graph</h2>
+  <p class="lede">Graphs get a name from one rule they follow. Learn the rule and the picture together — the exam asks for both.</p>
+  <p class="syl"><b>Syllabus:</b> Types of graph — simple, multigraph, directed, undirected, weighted, regular, complete, strongly and weakly connected, isomorphic graphs.</p>
+</div>
+
+<h3 id="ty-edges"><span class="n">3.1</span>Null, simple, multigraph, pseudograph</h3>
+<article class="type"><figure data-fig="A B C D" data-pos="A 30 30, B 130 30, C 30 110, D 130 110"></figure>
+<div class="type-body"><h4>Null graph <span class="aka">(edgeless / empty graph)</span></h4><p>Vertices but <b>no edges</b>. Every vertex is isolated. A null graph with one vertex is the <b>trivial graph</b>.</p><span class="rule">|E| = 0</span></div></article>
+<article class="type"><figure data-fig="A-B B-C C-D D-A A-C" data-pos="A 30 30, B 150 30, C 150 130, D 30 130"></figure>
+<div class="type-body"><h4>Simple graph</h4><p>At most <b>one edge</b> between any two vertices and <b>no self-loops</b>. This is the default meaning of “graph” in most questions.</p><span class="rule">no loops · no parallel edges</span></div></article>
+<article class="type"><figure data-fig="A-B A-B B-C C-D C-D C-D" data-pos="A 30 80, B 120 30, C 200 110, D 60 150"></figure>
+<div class="type-body"><h4>Multigraph</h4><p>Allows <b>multiple (parallel) edges</b> between the same pair, but no loops. Example: two different train routes between the same two cities.</p><span class="rule">parallel edges allowed</span></div></article>
+<article class="type"><figure data-fig="A-B A-B B-C C-C A-A" data-pos="A 40 110, B 130 40, C 210 110"></figure>
+<div class="type-body"><h4>Pseudograph</h4><p>Allows <b>both</b> parallel edges and <b>self-loops</b>. The most general undirected graph.</p><span class="rule">loops + parallel edges allowed</span></div></article>
+
+<h3 id="ty-dir"><span class="n">3.2</span>Directed, undirected, weighted</h3>
+<article class="type"><figure data-fig="A-B B-C C-A C-D" data-pos="A 30 40, B 150 40, C 90 130, D 210 130"></figure>
+<div class="type-body"><h4>Undirected graph</h4><p>Edges have no direction. (u, v) = (v, u). Movement is allowed both ways.</p></div></article>
+<article class="type"><figure data-fig="A>B B>C C>A C>D" data-pos="A 30 40, B 150 40, C 90 130, D 210 130"></figure>
+<div class="type-body"><h4>Directed graph <span class="aka">(digraph)</span></h4><p>Every edge has a direction, drawn as an arrow. &lt;u, v&gt; ≠ &lt;v, u&gt;.</p></div></article>
+<article class="type"><figure data-fig="A-B:4 B-C:2 C-A:7 C-D:3" data-pos="A 30 40, B 150 40, C 90 130, D 210 130"></figure>
+<div class="type-body"><h4>Weighted graph <span class="aka">(network)</span></h4><p>Each edge carries a number called its <b>weight</b> or <b>cost</b> — distance, time, price, bandwidth. Weighted graphs are the input for MST and shortest-path algorithms (Part 6). A weighted graph can be directed or undirected.</p></div></article>
+
+<h3 id="ty-reg"><span class="n">3.3</span>Regular and complete graphs</h3>
+<article class="type"><figure data-fig="A-B B-C C-D D-E E-F F-A" data-pos="A 90 20, B 170 60, C 170 140, D 90 180, E 10 140, F 10 60" data-nl="A=2 B=2 C=2 D=2 E=2 F=2"></figure>
+<div class="type-body"><h4>Regular graph <span class="aka">(k-regular)</span></h4><p>Every vertex has the <b>same degree k</b>. A cycle is 2-regular. By the handshake rule a k-regular graph on n vertices has <b>nk/2</b> edges.</p><span class="rule">deg(v) = k for every v</span></div></article>
+<article class="type"><figure data-fig="A-B A-C A-D B-C B-D C-D" data-pos="A 30 30, B 160 30, C 160 150, D 30 150"></figure>
+<div class="type-body"><h4>Complete graph <span class="aka">(K<sub>n</sub>)</span></h4><p>Every vertex is joined to <b>every other</b> vertex by exactly one edge. K<sub>n</sub> has n(n − 1)/2 edges and is (n − 1)-regular. Every complete graph is regular, but not every regular graph is complete.</p><span class="rule">|E| = n(n − 1)/2</span></div></article>
+<div class="lab" data-kn></div>
+
+<h3 id="ty-bip"><span class="n">3.4</span>Bipartite graphs</h3>
+<article class="type"><figure data-fig="A-X A-Y B-Y C-X C-Z" data-pos="A 30 30, B 30 100, C 30 170, X 180 30, Y 180 100, Z 180 170" data-bip="ABC XYZ"></figure>
+<div class="type-body"><h4>Bipartite graph</h4><p>The vertices can be split into two groups so that <b>every edge goes from one group to the other</b>. No edge stays inside a group. Example: students on one side, courses on the other; an edge means “is enrolled in”.</p><p><b>Test:</b> a graph is bipartite <b>if and only if it has no odd-length cycle</b>. BFS can check this by colouring levels alternately.</p></div></article>
+<article class="type"><figure data-fig="A-X A-Y A-Z B-X B-Y B-Z" data-pos="A 40 40, B 40 150, X 190 20, Y 190 95, Z 190 170" data-bip="AB XYZ"></figure>
+<div class="type-body"><h4>Complete bipartite <span class="aka">(K<sub>m,n</sub>)</span></h4><p>Every vertex of the first group (size m) is joined to every vertex of the second group (size n). It has <b>m × n</b> edges. Shown: K<sub>2,3</sub> with 6 edges.</p></div></article>
+
+<h3 id="ty-conn"><span class="n">3.5</span>Connected, strongly and weakly connected</h3>
+<article class="type"><figure data-fig="A-B B-C C-D D-A" data-pos="A 30 30, B 150 30, C 150 130, D 30 130"></figure>
+<div class="type-body"><h4>Connected graph</h4><p>An undirected graph in which there is a path between <b>every pair</b> of vertices.</p></div></article>
+<article class="type"><figure data-fig="A-B B-C D-E" data-pos="A 30 30, B 150 30, C 90 130, D 210 40, E 210 130"></figure>
+<div class="type-body"><h4>Disconnected graph</h4><p>At least two vertices have no path between them. Here {A, B, C} and {D, E} are the two components.</p></div></article>
+<article class="type"><figure data-fig="A>B B>C C>D D>A" data-pos="A 30 30, B 150 30, C 150 130, D 30 130"></figure>
+<div class="type-body"><h4>Strongly connected</h4><p>A directed graph in which you can go from <b>every vertex to every other vertex following the arrows</b>. Here A → B → C → D → A works from any start.</p><span class="verdict yes">✓ every u → v and v → u</span></div></article>
+<article class="type"><figure data-fig="A>B C>B C>D D>A" data-pos="A 30 30, B 150 30, C 150 130, D 30 130"></figure>
+<div class="type-body"><h4>Weakly connected</h4><p>Not strongly connected, but it <b>becomes connected if you ignore the arrow directions</b>. Here nothing leaves B, so B cannot reach anyone — but as an undirected graph it is one piece.</p><span class="verdict no">not strongly connected</span></div></article>
+<div class="law">Strongly connected ⇒ weakly connected. The reverse is not true.</div>
+
+<h3 id="ty-cyc"><span class="n">3.6</span>Cyclic, acyclic, DAG, tree, forest</h3>
+<article class="type"><figure data-fig="A-B B-C C-A C-D" data-pos="A 30 40, B 150 40, C 90 130, D 210 130" data-ec="A-B=back B-C=back A-C=back"></figure>
+<div class="type-body"><h4>Cyclic graph</h4><p>Contains at least one cycle (here A–B–C–A).</p></div></article>
+<article class="type"><figure data-fig="dag" data-scale="0.6"></figure>
+<div class="type-body"><h4>DAG <span class="aka">(directed acyclic graph)</span></h4><p>A directed graph with <b>no directed cycle</b>. Used for task scheduling, course plans, build systems (which file to compile first) and spreadsheets (which cell to compute first). Every DAG has a topological order (Part 6).</p></div></article>
+<article class="type"><figure data-fig="tree" data-scale="0.8"></figure>
+<div class="type-body"><h4>Tree</h4><p>A <b>connected, acyclic</b> undirected graph. It always has n − 1 edges and exactly one path between any two vertices.</p></div></article>
+<article class="type"><figure data-fig="A-B A-C D-E F" data-pos="A 70 30, B 30 110, C 110 110, D 180 30, E 180 110, F 250 70"></figure>
+<div class="type-body"><h4>Forest</h4><p>An acyclic graph that may be disconnected — a set of trees. A forest with n vertices and c trees has <b>n − c</b> edges.</p></div></article>
+
+<h3 id="ty-iso"><span class="n">3.7</span>Isomorphic and planar graphs</h3>
+<div class="row">
+  <figure data-fig="1-2 2-3 3-4 4-1 1-3" data-pos="1 30 30, 2 150 30, 3 150 140, 4 30 140" data-cap="G₁"></figure>
+  <figure data-fig="P-Q Q-R R-S S-P Q-S" data-pos="P 90 20, Q 20 90, R 90 160, S 160 90" data-cap="G₂ — the same graph drawn differently"></figure>
+</div>
+<p>Two graphs are <b>isomorphic</b> if you can rename the vertices of one to get exactly the other — same structure, different drawing. Here the mapping <b>1→Q, 2→P, 3→S, 4→R</b> turns every edge of G₁ into an edge of G₂.</p>
+<div class="exam"><b>Exam check-list:</b> isomorphic graphs must have the same (1) number of vertices, (2) number of edges, (3) degree sequence. G₁: degrees 3, 2, 3, 2. G₂: degrees 2, 3, 2, 3 → sorted both are 3, 3, 2, 2 ✓. These checks are <b>necessary but not enough</b>; to prove isomorphism you must give the mapping.</div>
+<div class="row">
+  <figure data-fig="A-B A-C A-D B-C B-D C-D" data-pos="A 30 30, B 160 30, C 160 150, D 30 150" data-ec="A-C=hot B-D=hot" data-cap="K₄ drawn with two edges crossing…"></figure>
+  <figure data-fig="A-B A-C A-D B-C B-D C-D" data-pos="A 95 20, B 20 150, C 170 150, D 95 105" data-cap="…and redrawn with no crossing. K₄ is <b>planar</b>."></figure>
+</div>
+<p>A <b>planar graph</b> can be drawn on paper with <b>no two edges crossing</b>. Circuit boards must be planar (or use more layers). K₅ and K<sub>3,3</sub> are the classic non-planar graphs.</p>
+
+<h3 id="ty-check"><span class="n">3.8</span>Type checker</h3>
+<p>Pick an example or type your own edges (<code>A-B</code> undirected, <code>A&gt;B</code> directed). The checker tests every property from this part and draws a bipartite colouring when one exists.</p>
+<div class="lab" data-checker></div>
+
+<h3 id="ty-sum"><span class="n">3.9</span>Summary table</h3>
+<div class="tbl"><table class="t">
+<thead><tr><th>Type</th><th>Rule</th><th>Edges</th></tr></thead>
+<tbody>
+<tr><td>Null</td><td>No edges</td><td class="num">0</td></tr>
+<tr><td>Simple</td><td>No loops, no parallel edges</td><td class="num">≤ n(n−1)/2</td></tr>
+<tr><td>Multigraph</td><td>Parallel edges allowed</td><td>any</td></tr>
+<tr><td>Pseudograph</td><td>Loops and parallel edges allowed</td><td>any</td></tr>
+<tr><td>Weighted</td><td>Every edge has a number</td><td>—</td></tr>
+<tr><td>k-regular</td><td>All degrees = k</td><td class="num">nk/2</td></tr>
+<tr><td>Complete K<sub>n</sub></td><td>Every pair joined</td><td class="num">n(n−1)/2</td></tr>
+<tr><td>Complete bipartite K<sub>m,n</sub></td><td>Two groups, every cross pair joined</td><td class="num">m·n</td></tr>
+<tr><td>Tree</td><td>Connected + acyclic</td><td class="num">n − 1</td></tr>
+<tr><td>Forest of c trees</td><td>Acyclic</td><td class="num">n − c</td></tr>
+<tr><td>Strongly connected</td><td>Directed path both ways between every pair</td><td class="num">≥ n</td></tr>
+<tr><td>DAG</td><td>Directed, no directed cycle</td><td class="num">≤ n(n−1)/2</td></tr>
+</tbody></table></div>
+
+<div class="recap"><p class="t">Remember from Part 3</p><ul>
+<li>Simple = no loops and no parallel edges. Multigraph allows parallel edges; pseudograph allows loops too.</li>
+<li>Complete K<sub>n</sub>: n(n − 1)/2 edges, (n − 1)-regular.</li>
+<li>Bipartite ⇔ no odd cycle.</li>
+<li>Strongly connected: follow arrows from anyone to anyone. Weakly: only if you ignore arrows.</li>
+<li>Isomorphic = same structure; prove with a vertex mapping.</li>
+</ul></div>
+<div class="quiz" data-quiz="types"></div>
+</section>
+
+<section id="repr" class="unit" hidden>
+<div class="unit-head">
+  <p class="eyebrow">Unit V · Part 4</p>
+  <h2>Representation of Graphs</h2>
+  <p class="lede">A computer cannot see a drawing. We must store “who is connected to whom” as numbers. There are four standard ways; two of them are used almost everywhere.</p>
+  <p class="syl"><b>Syllabus:</b> Representation of graphs — adjacency matrix, adjacency list, incidence matrix; their programs and comparison.</p>
+</div>
+
+<h3 id="r-mat"><span class="n">4.1</span>Adjacency matrix</h3>
+<div class="def"><span class="t">Definition</span><p>For a graph with n vertices, the <b>adjacency matrix</b> A is an n × n array where <b>A[i][j] = 1</b> if there is an edge from vertex i to vertex j, and <b>A[i][j] = 0</b> otherwise.</p></div>
+<div class="easy"><span class="t">In simple words</span><p>Make a table with one row and one column for every vertex. Put a 1 in the box where row u meets column v if u and v are connected.</p></div>
+<figure data-rep="adj" data-g="intro" data-cap="<b>Undirected:</b> the matrix is symmetric. Row sum = degree (shown on the right)."></figure>
+<figure data-rep="adj" data-g="digraph" data-cap="<b>Directed:</b> row = from, column = to. Row sum = out-degree, column sum = in-degree. Not symmetric."></figure>
+<figure data-rep="adj" data-g="wt" data-cap="<b>Weighted:</b> store the weight instead of 1. Use ∞ (or a large number) for “no edge” and 0 on the diagonal."></figure>
+<h4>Properties</h4>
+<ul>
+<li>Space: always <b>n²</b> cells, even if the graph has very few edges.</li>
+<li>Check “is there an edge u–v?” in <b>O(1)</b> — just read A[u][v].</li>
+<li>Find all neighbours of u: scan the whole row, <b>O(n)</b>.</li>
+<li>Undirected ⇒ symmetric (A[u][v] = A[v][u]). Only the upper half needs to be stored.</li>
+<li>Diagonal is all 0 in a simple graph (no self-loops).</li>
+<li>Number of 1s = 2|E| (undirected) or |E| (directed).</li>
+</ul>
+<details class="prog"><summary>Program 1 — adjacency matrix: create, display, degrees</summary><div class="inner">
+<div class="code-wrap"><pre class="c">/* Adjacency matrix: create, display, degree of every vertex */
+#include &lt;stdio.h&gt;
+#define MAX 20
+
+int adj[MAX][MAX];
+int n, directed;
+
+void createGraph() {
+    int e, i;
+    char u, v;
+    printf("Number of vertices: ");
+    scanf("%d", &amp;n);
+    printf("Directed? (1 = yes, 0 = no): ");
+    scanf("%d", &amp;directed);
+    printf("Number of edges: ");
+    scanf("%d", &amp;e);
+    for (i = 0; i &lt; e; i++) {
+        printf("Edge %d (e.g. A B): ", i + 1);
+        scanf(" %c %c", &amp;u, &amp;v);
+        adj[u - 'A'][v - 'A'] = 1;
+        if (!directed)
+            adj[v - 'A'][u - 'A'] = 1;   /* undirected: both ways */
+    }
+}
+
+void displayMatrix() {
+    int i, j;
+    printf("\nAdjacency matrix:\n   ");
+    for (j = 0; j &lt; n; j++) printf(" %c", 'A' + j);
+    printf("\n");
+    for (i = 0; i &lt; n; i++) {
+        printf(" %c ", 'A' + i);
+        for (j = 0; j &lt; n; j++) printf(" %d", adj[i][j]);
+        printf("\n");
+    }
+}
+
+void degrees() {
+    int i, j, in, out;
+    printf("\nVertex  ");
+    printf(directed ? "In  Out\n" : "Degree\n");
+    for (i = 0; i &lt; n; i++) {
+        in = out = 0;
+        for (j = 0; j &lt; n; j++) {
+            out += adj[i][j];            /* row sum    */
+            in  += adj[j][i];            /* column sum */
+        }
+        if (directed) printf("  %c     %d   %d\n", 'A' + i, in, out);
+        else          printf("  %c     %d\n", 'A' + i, out);
+    }
+}
+
+int main() {
+    createGraph();
+    displayMatrix();
+    degrees();
+    return 0;
+}</pre></div>
+<p class="lbl">Input (Figure 1 graph)</p><pre class="io">6
+0
+8
+A B
+A C
+B C
+B D
+C E
+D E
+D F
+E F</pre>
+<p class="lbl">Output</p><pre class="io">Adjacency matrix:
+    A B C D E F
+ A  0 1 1 0 0 0
+ B  1 0 1 1 0 0
+ C  1 1 0 0 1 0
+ D  0 1 0 0 1 1
+ E  0 0 1 1 0 1
+ F  0 0 0 1 1 0
+
+Vertex  Degree
+  A     2
+  B     3
+  C     3
+  D     3
+  E     3
+  F     2</pre></div></details>
+
+<h3 id="r-list"><span class="n">4.2</span>Adjacency list</h3>
+<div class="def"><span class="t">Definition</span><p>An <b>adjacency list</b> keeps an array of n head pointers, one per vertex. Head[u] points to a <b>linked list of all vertices adjacent to u</b>.</p></div>
+<div class="easy"><span class="t">In simple words</span><p>For every vertex, write down the list of its neighbours. Like a phone's contact list: each person has their own list of friends.</p></div>
+<figure data-rep="list" data-g="intro" data-cap="Each edge u–v appears <b>twice</b> in an undirected graph: v in u's list and u in v's list. 8 edges → 16 list nodes."></figure>
+<figure data-rep="list" data-g="wt" data-w data-cap="Weighted: each list node also stores the weight (orange)."></figure>
+<pre class="algo">struct node {
+    int vertex;          /* neighbour number          */
+    int weight;          /* only for weighted graphs  */
+    struct node *next;   /* next neighbour in list    */
+};
+struct node *head[MAX];  /* head[u] = first neighbour of u */</pre>
+<h4>Properties</h4>
+<ul>
+<li>Space: <b>O(n + e)</b> — n heads plus 2e nodes (undirected) or e nodes (directed).</li>
+<li>List all neighbours of u in <b>O(deg(u))</b> — only real neighbours are visited. This makes BFS and DFS fast.</li>
+<li>Check “is there an edge u–v?” needs a scan of u's list: <b>O(deg(u))</b>.</li>
+<li>In-degree in a digraph is slow: you must scan every list (or keep an inverse list).</li>
+</ul>
+<details class="prog"><summary>Program 2 — adjacency list with linked lists</summary><div class="inner">
+<div class="code-wrap"><pre class="c">/* Adjacency list using linked lists (new node added at the end) */
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#define MAX 20
+
+struct node {
+    int vertex;
+    struct node *next;
+};
+
+struct node *head[MAX];
+int n;
+
+void addEdge(int u, int v) {
+    struct node *p, *nn = (struct node *)malloc(sizeof(struct node));
+    nn-&gt;vertex = v;
+    nn-&gt;next = NULL;
+    if (head[u] == NULL) {
+        head[u] = nn;
+        return;
+    }
+    p = head[u];
+    while (p-&gt;next != NULL) p = p-&gt;next;
+    p-&gt;next = nn;
+}
+
+void display() {
+    int i;
+    struct node *p;
+    printf("\nAdjacency list:\n");
+    for (i = 0; i &lt; n; i++) {
+        printf(" %c", 'A' + i);
+        for (p = head[i]; p != NULL; p = p-&gt;next)
+            printf(" -&gt; %c", 'A' + p-&gt;vertex);
+        printf(" -&gt; NULL\n");
+    }
+}
+
+int main() {
+    int e, i, directed;
+    char u, v;
+    printf("Number of vertices: ");
+    scanf("%d", &amp;n);
+    printf("Directed? (1 = yes, 0 = no): ");
+    scanf("%d", &amp;directed);
+    printf("Number of edges: ");
+    scanf("%d", &amp;e);
+    for (i = 0; i &lt; e; i++) {
+        printf("Edge %d (e.g. A B): ", i + 1);
+        scanf(" %c %c", &amp;u, &amp;v);
+        addEdge(u - 'A', v - 'A');
+        if (!directed) addEdge(v - 'A', u - 'A');
+    }
+    display();
+    return 0;
+}</pre></div>
+<p class="lbl">Input: same as Program 1</p>
+<p class="lbl">Output</p><pre class="io">Adjacency list:
+ A -&gt; B -&gt; C -&gt; NULL
+ B -&gt; A -&gt; C -&gt; D -&gt; NULL
+ C -&gt; A -&gt; B -&gt; E -&gt; NULL
+ D -&gt; B -&gt; E -&gt; F -&gt; NULL
+ E -&gt; C -&gt; D -&gt; F -&gt; NULL
+ F -&gt; D -&gt; E -&gt; NULL</pre></div></details>
+
+<h3 id="r-inc"><span class="n">4.3</span>Incidence matrix</h3>
+<div class="def"><span class="t">Definition</span><p>The <b>incidence matrix</b> is an n × e array (rows = vertices, columns = edges). M[v][k] = 1 if edge k touches vertex v, otherwise 0. For a digraph, use <b>+1</b> at the start (tail) and <b>−1</b> at the end (head) of the edge.</p></div>
+<figure data-rep="inc" data-g="A-B A-C B-C C-D" data-pos="A 30 30, B 160 30, C 95 130, D 230 130" data-cap="Undirected: every column has exactly two 1s. Row sum = degree."></figure>
+<figure data-rep="inc" data-g="A>B A>C B>C D>C" data-pos="A 30 30, B 160 30, C 95 130, D 230 130" data-cap="Directed: each column has one +1 (tail) and one −1 (head, orange)."></figure>
+<p>Space is n × e, which is large for most graphs, so the incidence matrix is used mainly in theory and in electrical circuit analysis (Kirchhoff's laws).</p>
+
+<h3 id="r-edge"><span class="n">4.4</span>Edge list</h3>
+<p>The simplest form: just store every edge as a pair (u, v), or a triple (u, v, w) for a weighted graph. Space is <b>O(e)</b>.</p>
+<figure data-rep="edge" data-g="wt" data-cap="Edge list of the weighted graph: one row per edge."></figure>
+<p>Finding neighbours is slow (scan all edges), but sorting edges by weight is easy. That is exactly what <b>Kruskal's algorithm</b> needs, so Kruskal uses an edge list.</p>
+
+<h3 id="r-lab"><span class="n">4.5</span>Representation lab</h3>
+<p>Edit the graph on the left. All four representations update instantly. Hover a matrix cell to light up its two vertices.</p>
+<div class="lab" data-repr></div>
+
+<h3 id="r-cmp"><span class="n">4.6</span>Which one to use?</h3>
+<div class="tbl"><table class="t">
+<thead><tr><th>Operation</th><th>Adjacency matrix</th><th>Adjacency list</th><th>Incidence matrix</th><th>Edge list</th></tr></thead>
+<tbody>
+<tr><td>Space</td><td class="num">O(n²)</td><td class="num">O(n + e)</td><td class="num">O(n · e)</td><td class="num">O(e)</td></tr>
+<tr><td>Is u–v an edge?</td><td class="num"><b>O(1)</b></td><td class="num">O(deg u)</td><td class="num">O(e)</td><td class="num">O(e)</td></tr>
+<tr><td>All neighbours of u</td><td class="num">O(n)</td><td class="num"><b>O(deg u)</b></td><td class="num">O(e)</td><td class="num">O(e)</td></tr>
+<tr><td>Add an edge</td><td class="num">O(1)</td><td class="num">O(1) at head</td><td>new column</td><td class="num">O(1)</td></tr>
+<tr><td>BFS / DFS time</td><td class="num">O(n²)</td><td class="num"><b>O(n + e)</b></td><td>—</td><td>—</td></tr>
+<tr><td>Best for</td><td>Dense graphs, quick edge checks, Floyd–Warshall</td><td>Sparse graphs (most real graphs), BFS, DFS, Dijkstra</td><td>Circuit theory</td><td>Kruskal, input files</td></tr>
+</tbody></table></div>
+<div class="exam"><b>Exam tip:</b> Example — a road map of 1000 cities with about 3000 roads. Matrix: 1,000,000 cells. List: 1000 + 6000 = 7000 nodes. The list is over 100 times smaller, so use the list.</div>
+
+<div class="recap"><p class="t">Remember from Part 4</p><ul>
+<li>Adjacency matrix: n × n, A[u][v] = 1 if edge. Symmetric for undirected graphs. Edge check O(1), space O(n²).</li>
+<li>Adjacency list: array of linked lists. Space O(n + e). Best for sparse graphs and traversals.</li>
+<li>Incidence matrix: n × e, vertex vs edge.</li>
+<li>Edge list: list of (u, v, w). Used by Kruskal.</li>
+</ul></div>
+<div class="quiz" data-quiz="repr"></div>
+</section>
+
+<section id="traversal" class="unit" hidden>
+<div class="unit-head">
+  <p class="eyebrow">Unit V · Part 5</p>
+  <h2>Graph Traversal: BFS and DFS</h2>
+  <p class="lede">Traversal means visiting every vertex exactly once. BFS spreads out level by level using a queue. DFS goes deep first using a stack. Watch both run step by step.</p>
+  <p class="syl"><b>Syllabus:</b> Graph traversal — Breadth First Search and Depth First Search, algorithms, programs and comparison.</p>
+</div>
+
+<h3 id="tr-idea"><span class="n">5.1</span>Why traversal needs a visited[] array</h3>
+<p>In a tree you can never come back to a node you already saw. A graph can have <b>cycles</b>: from A you go to B, from B to C, and from C back to A. Without a record, the traversal would go round forever.</p>
+<div class="law">Keep an array visited[n], all 0 at the start. Set visited[v] = 1 the moment you first reach v, and never process v again.</div>
+<div class="row">
+  <div class="card"><h5>BFS — Breadth First Search</h5><p>Like ripples on water: visit the start, then <b>all vertices 1 edge away</b>, then all 2 edges away, and so on. Uses a <b>queue</b>.</p></div>
+  <div class="card"><h5>DFS — Depth First Search</h5><p>Like walking through a maze: keep going forward as <b>deep</b> as you can; when you hit a dead end, go back one step and try another way. Uses a <b>stack</b> (or recursion).</p></div>
+</div>
+<div class="exam"><b>Order rule used in these notes and in most exams:</b> when a vertex has several unvisited neighbours, take them in <b>alphabetical (or numerical) order</b>, which is the order in the adjacency matrix row. A different neighbour order gives a different but still correct traversal — always state your order.</div>
+
+<h3 id="tr-bfs"><span class="n">5.2</span>Breadth First Search (BFS)</h3>
+<pre class="algo">BFS(G, s)
+1. Set visited[v] = 0 for every vertex v.
+2. visited[s] = 1;  ENQUEUE(s)
+3. While the queue is not empty:
+     u = DEQUEUE();  print u
+     For every neighbour v of u (in order):
+         If visited[v] == 0:
+             visited[v] = 1;  ENQUEUE(v)
+4. Stop.</pre>
+<p>Press <b>Play</b> or use <b>Next</b>. The label under each vertex is its <b>level</b> — the number of edges from the start. The side panel shows the queue with its front (F) and rear (R), the visited array and the output.</p>
+<div class="lab" data-play="bfs" data-g="trav" data-s="A" data-title="BFS from A"></div>
+<h4>Dry run table (write this in the exam)</h4>
+<div data-dry="bfs" data-g="trav" data-s="A"></div>
+<div class="trap"><b>Common mistake:</b> Marking a vertex visited only when it is <b>dequeued</b>. Then the same vertex can enter the queue twice (for example F from both C and E). Mark it visited <b>when you enqueue it</b>.</div>
+<h4>What BFS gives you for free</h4>
+<ul>
+<li><b>Shortest path in an unweighted graph:</b> the level of v is the fewest edges from s to v. Follow the thick BFS-tree edges back to s to get the path.</li>
+<li><b>BFS spanning tree:</b> the thick edges form a tree that reaches every vertex in the component.</li>
+<li><b>Connected components:</b> start BFS again from any unvisited vertex; each new start is a new component.</li>
+<li><b>Bipartite test:</b> colour levels even/odd. If an edge joins two vertices of the same level, the graph is not bipartite.</li>
+</ul>
+
+<h3 id="tr-dfs"><span class="n">5.3</span>Depth First Search (DFS)</h3>
+<div class="pair">
+<div><p class="lbl">Recursive</p><pre class="algo">DFS(u)
+1. visited[u] = 1;  print u
+2. For every neighbour v of u (in order):
+       If visited[v] == 0:
+           DFS(v)
+3. Return.</pre></div>
+<div><p class="lbl">With an explicit stack</p><pre class="algo">DFS_STACK(s)
+1. PUSH(s)
+2. While the stack is not empty:
+     u = POP()
+     If visited[u] == 1: continue
+     visited[u] = 1;  print u
+     Push unvisited neighbours of u
+       in REVERSE order (so the smallest
+       is on top and comes out first)
+3. Stop.</pre></div>
+</div>
+<p>The label under each vertex shows <b>discovery / finish</b> time: when DFS first reached the vertex and when it finished all its neighbours. The side panel shows the call stack.</p>
+<div class="lab" data-play="dfs" data-g="trav" data-s="A" data-title="DFS from A"></div>
+<h4>Dry run table (stack version)</h4>
+<div data-dry="dfs" data-g="trav" data-s="A"></div>
+<p>Both versions print <b>A B D E F C G</b> here. Some vertices are pushed twice in the stack version (C and G above), which is why the pop step checks visited[] first and skips them.</p>
+<h4>Edge types and cycle detection<span class="adv-tag">Advanced</span></h4>
+<p>During DFS, every edge falls into one of these groups. The player draws them in different styles.</p>
+<div class="tbl"><table class="t">
+<thead><tr><th>Edge</th><th>Meaning</th><th>Drawn as</th></tr></thead>
+<tbody>
+<tr><td><b>Tree edge</b></td><td>Led DFS to a new vertex</td><td>Thick blue</td></tr>
+<tr><td><b>Back edge</b></td><td>Points to an ancestor still on the stack — it closes a <b>cycle</b></td><td>Dashed purple</td></tr>
+<tr><td><b>Forward edge</b> (digraph)</td><td>Points to a descendant that is already finished</td><td>Dotted green</td></tr>
+<tr><td><b>Cross edge</b> (digraph)</td><td>Points to a vertex in another, finished branch</td><td>Dotted green</td></tr>
+</tbody></table></div>
+<div class="law">A graph has a cycle if and only if DFS finds a back edge.</div>
+<div class="lab" data-play="dfs" data-g="digraph" data-s="A" data-title="DFS on a directed graph — watch for the back edge E → D"></div>
+
+<h3 id="tr-lab"><span class="n">5.4</span>Traversal lab</h3>
+<p>Choose BFS or DFS, pick a graph and a start vertex. Open <b>Edit the graph</b> to draw your own: tap empty space for a vertex, tap two vertices for an edge. Try the disconnected graph to see BFS restart from a new vertex.</p>
+<div class="lab" data-lab="trav"></div>
+
+<h3 id="tr-ex"><span class="n">5.5</span>Worked exam problems</h3>
+<h4>Problem 1 — BFS starting from E</h4>
+<figure data-fig="exam" data-cap="Graph for Problems 1 and 2"></figure>
+<div data-dry="bfs" data-g="exam" data-s="E"></div>
+<p><b>Answer:</b> BFS order = <b>E B D F A C</b>. Levels: E (0); B, D, F (1); A, C (2).</p>
+<h4>Problem 2 — DFS starting from A</h4>
+<div data-dry="dfs" data-g="exam" data-s="A"></div>
+<p><b>Answer:</b> DFS order = <b>A B C F E D</b>.</p>
+<div class="lab" data-play="dfs" data-g="exam" data-s="A" data-title="Check Problem 2 in the player"></div>
+
+<h3 id="tr-cmp"><span class="n">5.6</span>BFS vs DFS</h3>
+<div class="tbl"><table class="t">
+<thead><tr><th></th><th>BFS</th><th>DFS</th></tr></thead>
+<tbody>
+<tr><td>Data structure</td><td>Queue (FIFO)</td><td>Stack (LIFO) or recursion</td></tr>
+<tr><td>Order</td><td>Level by level (wide first)</td><td>One branch to the end (deep first)</td></tr>
+<tr><td>Time (adjacency list)</td><td class="num">O(V + E)</td><td class="num">O(V + E)</td></tr>
+<tr><td>Time (adjacency matrix)</td><td class="num">O(V²)</td><td class="num">O(V²)</td></tr>
+<tr><td>Extra memory</td><td>O(V) — can hold a whole level, which is large for wide graphs</td><td>O(V) — the depth of the path, small for wide graphs</td></tr>
+<tr><td>Shortest path (unweighted)</td><td><b>Yes</b></td><td>No</td></tr>
+<tr><td>Cycle detection</td><td>Possible</td><td>Natural (back edges)</td></tr>
+<tr><td>Topological sort</td><td>Kahn's method (queue of in-degree 0)</td><td>Reverse of finish order</td></tr>
+<tr><td>Used for</td><td>Shortest hops, web pages discovery, social “people you may know”, bipartite check</td><td>Mazes and puzzles, cycle detection, bridges, strongly connected components</td></tr>
+</tbody></table></div>
+
+<h3 id="tr-prog"><span class="n">5.7</span>Programs</h3>
+<details class="prog"><summary>Program 3 — BFS using a queue</summary><div class="inner">
+<div class="code-wrap"><pre class="c">/* Breadth First Search on an adjacency matrix */
+#include &lt;stdio.h&gt;
+#define MAX 20
+
+int adj[MAX][MAX], visited[MAX];
+int queue[MAX], front = 0, rear = -1;
+int n;
+
+void enqueue(int v) { queue[++rear] = v; }
+int  dequeue()      { return queue[front++]; }
+int  isEmpty()      { return front &gt; rear; }
+
+void bfs(int start) {
+    int u, v;
+    visited[start] = 1;
+    enqueue(start);
+    while (!isEmpty()) {
+        u = dequeue();
+        printf("%c ", 'A' + u);
+        for (v = 0; v &lt; n; v++) {          /* neighbours in order A, B, C ... */
+            if (adj[u][v] == 1 &amp;&amp; !visited[v]) {
+                visited[v] = 1;            /* mark when enqueued, not when printed */
+                enqueue(v);
+            }
+        }
+    }
+}
+
+int main() {
+    int e, i;
+    char u, v, s;
+    printf("Number of vertices: ");
+    scanf("%d", &amp;n);
+    printf("Number of edges: ");
+    scanf("%d", &amp;e);
+    for (i = 0; i &lt; e; i++) {
+        printf("Edge %d: ", i + 1);
+        scanf(" %c %c", &amp;u, &amp;v);
+        adj[u - 'A'][v - 'A'] = adj[v - 'A'][u - 'A'] = 1;
+    }
+    printf("Start vertex: ");
+    scanf(" %c", &amp;s);
+    printf("\nBFS order: ");
+    bfs(s - 'A');
+    printf("\n");
+    return 0;
+}</pre></div>
+<p class="lbl">Input (graph of 5.2)</p><pre class="io">7
+8
+A B
+A C
+B D
+B E
+C F
+E F
+E G
+F G
+A</pre>
+<p class="lbl">Output</p><pre class="io">BFS order: A B C D E F G</pre></div></details>
+<details class="prog"><summary>Program 4 — DFS, recursive and with a stack</summary><div class="inner">
+<div class="code-wrap"><pre class="c">/* Depth First Search: recursive version and explicit-stack version */
+#include &lt;stdio.h&gt;
+#define MAX 20
+
+int adj[MAX][MAX], visited[MAX];
+int n;
+
+void dfs(int u) {                         /* recursive: uses the call stack */
+    int v;
+    visited[u] = 1;
+    printf("%c ", 'A' + u);
+    for (v = 0; v &lt; n; v++)
+        if (adj[u][v] == 1 &amp;&amp; !visited[v])
+            dfs(v);
+}
+
+void dfsStack(int start) {                /* same order with our own stack */
+    int stack[MAX * MAX], top = -1, u, v;
+    stack[++top] = start;
+    while (top &gt;= 0) {
+        u = stack[top--];                 /* pop */
+        if (visited[u]) continue;
+        visited[u] = 1;
+        printf("%c ", 'A' + u);
+        for (v = n - 1; v &gt;= 0; v--)      /* push in reverse so A..Z come out first */
+            if (adj[u][v] == 1 &amp;&amp; !visited[v])
+                stack[++top] = v;
+    }
+}
+
+int main() {
+    int e, i;
+    char u, v, s;
+    printf("Number of vertices: ");
+    scanf("%d", &amp;n);
+    printf("Number of edges: ");
+    scanf("%d", &amp;e);
+    for (i = 0; i &lt; e; i++) {
+        printf("Edge %d: ", i + 1);
+        scanf(" %c %c", &amp;u, &amp;v);
+        adj[u - 'A'][v - 'A'] = adj[v - 'A'][u - 'A'] = 1;
+    }
+    printf("Start vertex: ");
+    scanf(" %c", &amp;s);
+
+    printf("\nDFS (recursive): ");
+    dfs(s - 'A');
+
+    for (i = 0; i &lt; n; i++) visited[i] = 0;
+    printf("\nDFS (stack)    : ");
+    dfsStack(s - 'A');
+    printf("\n");
+    return 0;
+}</pre></div>
+<p class="lbl">Input: same as Program 3</p>
+<p class="lbl">Output</p><pre class="io">DFS (recursive): A B D E F C G
+DFS (stack)    : A B D E F C G</pre></div></details>
+
+<div class="recap"><p class="t">Remember from Part 5</p><ul>
+<li>BFS = queue, level by level. DFS = stack/recursion, deep first.</li>
+<li>Mark visited when you enqueue (BFS) or when you first reach the vertex (DFS).</li>
+<li>Both take O(V + E) with an adjacency list, O(V²) with a matrix.</li>
+<li>BFS gives the fewest-edges path. A DFS back edge means a cycle.</li>
+<li>Disconnected graph: restart from any unvisited vertex; count the restarts to count components.</li>
+</ul></div>
+<div class="quiz" data-quiz="traversal"></div>
+</section>
+
+<section id="algos" class="unit" hidden>
+<div class="unit-head">
+  <p class="eyebrow">Unit V · Part 6 <span class="adv-tag">Advanced</span></p>
+  <h2>MST, Shortest Path and Topological Sort</h2>
+  <p class="lede">The algorithms that run inside maps, networks and build tools. Each one is a small change to BFS or DFS — see exactly where with the step players.</p>
+  <p class="syl"><b>Beyond the core syllabus:</b> spanning trees, Prim's and Kruskal's MST, Dijkstra's shortest path, topological sort. Commonly asked in university exams and placement interviews.</p>
+</div>
+
+<h3 id="a-st"><span class="n">6.1</span>Spanning tree and minimum spanning tree</h3>
+<div class="def"><span class="t">Definition</span><p>A <b>spanning tree</b> of a connected graph G is a subgraph that <b>includes every vertex</b> of G and is a <b>tree</b> (connected, no cycle). It always has <b>n − 1 edges</b>. A <b>minimum spanning tree (MST)</b> is a spanning tree whose total edge weight is as small as possible.</p></div>
+<div class="easy"><span class="t">In simple words</span><p>You must lay cables to connect 7 villages. Every village must be reachable, and cable is expensive. The MST tells you which roads to lay cable along so that the <b>total cable length is the least</b>.</p></div>
+<div class="row">
+  <figure data-fig="mst" data-cap="Weighted graph: 7 vertices, 11 edges."></figure>
+  <figure data-fig="mst" data-ec="A-D=tree C-E=tree D-F=tree A-B=tree B-E=tree E-G=tree" data-cap="Its MST: 6 edges, total weight <b>5 + 5 + 6 + 7 + 7 + 9 = 39</b>."></figure>
+</div>
+<ul>
+<li>A connected graph with n vertices can have many spanning trees. K<sub>n</sub> has <b>n<sup>n−2</sup></b> of them (Cayley's formula): K<sub>4</sub> has 16.</li>
+<li>Adding any one more edge to a spanning tree creates exactly one cycle. Removing any edge disconnects it.</li>
+<li>If all edge weights are different, the MST is <b>unique</b>.</li>
+<li>Both algorithms below are <b>greedy</b>: they always take the cheapest safe edge and never undo a choice.</li>
+</ul>
+
+<h3 id="a-prim"><span class="n">6.2</span>Prim's algorithm</h3>
+<p><b>Idea:</b> grow one tree. Start from any vertex. At every step add the <b>cheapest edge that joins a tree vertex to a non-tree vertex</b>. It is BFS with a priority instead of a plain queue.</p>
+<pre class="algo">PRIM(G, s)
+1. key[v] = ∞, parent[v] = NIL, inTree[v] = 0 for every v
+2. key[s] = 0
+3. Repeat n times:
+     u = vertex with inTree[u] = 0 and the smallest key[u]
+     inTree[u] = 1                  // add u (and edge parent[u]–u) to the MST
+     For every neighbour v of u with inTree[v] = 0:
+         If w(u, v) &lt; key[v]:
+             key[v] = w(u, v);  parent[v] = u</pre>
+<div class="lab" data-play="prim" data-g="mst" data-s="A" data-title="Prim's MST from A — labels show key[v]"></div>
+<p>Order of edges added: A–D (5), D–F (6), A–B (7), B–E (7), E–C (5), E–G (9). Total = <b>39</b>. Note that Prim can add a cheap edge (E–C, 5) late, because C was not reachable cheaply until E joined the tree.</p>
+<details class="prog"><summary>Program 5 — Prim's MST (adjacency matrix, O(n²))</summary><div class="inner">
+<div class="code-wrap"><pre class="c">/* Prim's minimum spanning tree, O(n^2) with an adjacency matrix */
+#include &lt;stdio.h&gt;
+#include &lt;limits.h&gt;
+#define MAX 20
+
+int cost[MAX][MAX];     /* 0 = no edge */
+int n;
+
+void prim(int start) {
+    int key[MAX], parent[MAX], inTree[MAX];
+    int i, k, u, v, total = 0;
+    for (i = 0; i &lt; n; i++) {
+        key[i] = INT_MAX;
+        parent[i] = -1;
+        inTree[i] = 0;
+    }
+    key[start] = 0;
+    printf("\nEdge   Weight\n");
+    for (k = 0; k &lt; n; k++) {
+        u = -1;                                   /* pick the smallest key */
+        for (i = 0; i &lt; n; i++)
+            if (!inTree[i] &amp;&amp; key[i] != INT_MAX &amp;&amp; (u == -1 || key[i] &lt; key[u]))
+                u = i;
+        if (u == -1) { printf("Graph is not connected\n"); return; }
+        inTree[u] = 1;
+        if (parent[u] != -1) {
+            printf("%c - %c   %d\n", 'A' + parent[u], 'A' + u, cost[parent[u]][u]);
+            total += cost[parent[u]][u];
+        }
+        for (v = 0; v &lt; n; v++)                   /* update keys of neighbours */
+            if (cost[u][v] &amp;&amp; !inTree[v] &amp;&amp; cost[u][v] &lt; key[v]) {
+                key[v] = cost[u][v];
+                parent[v] = u;
+            }
+    }
+    printf("Total weight of MST = %d\n", total);
+}
+
+int main() {
+    int e, i, w;
+    char u, v, s;
+    printf("Number of vertices: ");
+    scanf("%d", &amp;n);
+    printf("Number of edges: ");
+    scanf("%d", &amp;e);
+    for (i = 0; i &lt; e; i++) {
+        printf("Edge %d (u v weight): ", i + 1);
+        scanf(" %c %c %d", &amp;u, &amp;v, &amp;w);
+        cost[u - 'A'][v - 'A'] = cost[v - 'A'][u - 'A'] = w;
+    }
+    printf("Start vertex: ");
+    scanf(" %c", &amp;s);
+    prim(s - 'A');
+    return 0;
+}</pre></div>
+<p class="lbl">Input (graph of 6.1)</p><pre class="io">7
+11
+A B 7
+A D 5
+B C 8
+B D 9
+B E 7
+C E 5
+D E 15
+D F 6
+E F 8
+E G 9
+F G 11
+A</pre>
+<p class="lbl">Output</p><pre class="io">Edge   Weight
+A - D   5
+D - F   6
+A - B   7
+B - E   7
+E - C   5
+E - G   9
+Total weight of MST = 39</pre></div></details>
+
+<h3 id="a-kru"><span class="n">6.3</span>Kruskal's algorithm</h3>
+<p><b>Idea:</b> forget about growing one tree. Sort <b>all</b> edges from cheapest to costliest and take them one by one. <b>Skip an edge if its two ends are already connected</b> (it would make a cycle). Stop at n − 1 edges.</p>
+<pre class="algo">KRUSKAL(G)
+1. Sort all edges by weight (smallest first)
+2. Make a separate set for every vertex: {A} {B} {C} ...
+3. For each edge (u, v) in sorted order:
+     If FIND(u) ≠ FIND(v):          // different sets → no cycle
+         add (u, v) to the MST
+         UNION(u, v)
+     Else: reject (cycle)
+4. Stop when the MST has n − 1 edges.</pre>
+<div class="lab" data-play="kruskal" data-g="mst" data-title="Kruskal's MST — sorted edge list and union-find sets on the right"></div>
+<p>The same graph gives the same total, <b>39</b>, but the edges are picked in a different order: A–D, C–E, D–F, A–B, B–E, (reject B–C, E–F, B–D), E–G.</p>
+<details class="prog"><summary>Program 6 — Kruskal's MST with union-find</summary><div class="inner">
+<div class="code-wrap"><pre class="c">/* Kruskal's minimum spanning tree with union-find */
+#include &lt;stdio.h&gt;
+#define MAX 50
+
+struct edge { int u, v, w; };
+
+struct edge E[MAX];
+int parent[MAX];
+int n, e;
+
+int find(int x) {                         /* root of x's set (with path compression) */
+    if (parent[x] != x)
+        parent[x] = find(parent[x]);
+    return parent[x];
+}
+
+void sortEdges() {                        /* simple bubble sort by weight */
+    int i, j;
+    struct edge t;
+    for (i = 0; i &lt; e - 1; i++)
+        for (j = 0; j &lt; e - 1 - i; j++)
+            if (E[j].w &gt; E[j + 1].w) { t = E[j]; E[j] = E[j + 1]; E[j + 1] = t; }
+}
+
+int main() {
+    int i, taken = 0, total = 0, ru, rv;
+    char a, b;
+    printf("Number of vertices: ");
+    scanf("%d", &amp;n);
+    printf("Number of edges: ");
+    scanf("%d", &amp;e);
+    for (i = 0; i &lt; e; i++) {
+        printf("Edge %d (u v weight): ", i + 1);
+        scanf(" %c %c %d", &amp;a, &amp;b, &amp;E[i].w);
+        E[i].u = a - 'A';
+        E[i].v = b - 'A';
+    }
+    for (i = 0; i &lt; n; i++) parent[i] = i;  /* every vertex is its own set */
+    sortEdges();
+
+    printf("\nEdge   Weight  Result\n");
+    for (i = 0; i &lt; e &amp;&amp; taken &lt; n - 1; i++) {
+        ru = find(E[i].u);
+        rv = find(E[i].v);
+        if (ru != rv) {
+            parent[ru] = rv;                  /* union */
+            taken++;
+            total += E[i].w;
+            printf("%c - %c   %2d    taken\n", 'A' + E[i].u, 'A' + E[i].v, E[i].w);
+        } else {
+            printf("%c - %c   %2d    rejected (cycle)\n", 'A' + E[i].u, 'A' + E[i].v, E[i].w);
+        }
+    }
+    printf("Total weight of MST = %d\n", total);
+    return 0;
+}</pre></div>
+<p class="lbl">Input: same as Program 5 (without the start vertex)</p>
+<p class="lbl">Output</p><pre class="io">Edge   Weight  Result
+A - D    5    taken
+C - E    5    taken
+D - F    6    taken
+A - B    7    taken
+B - E    7    taken
+B - C    8    rejected (cycle)
+E - F    8    rejected (cycle)
+B - D    9    rejected (cycle)
+E - G    9    taken
+Total weight of MST = 39</pre></div></details>
+<div class="tbl"><table class="t">
+<thead><tr><th></th><th>Prim</th><th>Kruskal</th></tr></thead>
+<tbody>
+<tr><td>Grows</td><td>One tree from a start vertex</td><td>A forest that merges into one tree</td></tr>
+<tr><td>Picks</td><td>Cheapest edge leaving the tree</td><td>Cheapest edge overall that makes no cycle</td></tr>
+<tr><td>Needs</td><td>Adjacency matrix/list + priority queue</td><td>Edge list + sorting + union-find</td></tr>
+<tr><td>Time</td><td>O(n²) with a matrix; O(e log n) with a heap</td><td>O(e log e) (the sort dominates)</td></tr>
+<tr><td>Better for</td><td>Dense graphs</td><td>Sparse graphs</td></tr>
+<tr><td>Disconnected graph</td><td>Covers only one component</td><td>Gives a minimum spanning forest</td></tr>
+</tbody></table></div>
+
+<h3 id="a-dij"><span class="n">6.4</span>Dijkstra's shortest path</h3>
+<p><b>Idea:</b> keep a tentative distance dist[v] for every vertex. Repeatedly pick the unfinished vertex with the <b>smallest</b> dist — its distance can no longer improve, so fix it. Then try to improve its neighbours: this is called <b>relaxing</b> an edge.</p>
+<pre class="algo">DIJKSTRA(G, s)
+1. dist[v] = ∞, prev[v] = NIL, done[v] = 0 for every v;  dist[s] = 0
+2. Repeat n times:
+     u = unfinished vertex with the smallest dist[u]
+     done[u] = 1
+     For every neighbour v of u with done[v] = 0:      // RELAX
+         If dist[u] + w(u, v) &lt; dist[v]:
+             dist[v] = dist[u] + w(u, v);  prev[v] = u
+3. The path to t: follow prev[] back from t to s.</pre>
+<div class="lab" data-play="dijkstra" data-g="wt" data-s="A" data-title="Dijkstra from A — labels show dist[v]"></div>
+<p>Notice: the direct edge A–B costs 4, but A → C → B costs 2 + 1 = <b>3</b>. Dijkstra finds this when it relaxes C–B. The final distances are A 0, B 3, C 2, D 8, E 10, F 13.</p>
+<div class="trap"><b>Common mistake:</b> Using Dijkstra with <b>negative</b> edge weights. Once a vertex is fixed it is never updated again, so a later negative edge cannot correct it. Use the <b>Bellman–Ford</b> algorithm for negative weights (it relaxes every edge n − 1 times, O(n·e)).</div>
+<details class="prog"><summary>Program 7 — Dijkstra (adjacency matrix, O(n²))</summary><div class="inner">
+<div class="code-wrap"><pre class="c">/* Dijkstra's shortest paths, O(n^2) with an adjacency matrix */
+#include &lt;stdio.h&gt;
+#include &lt;limits.h&gt;
+#define MAX 20
+
+int cost[MAX][MAX];     /* 0 = no edge */
+int n;
+
+void printPath(int prev[], int v) {
+    if (prev[v] != -1) {
+        printPath(prev, prev[v]);
+        printf(" -&gt; ");
+    }
+    printf("%c", 'A' + v);
+}
+
+void dijkstra(int s) {
+    int dist[MAX], prev[MAX], done[MAX];
+    int i, k, u, v;
+    for (i = 0; i &lt; n; i++) {
+        dist[i] = INT_MAX;
+        prev[i] = -1;
+        done[i] = 0;
+    }
+    dist[s] = 0;
+    for (k = 0; k &lt; n; k++) {
+        u = -1;                                   /* unfinished vertex with smallest dist */
+        for (i = 0; i &lt; n; i++)
+            if (!done[i] &amp;&amp; dist[i] != INT_MAX &amp;&amp; (u == -1 || dist[i] &lt; dist[u]))
+                u = i;
+        if (u == -1) break;                       /* the rest are unreachable */
+        done[u] = 1;
+        for (v = 0; v &lt; n; v++)                   /* relax every edge u -&gt; v */
+            if (cost[u][v] &amp;&amp; !done[v] &amp;&amp; dist[u] + cost[u][v] &lt; dist[v]) {
+                dist[v] = dist[u] + cost[u][v];
+                prev[v] = u;
+            }
+    }
+    printf("\nVertex  Distance  Path\n");
+    for (i = 0; i &lt; n; i++) {
+        if (dist[i] == INT_MAX) { printf("  %c     unreachable\n", 'A' + i); continue; }
+        printf("  %c     %4d      ", 'A' + i, dist[i]);
+        printPath(prev, i);
+        printf("\n");
+    }
+}
+
+int main() {
+    int e, i, w;
+    char u, v, s;
+    printf("Number of vertices: ");
+    scanf("%d", &amp;n);
+    printf("Number of edges: ");
+    scanf("%d", &amp;e);
+    for (i = 0; i &lt; e; i++) {
+        printf("Edge %d (u v weight): ", i + 1);
+        scanf(" %c %c %d", &amp;u, &amp;v, &amp;w);
+        cost[u - 'A'][v - 'A'] = cost[v - 'A'][u - 'A'] = w;   /* undirected */
+    }
+    printf("Source vertex: ");
+    scanf(" %c", &amp;s);
+    dijkstra(s - 'A');
+    return 0;
+}</pre></div>
+<p class="lbl">Input (graph above)</p><pre class="io">6
+9
+A B 4
+A C 2
+B C 1
+B D 5
+C D 8
+C E 10
+D E 2
+D F 6
+E F 3
+A</pre>
+<p class="lbl">Output</p><pre class="io">Vertex  Distance  Path
+  A        0      A
+  B        3      A -&gt; C -&gt; B
+  C        2      A -&gt; C
+  D        8      A -&gt; C -&gt; B -&gt; D
+  E       10      A -&gt; C -&gt; B -&gt; D -&gt; E
+  F       13      A -&gt; C -&gt; B -&gt; D -&gt; E -&gt; F</pre></div></details>
+
+<h3 id="a-topo"><span class="n">6.5</span>Topological sort</h3>
+<div class="def"><span class="t">Definition</span><p>A <b>topological order</b> of a DAG is a line-up of all vertices such that for every edge u → v, <b>u comes before v</b>.</p></div>
+<div class="easy"><span class="t">In simple words</span><p>You want to get dressed: socks before shoes, shirt before tie. Topological sort gives an order that respects every “before” rule. If the rules go in a circle (A before B before A), no order is possible.</p></div>
+<p><b>Kahn's method:</b> repeatedly take a vertex with <b>in-degree 0</b> (nothing left that must come before it), write it down, and delete its outgoing edges.</p>
+<pre class="algo">TOPO_SORT(G)
+1. Compute in[v] for every vertex
+2. Put every vertex with in[v] = 0 into a queue
+3. While the queue is not empty:
+     u = DEQUEUE();  print u
+     For every edge u → v:
+         in[v] = in[v] − 1
+         If in[v] == 0: ENQUEUE(v)
+4. If fewer than n vertices were printed → the graph has a cycle.</pre>
+<div class="lab" data-play="topo" data-g="dag" data-title="Topological sort of a DAG — labels show the current in-degree"></div>
+<div class="lab" data-play="topo" data-g="digraph" data-title="Same method on a graph with a cycle (D ⇄ E): it gets stuck"></div>
+<details class="prog"><summary>Program 8 — Topological sort (Kahn)</summary><div class="inner">
+<div class="code-wrap"><pre class="c">/* Topological sort (Kahn's algorithm) on a directed graph */
+#include &lt;stdio.h&gt;
+#define MAX 20
+
+int adj[MAX][MAX], indeg[MAX];
+int n;
+
+int main() {
+    int e, i, v, u, queue[MAX], front = 0, rear = -1, count = 0;
+    char a, b;
+    printf("Number of vertices: ");
+    scanf("%d", &amp;n);
+    printf("Number of edges: ");
+    scanf("%d", &amp;e);
+    for (i = 0; i &lt; e; i++) {
+        printf("Edge %d (from to): ", i + 1);
+        scanf(" %c %c", &amp;a, &amp;b);
+        adj[a - 'A'][b - 'A'] = 1;
+        indeg[b - 'A']++;
+    }
+    for (i = 0; i &lt; n; i++)                     /* all vertices with no prerequisite */
+        if (indeg[i] == 0) queue[++rear] = i;
+
+    printf("\nTopological order: ");
+    while (front &lt;= rear) {
+        u = queue[front++];
+        printf("%c ", 'A' + u);
+        count++;
+        for (v = 0; v &lt; n; v++)
+            if (adj[u][v]) {
+                indeg[v]--;                     /* remove edge u -&gt; v */
+                if (indeg[v] == 0) queue[++rear] = v;
+            }
+    }
+    if (count &lt; n) printf("\nThe graph has a cycle - no topological order.");
+    printf("\n");
+    return 0;
+}</pre></div>
+<p class="lbl">Input (DAG above)</p><pre class="io">8
+8
+A C
+B C
+B D
+C E
+D F
+E F
+E G
+F H</pre>
+<p class="lbl">Output</p><pre class="io">Topological order: A B C D E F G H</pre></div></details>
+
+<h3 id="a-lab"><span class="n">6.6</span>Algorithm lab</h3>
+<p>Run any of the four algorithms on the sample graphs or on your own. Open <b>Edit the graph</b> and set “New edge weight” before tapping two vertices.</p>
+<div class="lab" data-lab="algo"></div>
+
+<h3 id="a-when"><span class="n">6.7</span>Which algorithm when?</h3>
+<div class="tbl"><table class="t">
+<thead><tr><th>Problem</th><th>Algorithm</th><th>Time</th></tr></thead>
+<tbody>
+<tr><td>Visit everything / fewest hops (unweighted)</td><td>BFS</td><td class="num">O(V + E)</td></tr>
+<tr><td>Cycle check, components, maze</td><td>DFS</td><td class="num">O(V + E)</td></tr>
+<tr><td>Cheapest way to connect all vertices</td><td>Prim / Kruskal</td><td class="num">O(E log V)</td></tr>
+<tr><td>Shortest path, weights ≥ 0</td><td>Dijkstra</td><td class="num">O(V²) or O((V + E) log V)</td></tr>
+<tr><td>Shortest path, negative weights</td><td>Bellman–Ford</td><td class="num">O(V · E)</td></tr>
+<tr><td>Shortest paths between every pair</td><td>Floyd–Warshall</td><td class="num">O(V³)</td></tr>
+<tr><td>Order tasks with dependencies</td><td>Topological sort (Kahn or DFS)</td><td class="num">O(V + E)</td></tr>
+</tbody></table></div>
+
+<div class="recap"><p class="t">Remember from Part 6</p><ul>
+<li>Spanning tree: all n vertices, n − 1 edges, no cycle. MST: least total weight.</li>
+<li>Prim grows one tree using the smallest key. Kruskal sorts edges and skips cycles with union-find.</li>
+<li>Dijkstra fixes the closest unfinished vertex and relaxes its edges. No negative weights.</li>
+<li>Topological sort works only on a DAG: keep removing in-degree-0 vertices.</li>
+</ul></div>
+<div class="quiz" data-quiz="algos"></div>
+</section>
+
+<section id="revision" class="unit" hidden>
+<div class="unit-head">
+  <p class="eyebrow">Unit V · Revision</p>
+  <h2>Revision &amp; Exam</h2>
+  <p class="lede">Everything on one page the night before the exam: formulas, complexities, traps, model answers and a mixed quiz.</p>
+</div>
+
+<h3 id="rv-sheet"><span class="n">R.1</span>Formula sheet</h3>
+<div class="tbl"><table class="t">
+<thead><tr><th>Fact</th><th>Formula</th></tr></thead>
+<tbody>
+<tr><td>Graph</td><td class="formula">G = (V, E), order n = |V|, size e = |E|</td></tr>
+<tr><td>Handshake lemma</td><td class="formula">Σ deg(v) = 2e</td></tr>
+<tr><td>Digraph degrees</td><td class="formula">Σ in(v) = Σ out(v) = e</td></tr>
+<tr><td>Odd-degree vertices</td><td>Always an even number of them</td></tr>
+<tr><td>Max edges, simple undirected</td><td class="formula">n(n − 1) / 2</td></tr>
+<tr><td>Max edges, simple directed</td><td class="formula">n(n − 1)</td></tr>
+<tr><td>Complete graph K<sub>n</sub></td><td class="formula">n(n − 1)/2 edges, every degree n − 1</td></tr>
+<tr><td>k-regular graph</td><td class="formula">nk / 2 edges</td></tr>
+<tr><td>Complete bipartite K<sub>m,n</sub></td><td class="formula">m · n edges</td></tr>
+<tr><td>Tree / spanning tree</td><td class="formula">n − 1 edges</td></tr>
+<tr><td>Forest with c trees</td><td class="formula">n − c edges</td></tr>
+<tr><td>Spanning trees of K<sub>n</sub> (Cayley)</td><td class="formula">n<sup>n − 2</sup></td></tr>
+<tr><td>Adjacency matrix ones</td><td class="formula">2e (undirected), e (directed)</td></tr>
+<tr><td>Adjacency list nodes</td><td class="formula">2e (undirected), e (directed)</td></tr>
+</tbody></table></div>
+
+<h3 id="rv-cx"><span class="n">R.2</span>Complexity table</h3>
+<div class="tbl"><table class="t">
+<thead><tr><th>Algorithm</th><th>Matrix</th><th>List / heap</th><th>Uses</th></tr></thead>
+<tbody>
+<tr><td>BFS</td><td class="num">O(n²)</td><td class="num">O(n + e)</td><td>Queue</td></tr>
+<tr><td>DFS</td><td class="num">O(n²)</td><td class="num">O(n + e)</td><td>Stack / recursion</td></tr>
+<tr><td>Prim</td><td class="num">O(n²)</td><td class="num">O(e log n)</td><td>Priority queue</td></tr>
+<tr><td>Kruskal</td><td>—</td><td class="num">O(e log e)</td><td>Sort + union-find</td></tr>
+<tr><td>Dijkstra</td><td class="num">O(n²)</td><td class="num">O((n + e) log n)</td><td>Priority queue</td></tr>
+<tr><td>Topological sort</td><td class="num">O(n²)</td><td class="num">O(n + e)</td><td>Queue of in-degree 0</td></tr>
+</tbody></table></div>
+
+<h3 id="rv-trap"><span class="n">R.3</span>Common mistakes</h3>
+<div class="trap"><b>1.</b> Path length is the number of <b>edges</b>, not vertices.</div>
+<div class="trap"><b>2.</b> A self-loop adds <b>2</b> to the degree in an undirected graph.</div>
+<div class="trap"><b>3.</b> In BFS mark a vertex visited when it is <b>enqueued</b>, or it may enter the queue twice.</div>
+<div class="trap"><b>4.</b> BFS/DFS order depends on the neighbour order. State “neighbours taken in alphabetical order”.</div>
+<div class="trap"><b>5.</b> For a disconnected graph, one BFS/DFS does not reach everything — restart from an unvisited vertex.</div>
+<div class="trap"><b>6.</b> Weakly connected is <b>not</b> strongly connected. Check that arrows allow travel both ways.</div>
+<div class="trap"><b>7.</b> Same vertex count, edge count and degrees do <b>not</b> prove two graphs are isomorphic. Give the mapping.</div>
+<div class="trap"><b>8.</b> Dijkstra fails with negative weights; topological sort fails on any directed cycle.</div>
+
+<h3 id="rv-qa"><span class="n">R.4</span>Model answers</h3>
+<details class="qa"><summary><span class="qn">Q1</span>Define a graph. Differentiate between directed and undirected graphs. (5 marks)</summary><div class="ans">
+<p>A graph G = (V, E) is a non-linear data structure made of a finite non-empty set V of vertices and a set E of edges, where each edge connects a pair of vertices.</p>
+<p>In an <b>undirected</b> graph each edge is an unordered pair (u, v) = (v, u) and can be travelled both ways; its adjacency matrix is symmetric; each vertex has one degree; maximum edges n(n − 1)/2. In a <b>directed</b> graph each edge is an ordered pair &lt;u, v&gt; from tail u to head v and can be travelled one way only; its matrix need not be symmetric; each vertex has an in-degree and an out-degree; maximum edges n(n − 1). Draw one small example of each.</p></div></details>
+<details class="qa"><summary><span class="qn">Q2</span>Explain the following terms with an example: degree, path, cycle, loop, multiple edges, connected graph.</summary><div class="ans">
+<p>Use Figure 1 of Part 1. <b>Degree</b> = edges at a vertex, deg(B) = 3. <b>Path</b> = sequence of adjacent vertices without repetition, A–B–D–F. <b>Cycle</b> = path returning to its start, B–C–E–D–B. <b>Loop</b> = edge (v, v). <b>Multiple edges</b> = two or more edges between the same pair. <b>Connected graph</b> = a path exists between every pair of vertices.</p></div></details>
+<details class="qa"><summary><span class="qn">Q3</span>Prove that the number of odd-degree vertices in any graph is even.</summary><div class="ans">
+<p>By the handshake lemma Σ deg(v) = 2e, which is even. Split the sum into even-degree vertices and odd-degree vertices. The even part is even, so the odd part = 2e − (even) is also even. A sum of odd numbers is even only when there is an even count of them. Hence the number of odd-degree vertices is even. ∎</p></div></details>
+<details class="qa"><summary><span class="qn">Q4</span>Explain any five types of graphs with diagrams.</summary><div class="ans">
+<p>Choose from Part 3: simple, multigraph, weighted, regular, complete, bipartite, strongly/weakly connected, DAG, isomorphic. For each: one-line rule + small diagram + one property (e.g. K<sub>n</sub> has n(n − 1)/2 edges).</p></div></details>
+<details class="qa"><summary><span class="qn">Q5</span>Represent a given graph using an adjacency matrix and an adjacency list. Compare the two.</summary><div class="ans">
+<p>Draw the n × n matrix with 1 where an edge exists (symmetric for undirected), and the array of head pointers with linked lists of neighbours. Comparison: matrix space O(n²) vs list O(n + e); edge check O(1) vs O(deg); neighbour listing O(n) vs O(deg); matrix for dense graphs, list for sparse graphs. Use the table in 4.6.</p></div></details>
+<details class="qa"><summary><span class="qn">Q6</span>Write an algorithm for BFS and trace it on a graph.</summary><div class="ans">
+<p>Write the algorithm in 5.2. Then trace with the dry-run table: columns Step, Dequeue, Enqueue, Queue, Output. Finish with the BFS order and draw the BFS spanning tree. State complexity O(n + e) with lists.</p></div></details>
+<details class="qa"><summary><span class="qn">Q7</span>Write a C function for DFS. What is its time complexity?</summary><div class="ans">
+<p>The recursive dfs() of Program 4: mark visited, print, recurse on each unvisited neighbour. Time O(n²) with an adjacency matrix because each call scans a full row; O(n + e) with an adjacency list. Space O(n) for visited[] and the recursion stack.</p></div></details>
+<details class="qa"><summary><span class="qn">Q8</span>Compare BFS and DFS.</summary><div class="ans"><p>Use the table in 5.6: queue vs stack, level order vs depth order, both O(n + e), BFS gives shortest unweighted path, DFS detects cycles with back edges, applications of each.</p></div></details>
+<details class="qa"><summary><span class="qn">Q9</span>What is a spanning tree? Find the MST of a graph using Prim's / Kruskal's algorithm.</summary><div class="ans"><p>Definition from 6.1. Show the steps: for Prim a table of key/parent per step; for Kruskal the sorted edge list with taken/rejected marks. Draw the final tree and write the total weight. Mention both are greedy and give n − 1 edges.</p></div></details>
+<details class="qa"><summary><span class="qn">Q10</span>Find the shortest path from a source using Dijkstra's algorithm.</summary><div class="ans"><p>Make a table with one column per vertex and one row per step. Each row: the vertex fixed in this step and the updated dist values (∞ at the start). Circle the fixed values. At the end read every path from prev[]. Note the condition: no negative weights.</p></div></details>
+
+<h3 id="rv-quiz"><span class="n">R.5</span>Mixed quiz</h3>
+<div class="quiz" data-quiz="mixed"></div>
+<p class="foot">Every figure, animation and dry-run table in these notes is produced by the same JavaScript engine, and every C program was compiled with gcc and run on the inputs shown, so the figures, the player and the program output agree.</p>
+</section>
+<nav class="pager" id="pager" aria-label="Previous and next part"></nav>
+</main>
+</div>
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>

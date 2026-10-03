@@ -1,0 +1,118 @@
+<section id="basics" class="unit">
+<div class="unit-head">
+  <p class="eyebrow">Unit V · Part 1</p>
+  <h2>Graph Basics</h2>
+  <p class="lede">What a graph is, why almost every network in the real world is a graph, and the one counting rule you will use in every answer.</p>
+  <p class="syl"><b>Syllabus:</b> Definition of graph, directed and undirected graphs, basic properties.</p>
+</div>
+
+<h3 id="b-def"><span class="n">1.1</span>What is a graph?</h3>
+<div class="def"><span class="t">Definition (write this in the exam)</span>
+<p>A <b>graph</b> G is a pair of two finite sets, <b>G = (V, E)</b>, where V is a non-empty set of <b>vertices</b> (also called nodes) and E is a set of <b>edges</b>. Each edge is a pair of vertices (u, v) and shows that u and v are connected.</p></div>
+<div class="easy"><span class="t">In simple words</span>
+<p>A graph is <b>dots joined by lines</b>. The dots are vertices, the lines are edges. That is all. A city map (cities and roads), Instagram (people and follows) and the internet (computers and cables) are all graphs.</p></div>
+<div class="terms-grid">
+  <figure data-fig="intro" data-cap="<b>Figure 1.</b> A graph with 6 vertices and 8 edges."></figure>
+  <div>
+    <p class="formula">V = { A, B, C, D, E, F }</p>
+    <p class="formula">E = { (A,B), (A,C), (B,C), (B,D),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(C,E), (D,E), (D,F), (E,F) }</p>
+    <p>|V| = 6 is the <b>order</b> of the graph. |E| = 8 is the <b>size</b> of the graph.</p>
+    <p class="muted" style="font-size:15px">A graph is a <b>non-linear</b> data structure: one vertex can be connected to many others, in any pattern. There is no first or last element and no root.</p>
+  </div>
+</div>
+<div class="law">Graph = vertices + edges. Nothing else matters — not the position of the dots, not the length or shape of the lines.</div>
+<p>The same graph can be drawn in many ways. If you move vertex F to the top of the page, it is still the same graph, because the same pairs are connected. Only the <b>connections</b> matter.</p>
+
+<h3 id="b-life"><span class="n">1.2</span>Graphs around you</h3>
+<p>Whenever things are connected to other things, you have a graph. Learning graphs means learning how Google Maps, social media and the internet work underneath.</p>
+<div class="cols3">
+  <div class="card"><h5>Road map</h5><p>Cities are vertices, roads are edges. The road length is the <b>weight</b>. Google Maps runs a shortest-path algorithm (Part 6).</p>
+    <figure data-fig="P-S:250 P-M:150 S-H:300 M-H:710" data-pos="P 70 100, S 210 100, M 20 20, H 320 30" data-scale="0.7" data-cap="M Mumbai · P Pune · S Solapur · H Hyderabad (km)"></figure></div>
+  <div class="card"><h5>Friends network</h5><p>People are vertices; a friendship is an edge. Friendship goes both ways, so the graph is <b>undirected</b>.</p>
+    <figure data-fig="R-S R-T S-T T-U U-V" data-pos="R 20 60, S 100 10, T 110 100, U 200 60, V 280 60" data-scale="0.7"></figure></div>
+  <div class="card"><h5>Instagram follows</h5><p>If you follow someone, they may not follow you back. Each follow is an arrow, so this graph is <b>directed</b>.</p>
+    <figure data-fig="P>Q Q>P P>R R>S Q>S" data-pos="P 30 60, Q 140 10, R 140 110, S 260 60" data-scale="0.7"></figure></div>
+  <div class="card"><h5>Course prerequisites</h5><p>“C before Data Structures before Algorithms.” Arrows with no loop: a <b>DAG</b>. Topological sort gives a valid study order.</p>
+    <figure data-fig="C>D D>A M>A" data-pos="C 20 30, D 140 30, A 260 70, M 140 110" data-scale="0.7" data-cap="C programming → D (data structures) → A (algorithms) ← M (maths)"></figure></div>
+  <div class="card"><h5>Computer network</h5><p>Routers are vertices and cables are edges. Routing protocols such as OSPF use Dijkstra to send packets on the fastest path.</p></div>
+  <div class="card"><h5>Web pages</h5><p>Each page is a vertex and each hyperlink is a directed edge. Search engines walk this graph with BFS to discover pages.</p></div>
+</div>
+
+<h3 id="b-dir"><span class="n">1.3</span>Undirected and directed graphs</h3>
+<div class="row">
+  <figure data-fig="A-B A-C B-C C-D" data-pos="A 30 30, B 160 30, C 95 130, D 230 130" data-cap="<b>Undirected.</b> Edge (A, B) = edge (B, A). You can travel both ways."></figure>
+  <figure data-fig="A>B A>C B>C D>C" data-pos="A 30 30, B 160 30, C 95 130, D 230 130" data-cap="<b>Directed (digraph).</b> ⟨A, B⟩ means A → B only."></figure>
+</div>
+<div class="tbl"><table class="t">
+<thead><tr><th></th><th>Undirected graph</th><th>Directed graph (digraph)</th></tr></thead>
+<tbody>
+<tr><td><b>Edge</b></td><td>Unordered pair (u, v). (u, v) and (v, u) are the same edge.</td><td>Ordered pair &lt;u, v&gt;. u is the <b>tail</b> (start), v is the <b>head</b> (end).</td></tr>
+<tr><td><b>Drawn as</b></td><td>A plain line</td><td>An arrow</td></tr>
+<tr><td><b>Degree</b></td><td>One number: degree</td><td>Two numbers: in-degree and out-degree</td></tr>
+<tr><td><b>Max edges (simple)</b></td><td>n(n − 1) / 2</td><td>n(n − 1)</td></tr>
+<tr><td><b>Adjacency matrix</b></td><td>Always symmetric</td><td>Usually not symmetric</td></tr>
+<tr><td><b>Example</b></td><td>Facebook friends, roads with two-way traffic</td><td>Instagram follows, one-way streets, web links</td></tr>
+</tbody></table></div>
+<div class="trap"><b>Common mistake:</b> Writing directed edges with round brackets. Use (u, v) for undirected edges and &lt;u, v&gt; for directed edges. The order inside &lt; &gt; matters.</div>
+
+<h3 id="b-hand"><span class="n">1.4</span>Degree and the handshake rule</h3>
+<p>The <b>degree</b> of a vertex is the number of edges touching it. In Figure 1, deg(A) = 2 and deg(B) = 3.</p>
+<div class="law">Handshake lemma: in every undirected graph, the sum of all degrees = 2 × (number of edges).</div>
+<span class="big-f">Σ deg(v) = 2|E|</span>
+<p><b>Why it is true:</b> every edge has two ends. When you add up the degrees, each edge is counted once at each end, so it is counted exactly twice. In Figure 1: 2 + 3 + 3 + 3 + 3 + 2 = 16 = 2 × 8.</p>
+<p><b>Result you get for free:</b> the number of vertices with an <b>odd degree is always even</b>. The total 2|E| is even; the even degrees add up to an even number, so the odd degrees must also add up to an even number, and that needs an even count of them.</p>
+<div class="lab" data-handshake></div>
+<div class="exam"><b>Exam use:</b> “Can a graph have 5 vertices with degrees 3, 3, 3, 3, 3?” No. The sum is 15, which is odd, but the sum of degrees must be 2|E| (even). Equally: it would have 5 odd-degree vertices, which is an odd count.</div>
+<p>For a <b>directed</b> graph the rule becomes: Σ in-degree = Σ out-degree = |E|. Each arrow leaves one vertex and enters one vertex.</p>
+
+<h3 id="b-count"><span class="n">1.5</span>How many edges can a graph have?</h3>
+<p>In a <b>simple</b> graph (no loops, no repeated edges) every pair of vertices can have at most one edge. With n vertices there are n(n − 1)/2 pairs.</p>
+<div class="tbl"><table class="t">
+<thead><tr><th>Graph</th><th>Minimum edges</th><th>Maximum edges</th><th>n = 5</th></tr></thead>
+<tbody>
+<tr><td>Simple undirected</td><td>0</td><td>n(n − 1)/2</td><td class="num">10</td></tr>
+<tr><td>Simple directed</td><td>0</td><td>n(n − 1)</td><td class="num">20</td></tr>
+<tr><td>Connected undirected</td><td>n − 1 (a tree)</td><td>n(n − 1)/2</td><td class="num">4 to 10</td></tr>
+</tbody></table></div>
+<p>A graph with close to the maximum number of edges is <b>dense</b>. A graph with few edges (about n) is <b>sparse</b>. Most real graphs, like road maps, are sparse. This decides which representation to use in Part 4.</p>
+
+<h3 id="b-tree"><span class="n">1.6</span>Graph vs tree</h3>
+<p>In Unit IV you studied trees. A tree is just a special graph: <b>connected and with no cycle</b>.</p>
+<div class="row">
+  <figure data-fig="tree" data-cap="<b>Tree.</b> 6 vertices, 5 edges, exactly one path between any two vertices."></figure>
+  <figure data-fig="A-B A-C B-D B-E C-F E-F D-E" data-pos="A 150 30, B 80 110, C 220 110, D 40 190, E 120 190, F 220 190" data-ec="E-F=hot D-E=hot" data-cap="<b>Graph.</b> Add 2 more edges (red) and you get cycles. Now there are many paths."></figure>
+</div>
+<div class="tbl"><table class="t">
+<thead><tr><th></th><th>Tree</th><th>Graph</th></tr></thead>
+<tbody>
+<tr><td>Root</td><td>One special root</td><td>No root</td></tr>
+<tr><td>Cycles</td><td>Never</td><td>Allowed</td></tr>
+<tr><td>Edges for n vertices</td><td>Exactly n − 1</td><td>0 to n(n − 1)/2</td></tr>
+<tr><td>Path between two vertices</td><td>Exactly one</td><td>Zero, one or many</td></tr>
+<tr><td>Connected?</td><td>Always</td><td>Maybe not</td></tr>
+<tr><td>Model</td><td>Hierarchy (parent–child)</td><td>Network (any relation)</td></tr>
+<tr><td>Traversal needs visited[]?</td><td>No</td><td>Yes, to avoid looping on cycles</td></tr>
+</tbody></table></div>
+<div class="law">Every tree is a graph, but not every graph is a tree.</div>
+
+<h3 id="b-map"><span class="n">1.7</span>Map of this unit</h3>
+<p>Each part builds on the one before. Parts 1–5 are the syllabus; Part 6 takes you beyond it into the algorithms used in real software.</p>
+<div class="gmap">
+  <a href="#terms"><span class="pt">PART 2</span><b>Terminology</b><small>Degree, path, cycle, connected, component.</small></a>
+  <a href="#types"><span class="pt">PART 3</span><b>Types of graph</b><small>Simple, multi, complete, bipartite, DAG, isomorphic…</small></a>
+  <a href="#repr"><span class="pt">PART 4</span><b>Representation</b><small>Matrix, list, incidence matrix, edge list.</small></a>
+  <a href="#traversal"><span class="pt">PART 5</span><b>BFS &amp; DFS</b><small>Visit every vertex once using a queue or a stack.</small></a>
+  <a href="#algos" class="adv"><span class="pt">PART 6 · ADVANCED</span><b>MST &amp; shortest path</b><small>Prim, Kruskal, Dijkstra, topological sort.</small></a>
+  <a href="#revision"><span class="pt">✓</span><b>Revision &amp; exam</b><small>Cheat sheet, model answers, mixed quiz.</small></a>
+</div>
+
+<div class="recap"><p class="t">Remember from Part 1</p><ul>
+<li>G = (V, E): a set of vertices and a set of edges.</li>
+<li>Undirected edge (u, v) goes both ways; directed edge &lt;u, v&gt; goes from u to v only.</li>
+<li>Σ deg = 2|E|, so the number of odd-degree vertices is even.</li>
+<li>Max edges: n(n − 1)/2 undirected, n(n − 1) directed.</li>
+<li>A tree is a connected graph with no cycle and n − 1 edges.</li>
+</ul></div>
+<div class="quiz" data-quiz="basics"></div>
+</section>
+

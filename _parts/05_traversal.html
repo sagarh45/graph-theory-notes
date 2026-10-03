@@ -1,0 +1,236 @@
+<section id="traversal" class="unit" hidden>
+<div class="unit-head">
+  <p class="eyebrow">Unit V · Part 5</p>
+  <h2>Graph Traversal: BFS and DFS</h2>
+  <p class="lede">Traversal means visiting every vertex exactly once. BFS spreads out level by level using a queue. DFS goes deep first using a stack. Watch both run step by step.</p>
+  <p class="syl"><b>Syllabus:</b> Graph traversal — Breadth First Search and Depth First Search, algorithms, programs and comparison.</p>
+</div>
+
+<h3 id="tr-idea"><span class="n">5.1</span>Why traversal needs a visited[] array</h3>
+<p>In a tree you can never come back to a node you already saw. A graph can have <b>cycles</b>: from A you go to B, from B to C, and from C back to A. Without a record, the traversal would go round forever.</p>
+<div class="law">Keep an array visited[n], all 0 at the start. Set visited[v] = 1 the moment you first reach v, and never process v again.</div>
+<div class="row">
+  <div class="card"><h5>BFS — Breadth First Search</h5><p>Like ripples on water: visit the start, then <b>all vertices 1 edge away</b>, then all 2 edges away, and so on. Uses a <b>queue</b>.</p></div>
+  <div class="card"><h5>DFS — Depth First Search</h5><p>Like walking through a maze: keep going forward as <b>deep</b> as you can; when you hit a dead end, go back one step and try another way. Uses a <b>stack</b> (or recursion).</p></div>
+</div>
+<div class="exam"><b>Order rule used in these notes and in most exams:</b> when a vertex has several unvisited neighbours, take them in <b>alphabetical (or numerical) order</b>, which is the order in the adjacency matrix row. A different neighbour order gives a different but still correct traversal — always state your order.</div>
+
+<h3 id="tr-bfs"><span class="n">5.2</span>Breadth First Search (BFS)</h3>
+<pre class="algo">BFS(G, s)
+1. Set visited[v] = 0 for every vertex v.
+2. visited[s] = 1;  ENQUEUE(s)
+3. While the queue is not empty:
+     u = DEQUEUE();  print u
+     For every neighbour v of u (in order):
+         If visited[v] == 0:
+             visited[v] = 1;  ENQUEUE(v)
+4. Stop.</pre>
+<p>Press <b>Play</b> or use <b>Next</b>. The label under each vertex is its <b>level</b> — the number of edges from the start. The side panel shows the queue with its front (F) and rear (R), the visited array and the output.</p>
+<div class="lab" data-play="bfs" data-g="trav" data-s="A" data-title="BFS from A"></div>
+<h4>Dry run table (write this in the exam)</h4>
+<div data-dry="bfs" data-g="trav" data-s="A"></div>
+<div class="trap"><b>Common mistake:</b> Marking a vertex visited only when it is <b>dequeued</b>. Then the same vertex can enter the queue twice (for example F from both C and E). Mark it visited <b>when you enqueue it</b>.</div>
+<h4>What BFS gives you for free</h4>
+<ul>
+<li><b>Shortest path in an unweighted graph:</b> the level of v is the fewest edges from s to v. Follow the thick BFS-tree edges back to s to get the path.</li>
+<li><b>BFS spanning tree:</b> the thick edges form a tree that reaches every vertex in the component.</li>
+<li><b>Connected components:</b> start BFS again from any unvisited vertex; each new start is a new component.</li>
+<li><b>Bipartite test:</b> colour levels even/odd. If an edge joins two vertices of the same level, the graph is not bipartite.</li>
+</ul>
+
+<h3 id="tr-dfs"><span class="n">5.3</span>Depth First Search (DFS)</h3>
+<div class="pair">
+<div><p class="lbl">Recursive</p><pre class="algo">DFS(u)
+1. visited[u] = 1;  print u
+2. For every neighbour v of u (in order):
+       If visited[v] == 0:
+           DFS(v)
+3. Return.</pre></div>
+<div><p class="lbl">With an explicit stack</p><pre class="algo">DFS_STACK(s)
+1. PUSH(s)
+2. While the stack is not empty:
+     u = POP()
+     If visited[u] == 1: continue
+     visited[u] = 1;  print u
+     Push unvisited neighbours of u
+       in REVERSE order (so the smallest
+       is on top and comes out first)
+3. Stop.</pre></div>
+</div>
+<p>The label under each vertex shows <b>discovery / finish</b> time: when DFS first reached the vertex and when it finished all its neighbours. The side panel shows the call stack.</p>
+<div class="lab" data-play="dfs" data-g="trav" data-s="A" data-title="DFS from A"></div>
+<h4>Dry run table (stack version)</h4>
+<div data-dry="dfs" data-g="trav" data-s="A"></div>
+<p>Both versions print <b>A B D E F C G</b> here. Some vertices are pushed twice in the stack version (C and G above), which is why the pop step checks visited[] first and skips them.</p>
+<h4>Edge types and cycle detection<span class="adv-tag">Advanced</span></h4>
+<p>During DFS, every edge falls into one of these groups. The player draws them in different styles.</p>
+<div class="tbl"><table class="t">
+<thead><tr><th>Edge</th><th>Meaning</th><th>Drawn as</th></tr></thead>
+<tbody>
+<tr><td><b>Tree edge</b></td><td>Led DFS to a new vertex</td><td>Thick blue</td></tr>
+<tr><td><b>Back edge</b></td><td>Points to an ancestor still on the stack — it closes a <b>cycle</b></td><td>Dashed purple</td></tr>
+<tr><td><b>Forward edge</b> (digraph)</td><td>Points to a descendant that is already finished</td><td>Dotted green</td></tr>
+<tr><td><b>Cross edge</b> (digraph)</td><td>Points to a vertex in another, finished branch</td><td>Dotted green</td></tr>
+</tbody></table></div>
+<div class="law">A graph has a cycle if and only if DFS finds a back edge.</div>
+<div class="lab" data-play="dfs" data-g="digraph" data-s="A" data-title="DFS on a directed graph — watch for the back edge E → D"></div>
+
+<h3 id="tr-lab"><span class="n">5.4</span>Traversal lab</h3>
+<p>Choose BFS or DFS, pick a graph and a start vertex. Open <b>Edit the graph</b> to draw your own: tap empty space for a vertex, tap two vertices for an edge. Try the disconnected graph to see BFS restart from a new vertex.</p>
+<div class="lab" data-lab="trav"></div>
+
+<h3 id="tr-ex"><span class="n">5.5</span>Worked exam problems</h3>
+<h4>Problem 1 — BFS starting from E</h4>
+<figure data-fig="exam" data-cap="Graph for Problems 1 and 2"></figure>
+<div data-dry="bfs" data-g="exam" data-s="E"></div>
+<p><b>Answer:</b> BFS order = <b>E B D F A C</b>. Levels: E (0); B, D, F (1); A, C (2).</p>
+<h4>Problem 2 — DFS starting from A</h4>
+<div data-dry="dfs" data-g="exam" data-s="A"></div>
+<p><b>Answer:</b> DFS order = <b>A B C F E D</b>.</p>
+<div class="lab" data-play="dfs" data-g="exam" data-s="A" data-title="Check Problem 2 in the player"></div>
+
+<h3 id="tr-cmp"><span class="n">5.6</span>BFS vs DFS</h3>
+<div class="tbl"><table class="t">
+<thead><tr><th></th><th>BFS</th><th>DFS</th></tr></thead>
+<tbody>
+<tr><td>Data structure</td><td>Queue (FIFO)</td><td>Stack (LIFO) or recursion</td></tr>
+<tr><td>Order</td><td>Level by level (wide first)</td><td>One branch to the end (deep first)</td></tr>
+<tr><td>Time (adjacency list)</td><td class="num">O(V + E)</td><td class="num">O(V + E)</td></tr>
+<tr><td>Time (adjacency matrix)</td><td class="num">O(V²)</td><td class="num">O(V²)</td></tr>
+<tr><td>Extra memory</td><td>O(V) — can hold a whole level, which is large for wide graphs</td><td>O(V) — the depth of the path, small for wide graphs</td></tr>
+<tr><td>Shortest path (unweighted)</td><td><b>Yes</b></td><td>No</td></tr>
+<tr><td>Cycle detection</td><td>Possible</td><td>Natural (back edges)</td></tr>
+<tr><td>Topological sort</td><td>Kahn's method (queue of in-degree 0)</td><td>Reverse of finish order</td></tr>
+<tr><td>Used for</td><td>Shortest hops, web pages discovery, social “people you may know”, bipartite check</td><td>Mazes and puzzles, cycle detection, bridges, strongly connected components</td></tr>
+</tbody></table></div>
+
+<h3 id="tr-prog"><span class="n">5.7</span>Programs</h3>
+<details class="prog"><summary>Program 3 — BFS using a queue</summary><div class="inner">
+<div class="code-wrap"><pre class="c">/* Breadth First Search on an adjacency matrix */
+#include &lt;stdio.h&gt;
+#define MAX 20
+
+int adj[MAX][MAX], visited[MAX];
+int queue[MAX], front = 0, rear = -1;
+int n;
+
+void enqueue(int v) { queue[++rear] = v; }
+int  dequeue()      { return queue[front++]; }
+int  isEmpty()      { return front &gt; rear; }
+
+void bfs(int start) {
+    int u, v;
+    visited[start] = 1;
+    enqueue(start);
+    while (!isEmpty()) {
+        u = dequeue();
+        printf("%c ", 'A' + u);
+        for (v = 0; v &lt; n; v++) {          /* neighbours in order A, B, C ... */
+            if (adj[u][v] == 1 &amp;&amp; !visited[v]) {
+                visited[v] = 1;            /* mark when enqueued, not when printed */
+                enqueue(v);
+            }
+        }
+    }
+}
+
+int main() {
+    int e, i;
+    char u, v, s;
+    printf("Number of vertices: ");
+    scanf("%d", &amp;n);
+    printf("Number of edges: ");
+    scanf("%d", &amp;e);
+    for (i = 0; i &lt; e; i++) {
+        printf("Edge %d: ", i + 1);
+        scanf(" %c %c", &amp;u, &amp;v);
+        adj[u - 'A'][v - 'A'] = adj[v - 'A'][u - 'A'] = 1;
+    }
+    printf("Start vertex: ");
+    scanf(" %c", &amp;s);
+    printf("\nBFS order: ");
+    bfs(s - 'A');
+    printf("\n");
+    return 0;
+}</pre></div>
+<p class="lbl">Input (graph of 5.2)</p><pre class="io">7
+8
+A B
+A C
+B D
+B E
+C F
+E F
+E G
+F G
+A</pre>
+<p class="lbl">Output</p><pre class="io">BFS order: A B C D E F G</pre></div></details>
+<details class="prog"><summary>Program 4 — DFS, recursive and with a stack</summary><div class="inner">
+<div class="code-wrap"><pre class="c">/* Depth First Search: recursive version and explicit-stack version */
+#include &lt;stdio.h&gt;
+#define MAX 20
+
+int adj[MAX][MAX], visited[MAX];
+int n;
+
+void dfs(int u) {                         /* recursive: uses the call stack */
+    int v;
+    visited[u] = 1;
+    printf("%c ", 'A' + u);
+    for (v = 0; v &lt; n; v++)
+        if (adj[u][v] == 1 &amp;&amp; !visited[v])
+            dfs(v);
+}
+
+void dfsStack(int start) {                /* same order with our own stack */
+    int stack[MAX * MAX], top = -1, u, v;
+    stack[++top] = start;
+    while (top &gt;= 0) {
+        u = stack[top--];                 /* pop */
+        if (visited[u]) continue;
+        visited[u] = 1;
+        printf("%c ", 'A' + u);
+        for (v = n - 1; v &gt;= 0; v--)      /* push in reverse so A..Z come out first */
+            if (adj[u][v] == 1 &amp;&amp; !visited[v])
+                stack[++top] = v;
+    }
+}
+
+int main() {
+    int e, i;
+    char u, v, s;
+    printf("Number of vertices: ");
+    scanf("%d", &amp;n);
+    printf("Number of edges: ");
+    scanf("%d", &amp;e);
+    for (i = 0; i &lt; e; i++) {
+        printf("Edge %d: ", i + 1);
+        scanf(" %c %c", &amp;u, &amp;v);
+        adj[u - 'A'][v - 'A'] = adj[v - 'A'][u - 'A'] = 1;
+    }
+    printf("Start vertex: ");
+    scanf(" %c", &amp;s);
+
+    printf("\nDFS (recursive): ");
+    dfs(s - 'A');
+
+    for (i = 0; i &lt; n; i++) visited[i] = 0;
+    printf("\nDFS (stack)    : ");
+    dfsStack(s - 'A');
+    printf("\n");
+    return 0;
+}</pre></div>
+<p class="lbl">Input: same as Program 3</p>
+<p class="lbl">Output</p><pre class="io">DFS (recursive): A B D E F C G
+DFS (stack)    : A B D E F C G</pre></div></details>
+
+<div class="recap"><p class="t">Remember from Part 5</p><ul>
+<li>BFS = queue, level by level. DFS = stack/recursion, deep first.</li>
+<li>Mark visited when you enqueue (BFS) or when you first reach the vertex (DFS).</li>
+<li>Both take O(V + E) with an adjacency list, O(V²) with a matrix.</li>
+<li>BFS gives the fewest-edges path. A DFS back edge means a cycle.</li>
+<li>Disconnected graph: restart from any unvisited vertex; count the restarts to count components.</li>
+</ul></div>
+<div class="quiz" data-quiz="traversal"></div>
+</section>
+

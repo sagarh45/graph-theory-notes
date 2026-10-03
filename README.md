@@ -1,46 +1,36 @@
-# Getting Started with Create React App
+# Unit V · Graphs — interactive notes
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Simple-English notes for **Data Structures, Unit V (Graphs)**, with a visual for every idea.
 
-## Available Scripts
+## What is inside
 
-In the project directory, you can run:
+| Part | Topics | Interactive |
+|---|---|---|
+| 1. Graph Basics | definition, G = (V, E), real-life uses, degree, handshake lemma | handshake lab |
+| 2. Terminology | adjacent, incident, walk/trail/path/cycle, loops, components, bridge | term explorer |
+| 3. Types of Graph | null, simple, multi, pseudo, directed, weighted, regular, complete, bipartite, strongly/weakly connected, DAG, tree, forest, isomorphic, planar | K<sub>n</sub> slider, type checker |
+| 4. Representation | adjacency matrix, adjacency list, incidence matrix, edge list, comparison | representation lab (edit graph, all 4 forms update) |
+| 5. Traversal | BFS with queue, DFS with stack/recursion, discovery/finish time, edge types, dry-run tables | step-by-step players, traversal lab |
+| 6. MST & Shortest Path | Prim, Kruskal (union-find), Dijkstra, topological sort (Kahn) | step-by-step players, algorithm lab |
+| 7. Revision & Exam | formula sheet, exam questions, mixed quiz | quiz |
 
-### `npm start`
+Every graph editor accepts edges like `A-B` (undirected), `A>B` (directed), `A-B:4` (weight 4).
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## C programs
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+`c/` has 8 tested C programs (adjacency matrix, adjacency list, BFS, DFS, Prim, Kruskal, Dijkstra, topological sort). Their real outputs are shown in the notes.
 
-### `npm test`
+```bash
+gcc -Wall c/03_bfs.c -o bfs && ./bfs
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Run locally
 
-### `npm run build`
+```bash
+npm install
+npm run dev      # http://localhost:5173
+npm run build    # output in dist/
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+Built with Vite and plain JavaScript (no framework). Page content lives in `_parts/*.html`; `index.html` is these parts joined:
+`cat _parts/*.html > index.html`.

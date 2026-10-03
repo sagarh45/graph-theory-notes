@@ -1,0 +1,398 @@
+<section id="algos" class="unit" hidden>
+<div class="unit-head">
+  <p class="eyebrow">Unit V · Part 6 <span class="adv-tag">Advanced</span></p>
+  <h2>MST, Shortest Path and Topological Sort</h2>
+  <p class="lede">The algorithms that run inside maps, networks and build tools. Each one is a small change to BFS or DFS — see exactly where with the step players.</p>
+  <p class="syl"><b>Beyond the core syllabus:</b> spanning trees, Prim's and Kruskal's MST, Dijkstra's shortest path, topological sort. Commonly asked in university exams and placement interviews.</p>
+</div>
+
+<h3 id="a-st"><span class="n">6.1</span>Spanning tree and minimum spanning tree</h3>
+<div class="def"><span class="t">Definition</span><p>A <b>spanning tree</b> of a connected graph G is a subgraph that <b>includes every vertex</b> of G and is a <b>tree</b> (connected, no cycle). It always has <b>n − 1 edges</b>. A <b>minimum spanning tree (MST)</b> is a spanning tree whose total edge weight is as small as possible.</p></div>
+<div class="easy"><span class="t">In simple words</span><p>You must lay cables to connect 7 villages. Every village must be reachable, and cable is expensive. The MST tells you which roads to lay cable along so that the <b>total cable length is the least</b>.</p></div>
+<div class="row">
+  <figure data-fig="mst" data-cap="Weighted graph: 7 vertices, 11 edges."></figure>
+  <figure data-fig="mst" data-ec="A-D=tree C-E=tree D-F=tree A-B=tree B-E=tree E-G=tree" data-cap="Its MST: 6 edges, total weight <b>5 + 5 + 6 + 7 + 7 + 9 = 39</b>."></figure>
+</div>
+<ul>
+<li>A connected graph with n vertices can have many spanning trees. K<sub>n</sub> has <b>n<sup>n−2</sup></b> of them (Cayley's formula): K<sub>4</sub> has 16.</li>
+<li>Adding any one more edge to a spanning tree creates exactly one cycle. Removing any edge disconnects it.</li>
+<li>If all edge weights are different, the MST is <b>unique</b>.</li>
+<li>Both algorithms below are <b>greedy</b>: they always take the cheapest safe edge and never undo a choice.</li>
+</ul>
+
+<h3 id="a-prim"><span class="n">6.2</span>Prim's algorithm</h3>
+<p><b>Idea:</b> grow one tree. Start from any vertex. At every step add the <b>cheapest edge that joins a tree vertex to a non-tree vertex</b>. It is BFS with a priority instead of a plain queue.</p>
+<pre class="algo">PRIM(G, s)
+1. key[v] = ∞, parent[v] = NIL, inTree[v] = 0 for every v
+2. key[s] = 0
+3. Repeat n times:
+     u = vertex with inTree[u] = 0 and the smallest key[u]
+     inTree[u] = 1                  // add u (and edge parent[u]–u) to the MST
+     For every neighbour v of u with inTree[v] = 0:
+         If w(u, v) &lt; key[v]:
+             key[v] = w(u, v);  parent[v] = u</pre>
+<div class="lab" data-play="prim" data-g="mst" data-s="A" data-title="Prim's MST from A — labels show key[v]"></div>
+<p>Order of edges added: A–D (5), D–F (6), A–B (7), B–E (7), E–C (5), E–G (9). Total = <b>39</b>. Note that Prim can add a cheap edge (E–C, 5) late, because C was not reachable cheaply until E joined the tree.</p>
+<details class="prog"><summary>Program 5 — Prim's MST (adjacency matrix, O(n²))</summary><div class="inner">
+<div class="code-wrap"><pre class="c">/* Prim's minimum spanning tree, O(n^2) with an adjacency matrix */
+#include &lt;stdio.h&gt;
+#include &lt;limits.h&gt;
+#define MAX 20
+
+int cost[MAX][MAX];     /* 0 = no edge */
+int n;
+
+void prim(int start) {
+    int key[MAX], parent[MAX], inTree[MAX];
+    int i, k, u, v, total = 0;
+    for (i = 0; i &lt; n; i++) {
+        key[i] = INT_MAX;
+        parent[i] = -1;
+        inTree[i] = 0;
+    }
+    key[start] = 0;
+    printf("\nEdge   Weight\n");
+    for (k = 0; k &lt; n; k++) {
+        u = -1;                                   /* pick the smallest key */
+        for (i = 0; i &lt; n; i++)
+            if (!inTree[i] &amp;&amp; key[i] != INT_MAX &amp;&amp; (u == -1 || key[i] &lt; key[u]))
+                u = i;
+        if (u == -1) { printf("Graph is not connected\n"); return; }
+        inTree[u] = 1;
+        if (parent[u] != -1) {
+            printf("%c - %c   %d\n", 'A' + parent[u], 'A' + u, cost[parent[u]][u]);
+            total += cost[parent[u]][u];
+        }
+        for (v = 0; v &lt; n; v++)                   /* update keys of neighbours */
+            if (cost[u][v] &amp;&amp; !inTree[v] &amp;&amp; cost[u][v] &lt; key[v]) {
+                key[v] = cost[u][v];
+                parent[v] = u;
+            }
+    }
+    printf("Total weight of MST = %d\n", total);
+}
+
+int main() {
+    int e, i, w;
+    char u, v, s;
+    printf("Number of vertices: ");
+    scanf("%d", &amp;n);
+    printf("Number of edges: ");
+    scanf("%d", &amp;e);
+    for (i = 0; i &lt; e; i++) {
+        printf("Edge %d (u v weight): ", i + 1);
+        scanf(" %c %c %d", &amp;u, &amp;v, &amp;w);
+        cost[u - 'A'][v - 'A'] = cost[v - 'A'][u - 'A'] = w;
+    }
+    printf("Start vertex: ");
+    scanf(" %c", &amp;s);
+    prim(s - 'A');
+    return 0;
+}</pre></div>
+<p class="lbl">Input (graph of 6.1)</p><pre class="io">7
+11
+A B 7
+A D 5
+B C 8
+B D 9
+B E 7
+C E 5
+D E 15
+D F 6
+E F 8
+E G 9
+F G 11
+A</pre>
+<p class="lbl">Output</p><pre class="io">Edge   Weight
+A - D   5
+D - F   6
+A - B   7
+B - E   7
+E - C   5
+E - G   9
+Total weight of MST = 39</pre></div></details>
+
+<h3 id="a-kru"><span class="n">6.3</span>Kruskal's algorithm</h3>
+<p><b>Idea:</b> forget about growing one tree. Sort <b>all</b> edges from cheapest to costliest and take them one by one. <b>Skip an edge if its two ends are already connected</b> (it would make a cycle). Stop at n − 1 edges.</p>
+<pre class="algo">KRUSKAL(G)
+1. Sort all edges by weight (smallest first)
+2. Make a separate set for every vertex: {A} {B} {C} ...
+3. For each edge (u, v) in sorted order:
+     If FIND(u) ≠ FIND(v):          // different sets → no cycle
+         add (u, v) to the MST
+         UNION(u, v)
+     Else: reject (cycle)
+4. Stop when the MST has n − 1 edges.</pre>
+<div class="lab" data-play="kruskal" data-g="mst" data-title="Kruskal's MST — sorted edge list and union-find sets on the right"></div>
+<p>The same graph gives the same total, <b>39</b>, but the edges are picked in a different order: A–D, C–E, D–F, A–B, B–E, (reject B–C, E–F, B–D), E–G.</p>
+<details class="prog"><summary>Program 6 — Kruskal's MST with union-find</summary><div class="inner">
+<div class="code-wrap"><pre class="c">/* Kruskal's minimum spanning tree with union-find */
+#include &lt;stdio.h&gt;
+#define MAX 50
+
+struct edge { int u, v, w; };
+
+struct edge E[MAX];
+int parent[MAX];
+int n, e;
+
+int find(int x) {                         /* root of x's set (with path compression) */
+    if (parent[x] != x)
+        parent[x] = find(parent[x]);
+    return parent[x];
+}
+
+void sortEdges() {                        /* simple bubble sort by weight */
+    int i, j;
+    struct edge t;
+    for (i = 0; i &lt; e - 1; i++)
+        for (j = 0; j &lt; e - 1 - i; j++)
+            if (E[j].w &gt; E[j + 1].w) { t = E[j]; E[j] = E[j + 1]; E[j + 1] = t; }
+}
+
+int main() {
+    int i, taken = 0, total = 0, ru, rv;
+    char a, b;
+    printf("Number of vertices: ");
+    scanf("%d", &amp;n);
+    printf("Number of edges: ");
+    scanf("%d", &amp;e);
+    for (i = 0; i &lt; e; i++) {
+        printf("Edge %d (u v weight): ", i + 1);
+        scanf(" %c %c %d", &amp;a, &amp;b, &amp;E[i].w);
+        E[i].u = a - 'A';
+        E[i].v = b - 'A';
+    }
+    for (i = 0; i &lt; n; i++) parent[i] = i;  /* every vertex is its own set */
+    sortEdges();
+
+    printf("\nEdge   Weight  Result\n");
+    for (i = 0; i &lt; e &amp;&amp; taken &lt; n - 1; i++) {
+        ru = find(E[i].u);
+        rv = find(E[i].v);
+        if (ru != rv) {
+            parent[ru] = rv;                  /* union */
+            taken++;
+            total += E[i].w;
+            printf("%c - %c   %2d    taken\n", 'A' + E[i].u, 'A' + E[i].v, E[i].w);
+        } else {
+            printf("%c - %c   %2d    rejected (cycle)\n", 'A' + E[i].u, 'A' + E[i].v, E[i].w);
+        }
+    }
+    printf("Total weight of MST = %d\n", total);
+    return 0;
+}</pre></div>
+<p class="lbl">Input: same as Program 5 (without the start vertex)</p>
+<p class="lbl">Output</p><pre class="io">Edge   Weight  Result
+A - D    5    taken
+C - E    5    taken
+D - F    6    taken
+A - B    7    taken
+B - E    7    taken
+B - C    8    rejected (cycle)
+E - F    8    rejected (cycle)
+B - D    9    rejected (cycle)
+E - G    9    taken
+Total weight of MST = 39</pre></div></details>
+<div class="tbl"><table class="t">
+<thead><tr><th></th><th>Prim</th><th>Kruskal</th></tr></thead>
+<tbody>
+<tr><td>Grows</td><td>One tree from a start vertex</td><td>A forest that merges into one tree</td></tr>
+<tr><td>Picks</td><td>Cheapest edge leaving the tree</td><td>Cheapest edge overall that makes no cycle</td></tr>
+<tr><td>Needs</td><td>Adjacency matrix/list + priority queue</td><td>Edge list + sorting + union-find</td></tr>
+<tr><td>Time</td><td>O(n²) with a matrix; O(e log n) with a heap</td><td>O(e log e) (the sort dominates)</td></tr>
+<tr><td>Better for</td><td>Dense graphs</td><td>Sparse graphs</td></tr>
+<tr><td>Disconnected graph</td><td>Covers only one component</td><td>Gives a minimum spanning forest</td></tr>
+</tbody></table></div>
+
+<h3 id="a-dij"><span class="n">6.4</span>Dijkstra's shortest path</h3>
+<p><b>Idea:</b> keep a tentative distance dist[v] for every vertex. Repeatedly pick the unfinished vertex with the <b>smallest</b> dist — its distance can no longer improve, so fix it. Then try to improve its neighbours: this is called <b>relaxing</b> an edge.</p>
+<pre class="algo">DIJKSTRA(G, s)
+1. dist[v] = ∞, prev[v] = NIL, done[v] = 0 for every v;  dist[s] = 0
+2. Repeat n times:
+     u = unfinished vertex with the smallest dist[u]
+     done[u] = 1
+     For every neighbour v of u with done[v] = 0:      // RELAX
+         If dist[u] + w(u, v) &lt; dist[v]:
+             dist[v] = dist[u] + w(u, v);  prev[v] = u
+3. The path to t: follow prev[] back from t to s.</pre>
+<div class="lab" data-play="dijkstra" data-g="wt" data-s="A" data-title="Dijkstra from A — labels show dist[v]"></div>
+<p>Notice: the direct edge A–B costs 4, but A → C → B costs 2 + 1 = <b>3</b>. Dijkstra finds this when it relaxes C–B. The final distances are A 0, B 3, C 2, D 8, E 10, F 13.</p>
+<div class="trap"><b>Common mistake:</b> Using Dijkstra with <b>negative</b> edge weights. Once a vertex is fixed it is never updated again, so a later negative edge cannot correct it. Use the <b>Bellman–Ford</b> algorithm for negative weights (it relaxes every edge n − 1 times, O(n·e)).</div>
+<details class="prog"><summary>Program 7 — Dijkstra (adjacency matrix, O(n²))</summary><div class="inner">
+<div class="code-wrap"><pre class="c">/* Dijkstra's shortest paths, O(n^2) with an adjacency matrix */
+#include &lt;stdio.h&gt;
+#include &lt;limits.h&gt;
+#define MAX 20
+
+int cost[MAX][MAX];     /* 0 = no edge */
+int n;
+
+void printPath(int prev[], int v) {
+    if (prev[v] != -1) {
+        printPath(prev, prev[v]);
+        printf(" -&gt; ");
+    }
+    printf("%c", 'A' + v);
+}
+
+void dijkstra(int s) {
+    int dist[MAX], prev[MAX], done[MAX];
+    int i, k, u, v;
+    for (i = 0; i &lt; n; i++) {
+        dist[i] = INT_MAX;
+        prev[i] = -1;
+        done[i] = 0;
+    }
+    dist[s] = 0;
+    for (k = 0; k &lt; n; k++) {
+        u = -1;                                   /* unfinished vertex with smallest dist */
+        for (i = 0; i &lt; n; i++)
+            if (!done[i] &amp;&amp; dist[i] != INT_MAX &amp;&amp; (u == -1 || dist[i] &lt; dist[u]))
+                u = i;
+        if (u == -1) break;                       /* the rest are unreachable */
+        done[u] = 1;
+        for (v = 0; v &lt; n; v++)                   /* relax every edge u -&gt; v */
+            if (cost[u][v] &amp;&amp; !done[v] &amp;&amp; dist[u] + cost[u][v] &lt; dist[v]) {
+                dist[v] = dist[u] + cost[u][v];
+                prev[v] = u;
+            }
+    }
+    printf("\nVertex  Distance  Path\n");
+    for (i = 0; i &lt; n; i++) {
+        if (dist[i] == INT_MAX) { printf("  %c     unreachable\n", 'A' + i); continue; }
+        printf("  %c     %4d      ", 'A' + i, dist[i]);
+        printPath(prev, i);
+        printf("\n");
+    }
+}
+
+int main() {
+    int e, i, w;
+    char u, v, s;
+    printf("Number of vertices: ");
+    scanf("%d", &amp;n);
+    printf("Number of edges: ");
+    scanf("%d", &amp;e);
+    for (i = 0; i &lt; e; i++) {
+        printf("Edge %d (u v weight): ", i + 1);
+        scanf(" %c %c %d", &amp;u, &amp;v, &amp;w);
+        cost[u - 'A'][v - 'A'] = cost[v - 'A'][u - 'A'] = w;   /* undirected */
+    }
+    printf("Source vertex: ");
+    scanf(" %c", &amp;s);
+    dijkstra(s - 'A');
+    return 0;
+}</pre></div>
+<p class="lbl">Input (graph above)</p><pre class="io">6
+9
+A B 4
+A C 2
+B C 1
+B D 5
+C D 8
+C E 10
+D E 2
+D F 6
+E F 3
+A</pre>
+<p class="lbl">Output</p><pre class="io">Vertex  Distance  Path
+  A        0      A
+  B        3      A -&gt; C -&gt; B
+  C        2      A -&gt; C
+  D        8      A -&gt; C -&gt; B -&gt; D
+  E       10      A -&gt; C -&gt; B -&gt; D -&gt; E
+  F       13      A -&gt; C -&gt; B -&gt; D -&gt; E -&gt; F</pre></div></details>
+
+<h3 id="a-topo"><span class="n">6.5</span>Topological sort</h3>
+<div class="def"><span class="t">Definition</span><p>A <b>topological order</b> of a DAG is a line-up of all vertices such that for every edge u → v, <b>u comes before v</b>.</p></div>
+<div class="easy"><span class="t">In simple words</span><p>You want to get dressed: socks before shoes, shirt before tie. Topological sort gives an order that respects every “before” rule. If the rules go in a circle (A before B before A), no order is possible.</p></div>
+<p><b>Kahn's method:</b> repeatedly take a vertex with <b>in-degree 0</b> (nothing left that must come before it), write it down, and delete its outgoing edges.</p>
+<pre class="algo">TOPO_SORT(G)
+1. Compute in[v] for every vertex
+2. Put every vertex with in[v] = 0 into a queue
+3. While the queue is not empty:
+     u = DEQUEUE();  print u
+     For every edge u → v:
+         in[v] = in[v] − 1
+         If in[v] == 0: ENQUEUE(v)
+4. If fewer than n vertices were printed → the graph has a cycle.</pre>
+<div class="lab" data-play="topo" data-g="dag" data-title="Topological sort of a DAG — labels show the current in-degree"></div>
+<div class="lab" data-play="topo" data-g="digraph" data-title="Same method on a graph with a cycle (D ⇄ E): it gets stuck"></div>
+<details class="prog"><summary>Program 8 — Topological sort (Kahn)</summary><div class="inner">
+<div class="code-wrap"><pre class="c">/* Topological sort (Kahn's algorithm) on a directed graph */
+#include &lt;stdio.h&gt;
+#define MAX 20
+
+int adj[MAX][MAX], indeg[MAX];
+int n;
+
+int main() {
+    int e, i, v, u, queue[MAX], front = 0, rear = -1, count = 0;
+    char a, b;
+    printf("Number of vertices: ");
+    scanf("%d", &amp;n);
+    printf("Number of edges: ");
+    scanf("%d", &amp;e);
+    for (i = 0; i &lt; e; i++) {
+        printf("Edge %d (from to): ", i + 1);
+        scanf(" %c %c", &amp;a, &amp;b);
+        adj[a - 'A'][b - 'A'] = 1;
+        indeg[b - 'A']++;
+    }
+    for (i = 0; i &lt; n; i++)                     /* all vertices with no prerequisite */
+        if (indeg[i] == 0) queue[++rear] = i;
+
+    printf("\nTopological order: ");
+    while (front &lt;= rear) {
+        u = queue[front++];
+        printf("%c ", 'A' + u);
+        count++;
+        for (v = 0; v &lt; n; v++)
+            if (adj[u][v]) {
+                indeg[v]--;                     /* remove edge u -&gt; v */
+                if (indeg[v] == 0) queue[++rear] = v;
+            }
+    }
+    if (count &lt; n) printf("\nThe graph has a cycle - no topological order.");
+    printf("\n");
+    return 0;
+}</pre></div>
+<p class="lbl">Input (DAG above)</p><pre class="io">8
+8
+A C
+B C
+B D
+C E
+D F
+E F
+E G
+F H</pre>
+<p class="lbl">Output</p><pre class="io">Topological order: A B C D E F G H</pre></div></details>
+
+<h3 id="a-lab"><span class="n">6.6</span>Algorithm lab</h3>
+<p>Run any of the four algorithms on the sample graphs or on your own. Open <b>Edit the graph</b> and set “New edge weight” before tapping two vertices.</p>
+<div class="lab" data-lab="algo"></div>
+
+<h3 id="a-when"><span class="n">6.7</span>Which algorithm when?</h3>
+<div class="tbl"><table class="t">
+<thead><tr><th>Problem</th><th>Algorithm</th><th>Time</th></tr></thead>
+<tbody>
+<tr><td>Visit everything / fewest hops (unweighted)</td><td>BFS</td><td class="num">O(V + E)</td></tr>
+<tr><td>Cycle check, components, maze</td><td>DFS</td><td class="num">O(V + E)</td></tr>
+<tr><td>Cheapest way to connect all vertices</td><td>Prim / Kruskal</td><td class="num">O(E log V)</td></tr>
+<tr><td>Shortest path, weights ≥ 0</td><td>Dijkstra</td><td class="num">O(V²) or O((V + E) log V)</td></tr>
+<tr><td>Shortest path, negative weights</td><td>Bellman–Ford</td><td class="num">O(V · E)</td></tr>
+<tr><td>Shortest paths between every pair</td><td>Floyd–Warshall</td><td class="num">O(V³)</td></tr>
+<tr><td>Order tasks with dependencies</td><td>Topological sort (Kahn or DFS)</td><td class="num">O(V + E)</td></tr>
+</tbody></table></div>
+
+<div class="recap"><p class="t">Remember from Part 6</p><ul>
+<li>Spanning tree: all n vertices, n − 1 edges, no cycle. MST: least total weight.</li>
+<li>Prim grows one tree using the smallest key. Kruskal sorts edges and skips cycles with union-find.</li>
+<li>Dijkstra fixes the closest unfinished vertex and relaxes its edges. No negative weights.</li>
+<li>Topological sort works only on a DAG: keep removing in-degree-0 vertices.</li>
+</ul></div>
+<div class="quiz" data-quiz="algos"></div>
+</section>
+

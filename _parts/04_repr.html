@@ -1,0 +1,231 @@
+<section id="repr" class="unit" hidden>
+<div class="unit-head">
+  <p class="eyebrow">Unit V · Part 4</p>
+  <h2>Representation of Graphs</h2>
+  <p class="lede">A computer cannot see a drawing. We must store “who is connected to whom” as numbers. There are four standard ways; two of them are used almost everywhere.</p>
+  <p class="syl"><b>Syllabus:</b> Representation of graphs — adjacency matrix, adjacency list, incidence matrix; their programs and comparison.</p>
+</div>
+
+<h3 id="r-mat"><span class="n">4.1</span>Adjacency matrix</h3>
+<div class="def"><span class="t">Definition</span><p>For a graph with n vertices, the <b>adjacency matrix</b> A is an n × n array where <b>A[i][j] = 1</b> if there is an edge from vertex i to vertex j, and <b>A[i][j] = 0</b> otherwise.</p></div>
+<div class="easy"><span class="t">In simple words</span><p>Make a table with one row and one column for every vertex. Put a 1 in the box where row u meets column v if u and v are connected.</p></div>
+<figure data-rep="adj" data-g="intro" data-cap="<b>Undirected:</b> the matrix is symmetric. Row sum = degree (shown on the right)."></figure>
+<figure data-rep="adj" data-g="digraph" data-cap="<b>Directed:</b> row = from, column = to. Row sum = out-degree, column sum = in-degree. Not symmetric."></figure>
+<figure data-rep="adj" data-g="wt" data-cap="<b>Weighted:</b> store the weight instead of 1. Use ∞ (or a large number) for “no edge” and 0 on the diagonal."></figure>
+<h4>Properties</h4>
+<ul>
+<li>Space: always <b>n²</b> cells, even if the graph has very few edges.</li>
+<li>Check “is there an edge u–v?” in <b>O(1)</b> — just read A[u][v].</li>
+<li>Find all neighbours of u: scan the whole row, <b>O(n)</b>.</li>
+<li>Undirected ⇒ symmetric (A[u][v] = A[v][u]). Only the upper half needs to be stored.</li>
+<li>Diagonal is all 0 in a simple graph (no self-loops).</li>
+<li>Number of 1s = 2|E| (undirected) or |E| (directed).</li>
+</ul>
+<details class="prog"><summary>Program 1 — adjacency matrix: create, display, degrees</summary><div class="inner">
+<div class="code-wrap"><pre class="c">/* Adjacency matrix: create, display, degree of every vertex */
+#include &lt;stdio.h&gt;
+#define MAX 20
+
+int adj[MAX][MAX];
+int n, directed;
+
+void createGraph() {
+    int e, i;
+    char u, v;
+    printf("Number of vertices: ");
+    scanf("%d", &amp;n);
+    printf("Directed? (1 = yes, 0 = no): ");
+    scanf("%d", &amp;directed);
+    printf("Number of edges: ");
+    scanf("%d", &amp;e);
+    for (i = 0; i &lt; e; i++) {
+        printf("Edge %d (e.g. A B): ", i + 1);
+        scanf(" %c %c", &amp;u, &amp;v);
+        adj[u - 'A'][v - 'A'] = 1;
+        if (!directed)
+            adj[v - 'A'][u - 'A'] = 1;   /* undirected: both ways */
+    }
+}
+
+void displayMatrix() {
+    int i, j;
+    printf("\nAdjacency matrix:\n   ");
+    for (j = 0; j &lt; n; j++) printf(" %c", 'A' + j);
+    printf("\n");
+    for (i = 0; i &lt; n; i++) {
+        printf(" %c ", 'A' + i);
+        for (j = 0; j &lt; n; j++) printf(" %d", adj[i][j]);
+        printf("\n");
+    }
+}
+
+void degrees() {
+    int i, j, in, out;
+    printf("\nVertex  ");
+    printf(directed ? "In  Out\n" : "Degree\n");
+    for (i = 0; i &lt; n; i++) {
+        in = out = 0;
+        for (j = 0; j &lt; n; j++) {
+            out += adj[i][j];            /* row sum    */
+            in  += adj[j][i];            /* column sum */
+        }
+        if (directed) printf("  %c     %d   %d\n", 'A' + i, in, out);
+        else          printf("  %c     %d\n", 'A' + i, out);
+    }
+}
+
+int main() {
+    createGraph();
+    displayMatrix();
+    degrees();
+    return 0;
+}</pre></div>
+<p class="lbl">Input (Figure 1 graph)</p><pre class="io">6
+0
+8
+A B
+A C
+B C
+B D
+C E
+D E
+D F
+E F</pre>
+<p class="lbl">Output</p><pre class="io">Adjacency matrix:
+    A B C D E F
+ A  0 1 1 0 0 0
+ B  1 0 1 1 0 0
+ C  1 1 0 0 1 0
+ D  0 1 0 0 1 1
+ E  0 0 1 1 0 1
+ F  0 0 0 1 1 0
+
+Vertex  Degree
+  A     2
+  B     3
+  C     3
+  D     3
+  E     3
+  F     2</pre></div></details>
+
+<h3 id="r-list"><span class="n">4.2</span>Adjacency list</h3>
+<div class="def"><span class="t">Definition</span><p>An <b>adjacency list</b> keeps an array of n head pointers, one per vertex. Head[u] points to a <b>linked list of all vertices adjacent to u</b>.</p></div>
+<div class="easy"><span class="t">In simple words</span><p>For every vertex, write down the list of its neighbours. Like a phone's contact list: each person has their own list of friends.</p></div>
+<figure data-rep="list" data-g="intro" data-cap="Each edge u–v appears <b>twice</b> in an undirected graph: v in u's list and u in v's list. 8 edges → 16 list nodes."></figure>
+<figure data-rep="list" data-g="wt" data-w data-cap="Weighted: each list node also stores the weight (orange)."></figure>
+<pre class="algo">struct node {
+    int vertex;          /* neighbour number          */
+    int weight;          /* only for weighted graphs  */
+    struct node *next;   /* next neighbour in list    */
+};
+struct node *head[MAX];  /* head[u] = first neighbour of u */</pre>
+<h4>Properties</h4>
+<ul>
+<li>Space: <b>O(n + e)</b> — n heads plus 2e nodes (undirected) or e nodes (directed).</li>
+<li>List all neighbours of u in <b>O(deg(u))</b> — only real neighbours are visited. This makes BFS and DFS fast.</li>
+<li>Check “is there an edge u–v?” needs a scan of u's list: <b>O(deg(u))</b>.</li>
+<li>In-degree in a digraph is slow: you must scan every list (or keep an inverse list).</li>
+</ul>
+<details class="prog"><summary>Program 2 — adjacency list with linked lists</summary><div class="inner">
+<div class="code-wrap"><pre class="c">/* Adjacency list using linked lists (new node added at the end) */
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#define MAX 20
+
+struct node {
+    int vertex;
+    struct node *next;
+};
+
+struct node *head[MAX];
+int n;
+
+void addEdge(int u, int v) {
+    struct node *p, *nn = (struct node *)malloc(sizeof(struct node));
+    nn-&gt;vertex = v;
+    nn-&gt;next = NULL;
+    if (head[u] == NULL) {
+        head[u] = nn;
+        return;
+    }
+    p = head[u];
+    while (p-&gt;next != NULL) p = p-&gt;next;
+    p-&gt;next = nn;
+}
+
+void display() {
+    int i;
+    struct node *p;
+    printf("\nAdjacency list:\n");
+    for (i = 0; i &lt; n; i++) {
+        printf(" %c", 'A' + i);
+        for (p = head[i]; p != NULL; p = p-&gt;next)
+            printf(" -&gt; %c", 'A' + p-&gt;vertex);
+        printf(" -&gt; NULL\n");
+    }
+}
+
+int main() {
+    int e, i, directed;
+    char u, v;
+    printf("Number of vertices: ");
+    scanf("%d", &amp;n);
+    printf("Directed? (1 = yes, 0 = no): ");
+    scanf("%d", &amp;directed);
+    printf("Number of edges: ");
+    scanf("%d", &amp;e);
+    for (i = 0; i &lt; e; i++) {
+        printf("Edge %d (e.g. A B): ", i + 1);
+        scanf(" %c %c", &amp;u, &amp;v);
+        addEdge(u - 'A', v - 'A');
+        if (!directed) addEdge(v - 'A', u - 'A');
+    }
+    display();
+    return 0;
+}</pre></div>
+<p class="lbl">Input: same as Program 1</p>
+<p class="lbl">Output</p><pre class="io">Adjacency list:
+ A -&gt; B -&gt; C -&gt; NULL
+ B -&gt; A -&gt; C -&gt; D -&gt; NULL
+ C -&gt; A -&gt; B -&gt; E -&gt; NULL
+ D -&gt; B -&gt; E -&gt; F -&gt; NULL
+ E -&gt; C -&gt; D -&gt; F -&gt; NULL
+ F -&gt; D -&gt; E -&gt; NULL</pre></div></details>
+
+<h3 id="r-inc"><span class="n">4.3</span>Incidence matrix</h3>
+<div class="def"><span class="t">Definition</span><p>The <b>incidence matrix</b> is an n × e array (rows = vertices, columns = edges). M[v][k] = 1 if edge k touches vertex v, otherwise 0. For a digraph, use <b>+1</b> at the start (tail) and <b>−1</b> at the end (head) of the edge.</p></div>
+<figure data-rep="inc" data-g="A-B A-C B-C C-D" data-pos="A 30 30, B 160 30, C 95 130, D 230 130" data-cap="Undirected: every column has exactly two 1s. Row sum = degree."></figure>
+<figure data-rep="inc" data-g="A>B A>C B>C D>C" data-pos="A 30 30, B 160 30, C 95 130, D 230 130" data-cap="Directed: each column has one +1 (tail) and one −1 (head, orange)."></figure>
+<p>Space is n × e, which is large for most graphs, so the incidence matrix is used mainly in theory and in electrical circuit analysis (Kirchhoff's laws).</p>
+
+<h3 id="r-edge"><span class="n">4.4</span>Edge list</h3>
+<p>The simplest form: just store every edge as a pair (u, v), or a triple (u, v, w) for a weighted graph. Space is <b>O(e)</b>.</p>
+<figure data-rep="edge" data-g="wt" data-cap="Edge list of the weighted graph: one row per edge."></figure>
+<p>Finding neighbours is slow (scan all edges), but sorting edges by weight is easy. That is exactly what <b>Kruskal's algorithm</b> needs, so Kruskal uses an edge list.</p>
+
+<h3 id="r-lab"><span class="n">4.5</span>Representation lab</h3>
+<p>Edit the graph on the left. All four representations update instantly. Hover a matrix cell to light up its two vertices.</p>
+<div class="lab" data-repr></div>
+
+<h3 id="r-cmp"><span class="n">4.6</span>Which one to use?</h3>
+<div class="tbl"><table class="t">
+<thead><tr><th>Operation</th><th>Adjacency matrix</th><th>Adjacency list</th><th>Incidence matrix</th><th>Edge list</th></tr></thead>
+<tbody>
+<tr><td>Space</td><td class="num">O(n²)</td><td class="num">O(n + e)</td><td class="num">O(n · e)</td><td class="num">O(e)</td></tr>
+<tr><td>Is u–v an edge?</td><td class="num"><b>O(1)</b></td><td class="num">O(deg u)</td><td class="num">O(e)</td><td class="num">O(e)</td></tr>
+<tr><td>All neighbours of u</td><td class="num">O(n)</td><td class="num"><b>O(deg u)</b></td><td class="num">O(e)</td><td class="num">O(e)</td></tr>
+<tr><td>Add an edge</td><td class="num">O(1)</td><td class="num">O(1) at head</td><td>new column</td><td class="num">O(1)</td></tr>
+<tr><td>BFS / DFS time</td><td class="num">O(n²)</td><td class="num"><b>O(n + e)</b></td><td>—</td><td>—</td></tr>
+<tr><td>Best for</td><td>Dense graphs, quick edge checks, Floyd–Warshall</td><td>Sparse graphs (most real graphs), BFS, DFS, Dijkstra</td><td>Circuit theory</td><td>Kruskal, input files</td></tr>
+</tbody></table></div>
+<div class="exam"><b>Exam tip:</b> Example — a road map of 1000 cities with about 3000 roads. Matrix: 1,000,000 cells. List: 1000 + 6000 = 7000 nodes. The list is over 100 times smaller, so use the list.</div>
+
+<div class="recap"><p class="t">Remember from Part 4</p><ul>
+<li>Adjacency matrix: n × n, A[u][v] = 1 if edge. Symmetric for undirected graphs. Edge check O(1), space O(n²).</li>
+<li>Adjacency list: array of linked lists. Space O(n + e). Best for sparse graphs and traversals.</li>
+<li>Incidence matrix: n × e, vertex vs edge.</li>
+<li>Edge list: list of (u, v, w). Used by Kruskal.</li>
+</ul></div>
+<div class="quiz" data-quiz="repr"></div>
+</section>
+
