@@ -175,6 +175,19 @@ export const PRESETS = {
   mst: { text: 'A-B:7 A-D:5 B-C:8 B-D:9 B-E:7 C-E:5 D-E:15 D-F:6 E-F:8 E-G:9 F-G:11', pos: { A: [40, 40], B: [170, 40], C: [300, 40], D: [90, 150], E: [240, 150], F: [140, 260], G: [300, 260] } },
   comps: { text: 'A-B B-C A-C D-E F', pos: { A: [40, 50], B: [140, 50], C: [90, 140], D: [210, 50], E: [210, 140], F: [300, 95] } },
   tree: { text: 'A-B A-C B-D B-E C-F', pos: { A: [150, 30], B: [80, 110], C: [220, 110], D: [40, 190], E: [120, 190], F: [220, 190] } },
+  neg: { text: 'A>B:6 A>D:7 B>C:5 B>D:8 B>E:-4 C>B:-2 D>C:-3 D>E:9 E>A:2 E>C:7', directed: true, pos: { A: [40, 140], B: [170, 40], C: [330, 40], D: [170, 240], E: [330, 240] } },
+  negcyc: { text: 'A>B:4 A>C:5 B>D:3 C>B:-2 D>C:-3 D>E:2', directed: true, pos: { A: [40, 130], B: [170, 40], C: [170, 220], D: [310, 130], E: [430, 130] } },
+  dfail: { text: 'A>B:2 A>C:3 C>B:-2', directed: true, pos: { A: [40, 120], B: [200, 40], C: [200, 200] } },
+  fw: { text: 'A>B:3 A>D:7 B>A:8 B>C:2 C>A:5 C>D:1 D>A:2', directed: true, pos: { A: [40, 40], B: [240, 40], C: [240, 220], D: [40, 220] } },
+  cycd: { text: 'A>B A>C B>D C>D D>E E>C', directed: true, pos: { A: [40, 120], B: [150, 40], C: [150, 200], D: [270, 40], E: [270, 200] } },
+  bipg: { text: 'A-B B-C C-D D-E E-F F-A A-D', pos: { A: [40, 120], B: [130, 40], C: [260, 40], D: [350, 120], E: [260, 200], F: [130, 200] } },
+  oddc: { text: 'A-B B-C C-D D-E E-F F-A B-D', pos: { A: [40, 120], B: [130, 40], C: [260, 40], D: [350, 120], E: [260, 200], F: [130, 200] } },
+  brg: { text: 'A-B A-C B-C C-D D-E D-F E-F F-G', pos: { A: [40, 40], B: [40, 200], C: [150, 120], D: [280, 120], E: [390, 40], F: [390, 200], G: [500, 200] } },
+  sccg: { text: 'A>B B>C C>A B>D D>E E>F F>D G>F G>H H>G', directed: true, pos: { A: [40, 50], B: [160, 50], C: [100, 190], D: [290, 50], E: [410, 50], F: [350, 190], G: [480, 230], H: [530, 110] } },
+  house: { text: 'A-B B-C C-D D-A A-C B-D A-E B-E', pos: { A: [60, 140], B: [240, 140], C: [240, 300], D: [60, 300], E: [150, 40] } },
+  konig: { text: 'A-B A-B A-C A-C A-D B-D C-D', pos: { A: [180, 150], B: [60, 40], C: [60, 260], D: [330, 150] } },
+  colg: { text: 'A-B A-C A-D B-C B-E C-D C-E C-F D-F E-F', pos: { A: [60, 40], B: [60, 200], C: [190, 120], D: [190, 0], E: [190, 260], F: [320, 120] } },
+  cube: { text: 'A-B B-C C-D D-A E-F F-G G-H H-E A-E B-F C-G D-H', pos: { A: [40, 40], B: [300, 40], C: [300, 300], D: [40, 300], E: [110, 110], F: [230, 110], G: [230, 230], H: [110, 230] } },
 };
 
 export function preset(name) {

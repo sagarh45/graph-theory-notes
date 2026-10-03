@@ -2,7 +2,8 @@ import { makeGraph, preset, PRESETS, adj, degrees, properties, edgesToText, pars
 import { svgGraph, esc, adjMatrixHTML, adjListHTML, incidenceHTML, edgeListHTML } from './render.js';
 import { Player, graphStage } from './player.js';
 import { bfsFrames, dfsFrames, primFrames, kruskalFrames, dijkstraFrames, topoFrames } from './algos.js';
-import { bfsSide, dfsSide, primSide, kruskalSide, dijkstraSide, topoSide } from './sides.js';
+import { bfsSide, dfsSide, primSide, kruskalSide, dijkstraSide, topoSide, bellmanSide, floydSide, cycleSide, bipSide, compSide, bridgeSide, sccSide, eulerSide, colourSide } from './sides.js';
+import { bellmanFrames, floydFrames, cycleFrames, bipartiteFrames, componentsFrames, bridgeFrames, sccFrames, eulerFrames, colourFrames } from './algos2.js';
 
 /* ---------- helpers ---------- */
 function parsePos(s) {
@@ -40,7 +41,16 @@ const ALG = {
   prim: { run: (g, s) => primFrames(g, s), side: primSide, name: "Prim's MST", needsStart: true, undirected: true, weighted: true },
   kruskal: { run: (g) => kruskalFrames(g), side: kruskalSide, name: "Kruskal's MST", undirected: true, weighted: true },
   dijkstra: { run: (g, s) => dijkstraFrames(g, s), side: dijkstraSide, name: 'Dijkstra', needsStart: true, weighted: true },
-  topo: { run: (g) => topoFrames(g), side: topoSide, name: 'Topological sort', directed: true },
+  topo: { run: (g) => topoFrames(g), side: topoSide, name: 'Topological sort', directed: true, preset: 'dag' },
+  bellman: { run: (g, s) => bellmanFrames(g, s), side: bellmanSide, name: 'Bellman–Ford', needsStart: true, weighted: true, preset: 'neg' },
+  floyd: { run: (g) => floydFrames(g), side: floydSide, name: 'Floyd–Warshall', weighted: true, preset: 'fw' },
+  cycle: { run: (g, s) => cycleFrames(g, s), side: cycleSide, name: 'Cycle check', needsStart: true, preset: 'cycd' },
+  bip: { run: (g, s) => bipartiteFrames(g, s), side: bipSide, name: 'Bipartite check', needsStart: true, undirected: true, preset: 'oddc' },
+  comps: { run: (g) => componentsFrames(g), side: compSide, name: 'Components', undirected: true, preset: 'comps' },
+  bridge: { run: (g, s) => bridgeFrames(g, s), side: bridgeSide, name: 'Bridges & cut vertices', needsStart: true, undirected: true, preset: 'brg' },
+  scc: { run: (g) => sccFrames(g), side: sccSide, name: 'SCC (Kosaraju)', directed: true, preset: 'sccg' },
+  euler: { run: (g, s) => eulerFrames(g, s), side: eulerSide, name: 'Euler path', needsStart: true, undirected: true, preset: 'house' },
+  colour: { run: (g) => colourFrames(g), side: colourSide, name: 'Colouring', undirected: true, preset: 'colg' },
 };
 const LEGEND = {
   bfs: [['cur', 'being processed'], ['front', 'in the queue'], ['done', 'printed'], ['e-tree', 'BFS tree edge']],
@@ -49,12 +59,21 @@ const LEGEND = {
   kruskal: [['cur', 'ends of current edge'], ['done', 'touched by MST'], ['e-tree', 'taken'], ['e-rej', 'rejected (cycle)']],
   dijkstra: [['cur', 'just fixed'], ['front', 'tentative dist'], ['done', 'final'], ['e-tree', 'shortest-path tree'], ['e-cand', 'being relaxed']],
   topo: [['cur', 'just removed'], ['front', 'in the queue'], ['done', 'in the order'], ['bad', 'on a cycle']],
+  bellman: [['cur', 'just improved'], ['front', 'finite dist'], ['e-tree', 'current best path'], ['e-cand', 'edge being relaxed'], ['bad', 'negative cycle']],
+  floyd: [['cur', 'k (the middle stop)'], ['front', 'pair i, j'], ['e-cand', 'direct edge on i → k → j']],
+  cycle: [['cur', 'current'], ['front', 'grey / on the path'], ['done', 'black / finished'], ['e-tree', 'DFS tree edge'], ['bad', 'cycle']],
+  bip: [['side0', 'group X'], ['side1', 'group Y'], ['e-tree', 'BFS edge'], ['bad', 'conflict (odd cycle)']],
+  comps: [['k0', 'component 1'], ['k1', 'component 2'], ['k2', 'component 3'], ['e-tree', 'DFS edge']],
+  bridge: [['cur', 'current'], ['front', 'on the DFS path'], ['done', 'finished'], ['cutv', 'cut vertex'], ['e-tree', 'tree edge'], ['e-back', 'back edge'], ['e-hot', 'bridge']],
+  scc: [['front', 'on the stack (pass 1)'], ['done', 'finished (pass 1)'], ['k0', 'SCC 1'], ['k1', 'SCC 2'], ['k2', 'SCC 3']],
+  euler: [['oddv', 'odd degree'], ['front', 'on the stack'], ['e-cand', 'walked'], ['e-tree', 'fixed in the answer']],
+  colour: [['k0', 'colour c1'], ['k1', 'colour c2'], ['k2', 'colour c3'], ['k3', 'colour c4'], ['e-cand', 'neighbour checked']],
 };
 function legendHTML(alg) {
   return '<div class="legend">' + LEGEND[alg].map(([c, t]) => (c.startsWith('e-') ? `<span><i class="le ${c}"></i>${t}</span>` : `<span><i class="lg ${c}"></i>${t}</span>`)).join('') + '</div>';
 }
 function renderer(g, alg) {
-  return (f, small) => ({ stage: graphStage(g, f, small), side: small ? '' : ALG[alg].side(f.side) });
+  return (f, small) => ({ stage: graphStage(f.g || g, f, small), side: small ? '' : ALG[alg].side(f.side) });
 }
 
 /* ---------- fixed player ---------- */
@@ -134,18 +153,19 @@ function presetOptions(list) {
 const LAB_PRESETS = {
   trav: [['trav', 'Seven-vertex graph'], ['exam', 'Grid (6 vertices)'], ['digraph', 'Directed graph'], ['comps', 'Disconnected graph'], ['tree', 'Tree']],
   algo: [['wt', 'Weighted graph (6)'], ['mst', 'Weighted graph (7)'], ['dag', 'DAG (course plan)'], ['digraph', 'Directed with cycle']],
+  adv: [['neg', 'Directed, negative edges'], ['negcyc', 'Negative cycle'], ['fw', 'Four cities (all pairs)'], ['cycd', 'Directed with a cycle'], ['dag', 'DAG (no cycle)'], ['trav', 'Undirected (7)'], ['tree', 'Tree'], ['bipg', 'Bipartite (even cycle)'], ['oddc', 'Odd cycle'], ['comps', 'Disconnected graph'], ['brg', 'Two triangles + tail'], ['sccg', 'Directed (3 SCCs)'], ['house', 'House (Euler path)'], ['konig', 'Königsberg bridges'], ['colg', 'Colouring graph'], ['cube', 'Cube graph']],
 };
 export function mountLab(el) {
   const kind = el.dataset.lab; // trav | algo
-  const algs = kind === 'trav' ? ['bfs', 'dfs'] : ['dijkstra', 'prim', 'kruskal', 'topo'];
+  const algs = kind === 'trav' ? ['bfs', 'dfs'] : kind === 'adv' ? ['bellman', 'floyd', 'cycle', 'bip', 'comps', 'bridge', 'scc', 'euler', 'colour'] : ['dijkstra', 'prim', 'kruskal', 'topo'];
   let alg = el.dataset.alg || algs[0];
   let g = cloneGraph(preset(LAB_PRESETS[kind][0][0]));
-  el.innerHTML = `<p class="lab-title"><span class="pill">Try it</span>${kind === 'trav' ? 'Traversal lab — build any graph and run BFS or DFS' : 'Algorithm lab — shortest path, MST and topological sort'}</p>
+  el.innerHTML = `<p class="lab-title"><span class="pill">Try it</span>${kind === 'trav' ? 'Traversal lab — build any graph and run BFS or DFS' : kind === 'adv' ? 'Advanced lab — pick an algorithm, edit the graph, watch every step' : 'Algorithm lab — shortest path, MST and topological sort'}</p>
   <div class="lab-bar"><span class="seg" role="group" aria-label="Algorithm">${algs.map((a) => `<button type="button" class="chip" data-a="${a}">${ALG[a].name}</button>`).join('')}</span></div>
   <div class="lab-bar"><label class="ord">Graph <select class="ps">${presetOptions(LAB_PRESETS[kind])}<option value="custom">Custom (your edges)</option></select></label>
   <label class="ord st-wrap">Start <select class="st"></select></label>
   <label class="ord"><input type="checkbox" class="dir"> Directed</label>
-  ${kind === 'algo' ? '<label class="ord w-wrap">New edge weight <input type="number" class="nw" value="5" min="-9" max="99"></label>' : ''}
+  ${kind !== 'trav' ? '<label class="ord w-wrap">New edge weight <input type="number" class="nw" value="5" min="-9" max="99"></label>' : ''}
   <button type="button" class="primary run">Run ▶</button></div>
   <details class="ed-box"><summary>Edit the graph</summary><div class="ed-host"></div>
   <div class="lab-bar"><input class="et" aria-label="Edge list" spellcheck="false"><button type="button" class="apply">Apply edges</button><button type="button" class="clear">Clear edges</button></div>
@@ -167,6 +187,7 @@ export function mountLab(el) {
     $('.st-wrap').hidden = !ALG[a].needsStart;
     // pick a sensible graph for the algorithm
     const want = ALG[a].directed ? 'dag' : ALG[a].weighted ? (a === 'dijkstra' ? 'wt' : 'mst') : null;
+    if (kind === 'adv') { if (ps.value !== 'custom') loadPreset(ALG[a].preset); run(); return; }
     if (kind === 'algo' && want && ps.value !== 'custom' && ((ALG[a].directed && !g.directed) || (!ALG[a].directed && g.directed) || (ALG[a].weighted && !g.weighted))) loadPreset(want);
     run();
   }
@@ -176,7 +197,7 @@ export function mountLab(el) {
   function run() {
     let note = '';
     if (ALG[alg].undirected && g.directed) note = `${ALG[alg].name} works on <b>undirected</b> graphs. Directed edges are treated as undirected here.`;
-    if (ALG[alg].directed && !g.directed) note = 'Topological sort needs a <b>directed</b> graph. Tick “Directed” or choose the DAG preset.';
+    if (ALG[alg].directed && !g.directed) note = `${ALG[alg].name} needs a <b>directed</b> graph. Tick “Directed” or choose a directed preset.`;
     const gg = ALG[alg].undirected && g.directed ? { ...g, directed: false } : g;
     if (ALG[alg].directed && !g.directed) { phHost.innerHTML = `<div class="trap"><b>Not possible:</b> ${note}</div>`; player = null; $('.lg-host').innerHTML = ''; return; }
     if (!gg.nodes.length) { phHost.innerHTML = '<p class="empty">Add a vertex to start.</p>'; player = null; return; }

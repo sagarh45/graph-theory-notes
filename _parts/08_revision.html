@@ -23,6 +23,11 @@
 <tr><td>Spanning trees of K<sub>n</sub> (Cayley)</td><td class="formula">n<sup>n − 2</sup></td></tr>
 <tr><td>Adjacency matrix ones</td><td class="formula">2e (undirected), e (directed)</td></tr>
 <tr><td>Adjacency list nodes</td><td class="formula">2e (undirected), e (directed)</td></tr>
+<tr><td>Bellman–Ford passes</td><td class="formula">n − 1 (+ 1 check for a negative cycle)</td></tr>
+<tr><td>Floyd–Warshall step</td><td class="formula">D[i][j] = min(D[i][j], D[i][k] + D[k][j])</td></tr>
+<tr><td>Bridge / cut vertex</td><td class="formula">low[v] &gt; disc[u] / low[v] ≥ disc[u]</td></tr>
+<tr><td>Euler circuit / path</td><td class="formula">0 odd vertices / exactly 2 odd vertices</td></tr>
+<tr><td>Chromatic number</td><td class="formula">χ(K<sub>n</sub>) = n, bipartite = 2, planar ≤ 4, any ≤ Δ + 1</td></tr>
 </tbody></table></div>
 
 <h3 id="rv-cx"><span class="n">R.2</span>Complexity table</h3>
@@ -35,6 +40,12 @@
 <tr><td>Kruskal</td><td>—</td><td class="num">O(e log e)</td><td>Sort + union-find</td></tr>
 <tr><td>Dijkstra</td><td class="num">O(n²)</td><td class="num">O((n + e) log n)</td><td>Priority queue</td></tr>
 <tr><td>Topological sort</td><td class="num">O(n²)</td><td class="num">O(n + e)</td><td>Queue of in-degree 0</td></tr>
+<tr><td>Bellman–Ford</td><td class="num">O(n³)</td><td class="num">O(n · e)</td><td>Edge list</td></tr>
+<tr><td>Floyd–Warshall</td><td class="num">O(n³)</td><td>—</td><td>Distance matrix</td></tr>
+<tr><td>Cycle check, components, bipartite</td><td class="num">O(n²)</td><td class="num">O(n + e)</td><td>DFS / BFS</td></tr>
+<tr><td>Bridges, cut vertices (Tarjan)</td><td class="num">O(n²)</td><td class="num">O(n + e)</td><td>DFS + disc / low</td></tr>
+<tr><td>SCC (Kosaraju)</td><td class="num">O(n²)</td><td class="num">O(n + e)</td><td>2 DFS + reversed graph</td></tr>
+<tr><td>Euler path (Hierholzer)</td><td>—</td><td class="num">O(e)</td><td>Stack</td></tr>
 </tbody></table></div>
 
 <h3 id="rv-trap"><span class="n">R.3</span>Common mistakes</h3>
@@ -46,6 +57,9 @@
 <div class="trap"><b>6.</b> Weakly connected is <b>not</b> strongly connected. Check that arrows allow travel both ways.</div>
 <div class="trap"><b>7.</b> Same vertex count, edge count and degrees do <b>not</b> prove two graphs are isomorphic. Give the mapping.</div>
 <div class="trap"><b>8.</b> Dijkstra fails with negative weights; topological sort fails on any directed cycle.</div>
+<div class="trap"><b>9.</b> In Floyd–Warshall the <b>k</b> loop is outermost. Putting i or j outside gives wrong answers.</div>
+<div class="trap"><b>10.</b> Bridge test uses <b>&gt;</b> (low[v] &gt; disc[u]); cut-vertex test uses <b>≥</b>. The DFS root is a cut vertex only if it has 2 or more children.</div>
+<div class="trap"><b>11.</b> Euler = every <b>edge</b> once; Hamiltonian = every <b>vertex</b> once. Do not mix them.</div>
 
 <h3 id="rv-qa"><span class="n">R.4</span>Model answers</h3>
 <details class="qa"><summary><span class="qn">Q1</span>Define a graph. Differentiate between directed and undirected graphs. (5 marks)</summary><div class="ans">
@@ -66,6 +80,15 @@
 <details class="qa"><summary><span class="qn">Q8</span>Compare BFS and DFS.</summary><div class="ans"><p>Use the table in 5.6: queue vs stack, level order vs depth order, both O(n + e), BFS gives shortest unweighted path, DFS detects cycles with back edges, applications of each.</p></div></details>
 <details class="qa"><summary><span class="qn">Q9</span>What is a spanning tree? Find the MST of a graph using Prim's / Kruskal's algorithm.</summary><div class="ans"><p>Definition from 6.1. Show the steps: for Prim a table of key/parent per step; for Kruskal the sorted edge list with taken/rejected marks. Draw the final tree and write the total weight. Mention both are greedy and give n − 1 edges.</p></div></details>
 <details class="qa"><summary><span class="qn">Q10</span>Find the shortest path from a source using Dijkstra's algorithm.</summary><div class="ans"><p>Make a table with one column per vertex and one row per step. Each row: the vertex fixed in this step and the updated dist values (∞ at the start). Circle the fixed values. At the end read every path from prev[]. Note the condition: no negative weights.</p></div></details>
+
+<details class="qa"><summary><span class="qn">Q·A1</span>Explain Bellman–Ford with an example. How is it different from Dijkstra? (10 marks)</summary><div class="ans">
+<p>Write the algorithm of <a href="#x-bf">7.1</a>: initialise dist, relax all edges n − 1 times, then one extra pass for a negative cycle. Draw the 5-vertex graph, list the edge order and show the dist table after each pass (A 0, B 2, C 4, D 7, E −2). Then give the comparison table: negative edges allowed, detects negative cycles, O(n · e) against Dijkstra's O(n²).</p></div></details>
+<details class="qa"><summary><span class="qn">Q·A2</span>Find all-pairs shortest paths using Floyd–Warshall. (10 marks)</summary><div class="ans">
+<p>Write the recurrence D<sup>k</sup>[i][j] = min(D<sup>k−1</sup>[i][j], D<sup>k−1</sup>[i][k] + D<sup>k−1</sup>[k][j]). Write D⁰ from the graph, then D¹ … Dⁿ — in each, copy row k and column k unchanged and check the remaining cells. Circle the changed cells. State O(n³) time and O(n²) space.</p></div></details>
+<details class="qa"><summary><span class="qn">Q·A3</span>What are articulation points and bridges? How are they found? (5 marks)</summary><div class="ans">
+<p>Give both definitions with the figure of <a href="#x-br">7.5</a>. Explain disc and low, then the three rules (bridge: low[v] &gt; disc[u]; cut vertex: low[v] ≥ disc[u] for a non-root; root with ≥ 2 children). One DFS, O(n + e). Mention network reliability as the use.</p></div></details>
+<details class="qa"><summary><span class="qn">Q·A4</span>State the conditions for an Euler path and circuit. Explain the Königsberg bridge problem.</summary><div class="ans">
+<p>Draw the 4-vertex multigraph with 7 edges. Degrees 5, 3, 3, 3 → four odd vertices → no Euler path. Rule: connected and 0 odd vertices → circuit; exactly 2 odd → path from one odd vertex to the other. Contrast with Hamiltonian (every vertex once, NP-complete).</p></div></details>
 
 <h3 id="rv-quiz"><span class="n">R.5</span>Mixed quiz</h3>
 <div class="quiz" data-quiz="mixed"></div>

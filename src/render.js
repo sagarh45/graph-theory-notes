@@ -59,7 +59,7 @@ export function svgGraph(g, o = {}) {
       const fx = off ? 2 * mx - (a.x + b.x) / 2 : sx, fy = off ? 2 * my - (a.y + b.y) / 2 : sy;
       edgesS += arrowHead(fx, fy, tx, ty, cls);
     }
-    if (g.weighted && e.w != null && !o.hideW) labelsS += wLabel(mx, my, e.w, cls);
+    if (g.weighted && e.w != null && !o.hideW) { const t = g.directed && !off ? 0.42 : 0.5; labelsS += wLabel(off ? mx : a.x + (b.x - a.x) * t, off ? my : a.y + (b.y - a.y) * t, e.w, cls); }
   });
   s += `<g class="edges">${edgesS}</g><g class="wts">${labelsS}</g>`;
   g.nodes.forEach((n) => {

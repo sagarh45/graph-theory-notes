@@ -46,6 +46,18 @@ export const QUIZ = {
     ['A topological order exists if and only if the graph is…', ['connected', 'a DAG', 'complete', 'bipartite'], 1, 'Any directed cycle means some vertex must come before itself.'],
     ['With a binary heap, Dijkstra runs in…', ['O(n²)', 'O((n + e) log n)', 'O(n + e)', 'O(e²)'], 1, 'Each edge may cause a decrease-key, O(log n) each. The simple array version is O(n²).'],
   ],
+  adv: [
+    ['Bellman–Ford relaxes every edge how many times (at most) before the extra check?', ['1', 'log n', 'n − 1', 'e'], 2, 'A shortest path has at most n − 1 edges, so n − 1 passes are enough. Pass n is only the negative-cycle check.'],
+    ['If Bellman–Ford can still improve a distance in pass n, the graph has…', ['a bridge', 'a negative cycle reachable from s', 'no path', 'an Euler circuit'], 1, 'Without a negative cycle every distance is final after n − 1 passes.'],
+    ['Time complexity of Floyd–Warshall is…', ['O(n²)', 'O(n³)', 'O(n · e)', 'O(e log n)'], 1, 'Three nested loops over k, i and j.'],
+    ['In Floyd–Warshall, which loop must be the outermost?', ['i (source)', 'j (destination)', 'k (middle vertex)', 'any order works'], 2, 'D^k is built from D^(k−1). All pairs must be updated for one k before moving to the next.'],
+    ['DFS on a directed graph reaches a GREY vertex. This means…', ['a cross edge', 'the vertex is finished', 'a back edge, so a cycle', 'the graph is bipartite'], 2, 'Grey = still on the current path. Reaching it again closes a directed cycle.'],
+    ['A graph is bipartite if and only if it has no…', ['even cycle', 'odd cycle', 'bridge', 'vertex of degree 1'], 1, 'Going round an odd cycle you cannot alternate two colours.'],
+    ['Tree edge u → v (v child). u–v is a bridge when…', ['low[v] ≥ disc[u]', 'low[v] > disc[u]', 'disc[v] > low[u]', 'low[u] = low[v]'], 1, 'Strictly greater: nothing in the subtree of v reaches u or above. (≥ is the cut-vertex test.)'],
+    ['A connected undirected graph has an Euler circuit if…', ['every vertex has even degree', 'exactly two vertices have odd degree', 'it is complete', 'it has a Hamiltonian cycle'], 0, 'Every time the walk passes through a vertex it uses two edges. Exactly 2 odd vertices gives an Euler path instead.'],
+    ['Kosaraju\'s algorithm needs how many DFS passes?', ['1', '2', 'n', 'n − 1'], 1, 'Pass 1 on G for finish order, pass 2 on the reversed graph.'],
+    ['The chromatic number of K₅ is…', ['2', '3', '4', '5'], 3, 'Every pair is joined, so all 5 vertices need different colours.'],
+  ],
 };
 
 export function mountQuiz(el) {
@@ -69,4 +81,4 @@ export function mountQuiz(el) {
   });
   el.querySelector('.quiz-reset').onclick = () => mountQuiz(el);
 }
-QUIZ.mixed = [QUIZ.basics[0], QUIZ.terms[5], QUIZ.types[2], QUIZ.repr[4], QUIZ.traversal[4], QUIZ.traversal[3], QUIZ.algos[1], QUIZ.algos[3], QUIZ.types[3], QUIZ.basics[2]];
+QUIZ.mixed = [QUIZ.basics[0], QUIZ.terms[5], QUIZ.types[2], QUIZ.repr[4], QUIZ.traversal[4], QUIZ.traversal[3], QUIZ.algos[1], QUIZ.algos[3], QUIZ.types[3], QUIZ.basics[2], QUIZ.adv[0], QUIZ.adv[5], QUIZ.adv[7]];

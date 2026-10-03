@@ -1,0 +1,688 @@
+<section id="advanced" class="unit" hidden>
+<div class="unit-head">
+  <p class="eyebrow">Unit V · Part 7 <span class="adv-tag">Advanced</span></p>
+  <h2>Advanced Graph Algorithms</h2>
+  <p class="lede">What to do when weights are negative, when you need the distance between every pair, and how to find cycles, weak points, groups and colourings in a graph. Every algorithm has a step player.</p>
+  <p class="syl"><b>Beyond the core syllabus:</b> Bellman–Ford, Floyd–Warshall, cycle detection, components, bipartite check, bridges and cut vertices, strongly connected components, Euler and Hamiltonian paths, graph colouring. Asked in long university answers, GATE and placement interviews.</p>
+</div>
+
+<h3 id="x-bf"><span class="n">7.1</span>Bellman–Ford: shortest path with negative weights</h3>
+<p><b>Why do we need it?</b> Dijkstra fixes a vertex for ever as soon as it is the closest one. With a negative edge, a cheaper path can appear <b>later</b>, and Dijkstra misses it.</p>
+<div class="row">
+  <figure data-fig="dfail" data-nl="A=0 B=2 C=3" data-nc="B=bad" data-cap="Dijkstra from A: fixes <b>B = 2</b> first. Later A → C → B costs 3 + (−2) = <b>1</b>, but B is already final. Wrong answer."></figure>
+  <figure data-fig="dfail" data-nl="A=0 B=1 C=3" data-ec="A>C=tree C>B=tree" data-cap="Bellman–Ford keeps relaxing every edge, so it finds <b>B = 1</b> through C."></figure>
+</div>
+<div class="def"><span class="t">Definition</span><p><b>Bellman–Ford</b> finds the shortest distance from one source s to every vertex. Edge weights <b>may be negative</b>. It also reports a <b>negative cycle</b> if one can be reached from s.</p></div>
+<div class="easy"><span class="t">In simple words</span><p>Don't be clever, be patient. Relax <b>every edge</b>, then do it again, and again. A shortest path has at most n − 1 edges, so after <b>n − 1 rounds</b> every distance is correct. If a round n can still improve something, there must be a loop that keeps getting cheaper — a negative cycle.</p></div>
+<pre class="algo">BELLMAN-FORD(G, s)
+1. dist[v] = ∞, prev[v] = NIL for every v;   dist[s] = 0
+2. Repeat n − 1 times:                    // one "pass"
+     For every edge (u, v) with weight w:
+         If dist[u] + w &lt; dist[v]:         // RELAX
+             dist[v] = dist[u] + w;  prev[v] = u
+     (if nothing changed in this pass, stop early)
+3. For every edge (u, v):                 // extra check
+     If dist[u] + w &lt; dist[v]:  report "negative cycle"</pre>
+<div class="lab" data-play="bellman" data-g="neg" data-s="A" data-title="Bellman–Ford from A — labels show dist[v]"></div>
+<div class="tbl"><table class="t">
+<thead><tr><th>Pass</th><th>dist A</th><th>B</th><th>C</th><th>D</th><th>E</th></tr></thead>
+<tbody>
+<tr><td>Start</td><td class="num">0</td><td class="num">∞</td><td class="num">∞</td><td class="num">∞</td><td class="num">∞</td></tr>
+<tr><td>After pass 1</td><td class="num">0</td><td class="num">6</td><td class="num">4</td><td class="num">7</td><td class="num">2</td></tr>
+<tr><td>After pass 2</td><td class="num">0</td><td class="num">2</td><td class="num">4</td><td class="num">7</td><td class="num">2</td></tr>
+<tr><td>After pass 3</td><td class="num">0</td><td class="num">2</td><td class="num">4</td><td class="num">7</td><td class="num">−2</td></tr>
+<tr><td>After pass 4</td><td class="num">0</td><td class="num"><b>2</b></td><td class="num"><b>4</b></td><td class="num"><b>7</b></td><td class="num"><b>−2</b></td></tr>
+</tbody></table></div>
+<p>Edges are relaxed in the order A→B, A→D, B→C, B→D, B→E, C→B, D→C, D→E, E→A, E→C. The shortest path to E is A → D → C → B → E = 7 − 3 − 2 − 4 = <b>−2</b>. A different edge order gives the same final answer, but the in-between rows can change.</p>
+
+<h4>Negative cycle</h4>
+<p>If a cycle has a negative total, you can go round it forever and the cost keeps falling. Then "shortest path" has no meaning. Bellman–Ford catches this with the extra pass.</p>
+<div class="lab" data-play="bellman" data-g="negcyc" data-s="A" data-title="Negative cycle B → D → C → B (3 − 3 − 2 = −2)"></div>
+<div class="tbl"><table class="t">
+<thead><tr><th></th><th>Dijkstra</th><th>Bellman–Ford</th></tr></thead>
+<tbody>
+<tr><td>Negative edges</td><td>Not allowed</td><td>Allowed</td></tr>
+<tr><td>Negative cycle</td><td>Cannot detect</td><td>Detects it</td></tr>
+<tr><td>Idea</td><td>Greedy: fix the closest vertex</td><td>Relax all edges n − 1 times</td></tr>
+<tr><td>Time</td><td class="num">O(n²) or O((n + e) log n)</td><td class="num">O(n · e)</td></tr>
+<tr><td>Used in</td><td>Maps, GPS</td><td>Distance-vector routing (RIP), currency arbitrage</td></tr>
+</tbody></table></div>
+<details class="prog"><summary>Program 9 — Bellman–Ford with negative-cycle check</summary><div class="inner">
+<div class="code-wrap"><pre class="c">/* Bellman-Ford shortest paths (negative weights allowed), O(V * E) */
+#include &lt;stdio.h&gt;
+#include &lt;limits.h&gt;
+#define MAX 20
+#define MAXE 100
+
+struct Edge { int u, v, w; } E[MAXE];
+int n, e;
+
+void printPath(int prev[], int v) {
+    if (prev[v] != -1) {
+        printPath(prev, prev[v]);
+        printf(&quot; -&gt; &quot;);
+    }
+    printf(&quot;%c&quot;, &#x27;A&#x27; + v);
+}
+
+void bellmanFord(int s) {
+    int dist[MAX], prev[MAX];
+    int i, j, pass, changed;
+    for (i = 0; i &lt; n; i++) {
+        dist[i] = INT_MAX;
+        prev[i] = -1;
+    }
+    dist[s] = 0;
+    for (pass = 1; pass &lt;= n - 1; pass++) {       /* relax every edge n-1 times */
+        changed = 0;
+        for (j = 0; j &lt; e; j++) {
+            int u = E[j].u, v = E[j].v, w = E[j].w;
+            if (dist[u] != INT_MAX &amp;&amp; dist[u] + w &lt; dist[v]) {
+                dist[v] = dist[u] + w;
+                prev[v] = u;
+                changed = 1;
+            }
+        }
+        if (!changed) break;                      /* nothing improved: stop early */
+    }
+    for (j = 0; j &lt; e; j++)                       /* one more pass: negative cycle? */
+        if (dist[E[j].u] != INT_MAX &amp;&amp; dist[E[j].u] + E[j].w &lt; dist[E[j].v]) {
+            printf(&quot;\nNegative cycle found: shortest paths are not defined.\n&quot;);
+            return;
+        }
+    printf(&quot;\nPasses used: %d\n&quot;, pass &gt; n - 1 ? n - 1 : pass);
+    printf(&quot;Vertex  Distance  Path\n&quot;);
+    for (i = 0; i &lt; n; i++) {
+        if (dist[i] == INT_MAX) { printf(&quot;  %c     unreachable\n&quot;, &#x27;A&#x27; + i); continue; }
+        printf(&quot;  %c     %4d      &quot;, &#x27;A&#x27; + i, dist[i]);
+        printPath(prev, i);
+        printf(&quot;\n&quot;);
+    }
+}
+
+int main() {
+    int i, w;
+    char u, v, s;
+    printf(&quot;Number of vertices: &quot;);
+    scanf(&quot;%d&quot;, &amp;n);
+    printf(&quot;Number of directed edges: &quot;);
+    scanf(&quot;%d&quot;, &amp;e);
+    for (i = 0; i &lt; e; i++) {
+        printf(&quot;Edge %d (u v weight): &quot;, i + 1);
+        scanf(&quot; %c %c %d&quot;, &amp;u, &amp;v, &amp;w);
+        E[i].u = u - &#x27;A&#x27;; E[i].v = v - &#x27;A&#x27;; E[i].w = w;
+    }
+    printf(&quot;Source vertex: &quot;);
+    scanf(&quot; %c&quot;, &amp;s);
+    bellmanFord(s - &#x27;A&#x27;);
+    return 0;
+}</pre></div>
+<p class="lbl">Input (graph above)</p><pre class="io">5
+10
+A B 6
+A D 7
+B C 5
+B D 8
+B E -4
+C B -2
+D C -3
+D E 9
+E A 2
+E C 7
+A</pre>
+<p class="lbl">Output</p><pre class="io">Passes used: 4
+Vertex  Distance  Path
+  A        0      A
+  B        2      A -&gt; D -&gt; C -&gt; B
+  C        4      A -&gt; D -&gt; C
+  D        7      A -&gt; D
+  E       -2      A -&gt; D -&gt; C -&gt; B -&gt; E</pre>
+<p class="lbl">Output with the negative-cycle graph</p><pre class="io">Negative cycle found: shortest paths are not defined.</pre></div></details>
+
+<h3 id="x-fw"><span class="n">7.2</span>Floyd–Warshall: shortest path between every pair</h3>
+<div class="def"><span class="t">Definition</span><p><b>Floyd–Warshall</b> computes the shortest distance between <b>every pair</b> of vertices (i, j) using a distance matrix D. Negative edges are allowed, negative cycles are not.</p></div>
+<div class="easy"><span class="t">In simple words</span><p>Take the cities one by one. For city k ask every pair (i, j): <b>"Is it shorter to go from i to j by passing through k?"</b> If yes, write the new smaller number in the table. After you have tried every k, the table is complete.</p></div>
+<p class="formula-big">D<sup>k</sup>[i][j] = min( D<sup>k−1</sup>[i][j], &nbsp;D<sup>k−1</sup>[i][k] + D<sup>k−1</sup>[k][j] )</p>
+<pre class="algo">FLOYD-WARSHALL(W)
+1. D = W        // D[i][i] = 0, D[i][j] = weight, or ∞ if no edge
+2. For k = 1 to n:                // k = the allowed middle vertex
+     For i = 1 to n:
+         For j = 1 to n:
+             If D[i][k] + D[k][j] &lt; D[i][j]:
+                 D[i][j] = D[i][k] + D[k][j]
+3. Return D</pre>
+<div class="lab" data-play="floyd" data-g="fw" data-title="Floyd–Warshall on 4 cities — watch the matrix fill in"></div>
+<div class="row">
+<div class="tbl"><table class="t">
+<thead><tr><th>D⁰</th><th>A</th><th>B</th><th>C</th><th>D</th></tr></thead>
+<tbody>
+<tr><th>A</th><td class="num">0</td><td class="num">3</td><td class="num">∞</td><td class="num">7</td></tr>
+<tr><th>B</th><td class="num">8</td><td class="num">0</td><td class="num">2</td><td class="num">∞</td></tr>
+<tr><th>C</th><td class="num">5</td><td class="num">∞</td><td class="num">0</td><td class="num">1</td></tr>
+<tr><th>D</th><td class="num">2</td><td class="num">∞</td><td class="num">∞</td><td class="num">0</td></tr>
+</tbody></table></div>
+<div class="tbl"><table class="t">
+<thead><tr><th>D⁴ (final)</th><th>A</th><th>B</th><th>C</th><th>D</th></tr></thead>
+<tbody>
+<tr><th>A</th><td class="num">0</td><td class="num">3</td><td class="num">5</td><td class="num">6</td></tr>
+<tr><th>B</th><td class="num">5</td><td class="num">0</td><td class="num">2</td><td class="num">3</td></tr>
+<tr><th>C</th><td class="num">3</td><td class="num">6</td><td class="num">0</td><td class="num">1</td></tr>
+<tr><th>D</th><td class="num">2</td><td class="num">5</td><td class="num">7</td><td class="num">0</td></tr>
+</tbody></table></div>
+</div>
+<div class="exam"><b>Exam tip:</b> The <b>k loop must be the outermost</b>. In each round k, row k and column k never change, so copy them first and fill only the other cells — it saves time. Write all matrices D⁰, D¹, … Dⁿ.</div>
+<ul>
+<li>Time <b>O(n³)</b>, space <b>O(n²)</b>. Simple code, great for small dense graphs.</li>
+<li>Running Dijkstra from every vertex costs O(n · (n + e) log n) — better for big sparse graphs with no negative edges.</li>
+<li>A negative number on the diagonal at the end means a negative cycle.</li>
+<li>With 0/1 values and OR/AND instead of min/+, the same loops give <b>Warshall's transitive closure</b> (can i reach j at all?).</li>
+</ul>
+<details class="prog"><summary>Program 10 — Floyd–Warshall</summary><div class="inner">
+<div class="code-wrap"><pre class="c">/* Floyd-Warshall: shortest distance between every pair, O(V^3) */
+#include &lt;stdio.h&gt;
+#define MAX 20
+#define INF 99999
+
+int D[MAX][MAX];
+int n;
+
+void printMatrix(const char *title) {
+    int i, j;
+    printf(&quot;\n%s\n    &quot;, title);
+    for (j = 0; j &lt; n; j++) printf(&quot;%4c&quot;, &#x27;A&#x27; + j);
+    printf(&quot;\n&quot;);
+    for (i = 0; i &lt; n; i++) {
+        printf(&quot;%c : &quot;, &#x27;A&#x27; + i);
+        for (j = 0; j &lt; n; j++) {
+            if (D[i][j] &gt;= INF) printf(&quot;   -&quot;);
+            else printf(&quot;%4d&quot;, D[i][j]);
+        }
+        printf(&quot;\n&quot;);
+    }
+}
+
+void floyd() {
+    int i, j, k;
+    for (k = 0; k &lt; n; k++)                 /* allow vertex k as a middle stop */
+        for (i = 0; i &lt; n; i++)
+            for (j = 0; j &lt; n; j++)
+                if (D[i][k] &lt; INF &amp;&amp; D[k][j] &lt; INF &amp;&amp; D[i][k] + D[k][j] &lt; D[i][j])
+                    D[i][j] = D[i][k] + D[k][j];
+}
+
+int main() {
+    int e, i, j, w;
+    char u, v;
+    printf(&quot;Number of vertices: &quot;);
+    scanf(&quot;%d&quot;, &amp;n);
+    for (i = 0; i &lt; n; i++)
+        for (j = 0; j &lt; n; j++)
+            D[i][j] = (i == j) ? 0 : INF;
+    printf(&quot;Number of directed edges: &quot;);
+    scanf(&quot;%d&quot;, &amp;e);
+    for (i = 0; i &lt; e; i++) {
+        printf(&quot;Edge %d (u v weight): &quot;, i + 1);
+        scanf(&quot; %c %c %d&quot;, &amp;u, &amp;v, &amp;w);
+        D[u - &#x27;A&#x27;][v - &#x27;A&#x27;] = w;
+    }
+    printMatrix(&quot;Initial matrix D0 (- = no edge):&quot;);
+    floyd();
+    printMatrix(&quot;Shortest distances:&quot;);
+    return 0;
+}</pre></div>
+<p class="lbl">Input</p><pre class="io">4
+7
+A B 3
+A D 7
+B A 8
+B C 2
+C A 5
+C D 1
+D A 2</pre>
+<p class="lbl">Output</p><pre class="io">Initial matrix D0 (- = no edge):
+       A   B   C   D
+A :    0   3   -   7
+B :    8   0   2   -
+C :    5   -   0   1
+D :    2   -   -   0
+
+Shortest distances:
+       A   B   C   D
+A :    0   3   5   6
+B :    5   0   2   3
+C :    3   6   0   1
+D :    2   5   7   0</pre></div></details>
+
+<h3 id="x-cyc"><span class="n">7.3</span>Cycle detection</h3>
+<p>Many questions start with "does this graph have a cycle?" — a tree must not have one, a topological order needs none, a deadlock is one. The answer is a small change to DFS, and the rule is different for undirected and directed graphs.</p>
+<div class="tbl"><table class="t">
+<thead><tr><th>Graph</th><th>Cycle exists if DFS…</th><th>Why the extra rule</th></tr></thead>
+<tbody>
+<tr><td>Undirected</td><td>meets a <b>visited</b> vertex that is <b>not the parent</b></td><td>The edge back to the parent is the same edge we came along, not a loop.</td></tr>
+<tr><td>Directed</td><td>meets a <b>grey</b> vertex (still on the current path)</td><td>A black (finished) vertex can be reached by two paths without any cycle, e.g. A→B→D and A→C→D.</td></tr>
+</tbody></table></div>
+<div class="lab" data-play="cycle" data-g="cycd" data-s="A" data-title="Directed graph: white / grey / black DFS"></div>
+<p>Watch the step where C→D reaches D. D is still grey, so D → E → C → D is a cycle. DFS can stop at the first back edge — one is enough to prove a cycle.</p>
+<div class="lab" data-play="cycle" data-g="trav" data-s="A" data-title="Undirected graph: DFS with parent"></div>
+<p><b>Other ways to detect a cycle:</b></p>
+<ul>
+<li><b>Undirected, union-find</b> (like Kruskal): for each edge, if both ends are already in the same set → cycle.</li>
+<li><b>Directed, Kahn's topological sort:</b> if fewer than n vertices come out, the rest are on a cycle (see <a href="#a-topo">6.5</a>).</li>
+<li><b>Quick count:</b> a connected undirected graph with e ≥ n edges always has a cycle (a tree has only n − 1).</li>
+</ul>
+<details class="prog"><summary>Program 11 — Cycle detection in a directed graph (DFS colours)</summary><div class="inner">
+<div class="code-wrap"><pre class="c">/* Cycle detection in a directed graph using DFS colours
+   0 = white (not visited), 1 = grey (on the current path), 2 = black (finished) */
+#include &lt;stdio.h&gt;
+#define MAX 20
+
+int adj[MAX][MAX], color[MAX], parent[MAX];
+int n;
+
+int dfs(int u) {
+    int v, x;
+    color[u] = 1;                                   /* grey: on the path */
+    for (v = 0; v &lt; n; v++) {
+        if (!adj[u][v]) continue;
+        if (color[v] == 1) {                        /* back edge -&gt; cycle */
+            printf(&quot;Cycle found: %c&quot;, &#x27;A&#x27; + v);
+            {   int path[MAX], k = 0;
+                for (x = u; x != v; x = parent[x]) path[k++] = x;
+                while (k &gt; 0) printf(&quot; -&gt; %c&quot;, &#x27;A&#x27; + path[--k]);
+            }
+            printf(&quot; -&gt; %c\n&quot;, &#x27;A&#x27; + v);
+            return 1;
+        }
+        if (color[v] == 0) {
+            parent[v] = u;
+            if (dfs(v)) return 1;
+        }
+    }
+    color[u] = 2;                                   /* black: finished */
+    return 0;
+}
+
+int main() {
+    int e, i;
+    char u, v;
+    printf(&quot;Number of vertices: &quot;);
+    scanf(&quot;%d&quot;, &amp;n);
+    printf(&quot;Number of directed edges: &quot;);
+    scanf(&quot;%d&quot;, &amp;e);
+    for (i = 0; i &lt; e; i++) {
+        printf(&quot;Edge %d (u v): &quot;, i + 1);
+        scanf(&quot; %c %c&quot;, &amp;u, &amp;v);
+        adj[u - &#x27;A&#x27;][v - &#x27;A&#x27;] = 1;
+    }
+    printf(&quot;\n&quot;);
+    for (i = 0; i &lt; n; i++) {
+        if (color[i] == 0) {
+            parent[i] = -1;
+            if (dfs(i)) return 0;
+        }
+    }
+    printf(&quot;No cycle: the graph is a DAG.\n&quot;);
+    return 0;
+}</pre></div>
+<p class="lbl">Input (graph above)</p><pre class="io">5
+6
+A B
+A C
+B D
+C D
+D E
+E C</pre>
+<p class="lbl">Output</p><pre class="io">Cycle found: D -&gt; E -&gt; C -&gt; D</pre>
+<p class="lbl">Output with the DAG of Part 6</p><pre class="io">No cycle: the graph is a DAG.</pre></div></details>
+
+<h3 id="x-cc"><span class="n">7.4</span>Connected components and bipartite check</h3>
+<p><b>Counting components</b> is the simplest use of BFS or DFS: go through the vertices; every time you find an unvisited one, start a new search and give everything it reaches the same number (colour).</p>
+<div class="lab" data-play="comps" data-g="comps" data-title="Connected components — one colour per component"></div>
+<div class="def"><span class="t">Theorem</span><p>A graph is <b>bipartite</b> if and only if it has <b>no cycle of odd length</b>.</p></div>
+<div class="easy"><span class="t">In simple words</span><p>Colour the start white. Its neighbours must be dark, their neighbours white, and so on. If an edge ever joins two vertices of the same colour, you are stuck — that edge closes an odd cycle. BFS does this colouring level by level: even levels = X, odd levels = Y.</p></div>
+<div class="lab" data-play="bip" data-g="bipg" data-s="A" data-title="Even cycle + chord A–D: bipartite"></div>
+<div class="lab" data-play="bip" data-g="oddc" data-s="A" data-title="Chord B–D makes the odd cycle B–C–D: not bipartite"></div>
+<p><b>Uses:</b> matching students to projects, jobs to machines (both are bipartite graphs); checking if a 2-slot timetable is possible; Kₘ,ₙ problems.</p>
+
+<h3 id="x-br"><span class="n">7.5</span>Bridges and articulation points</h3>
+<div class="terms-grid">
+  <div class="def"><span class="t">Bridge (cut edge)</span><p>An edge whose removal <b>increases</b> the number of connected components.</p></div>
+  <div class="def"><span class="t">Articulation point (cut vertex)</span><p>A vertex whose removal (with its edges) <b>increases</b> the number of components.</p></div>
+</div>
+<figure data-fig="brg" data-ec="C-D=hot F-G=hot" data-nc="C=cutv D=cutv F=cutv" data-cap="Bridges <b>C–D</b> and <b>F–G</b> (red). Cut vertices <b>C, D, F</b>. Edges on a cycle are never bridges."></figure>
+<p><b>Slow way:</b> remove each edge (or vertex) and run DFS again — O(e · (n + e)). <b>Fast way (Tarjan):</b> one DFS that stores two numbers for each vertex.</p>
+<ul>
+<li><b>disc[u]</b> — the time DFS first reached u (1, 2, 3, …).</li>
+<li><b>low[u]</b> — the smallest disc that u's subtree can reach using <b>at most one back edge</b>. It tells us how high the subtree can "climb back".</li>
+</ul>
+<div class="tbl"><table class="t">
+<thead><tr><th>Test (v is a DFS child of u)</th><th>Meaning</th></tr></thead>
+<tbody>
+<tr><td class="formula">low[v] &gt; disc[u] → u–v is a <b>bridge</b></td><td>Nothing under v can climb back to u or above, so u–v is the only link.</td></tr>
+<tr><td class="formula">u not root and low[v] ≥ disc[u] → u is a <b>cut vertex</b></td><td>The subtree of v cannot get above u without going through u.</td></tr>
+<tr><td class="formula">u is root with ≥ 2 DFS children → u is a <b>cut vertex</b></td><td>The children's subtrees are joined only through the root.</td></tr>
+</tbody></table></div>
+<div class="lab" data-play="bridge" data-g="brg" data-s="A" data-title="Tarjan's DFS — label shows disc / low"></div>
+<p><b>Why care?</b> In a computer or road network, a bridge is a single cable or road whose failure splits the network, and a cut vertex is a single router or junction. Engineers add backup links exactly there.</p>
+<details class="prog"><summary>Program 12 — Bridges and cut vertices (Tarjan)</summary><div class="inner">
+<div class="code-wrap"><pre class="c">/* Bridges and articulation points (cut vertices) with Tarjan&#x27;s DFS, O(V + E) */
+#include &lt;stdio.h&gt;
+#define MAX 20
+
+int adj[MAX][MAX], disc[MAX], low[MAX], parent[MAX], isCut[MAX];
+int n, timer = 0;
+
+int min(int a, int b) { return a &lt; b ? a : b; }
+
+void dfs(int u) {
+    int v, children = 0;
+    disc[u] = low[u] = ++timer;
+    for (v = 0; v &lt; n; v++) {
+        if (!adj[u][v]) continue;
+        if (disc[v] == 0) {                       /* tree edge */
+            children++;
+            parent[v] = u;
+            dfs(v);
+            low[u] = min(low[u], low[v]);
+            if (low[v] &gt; disc[u])
+                printf(&quot;Bridge: %c - %c\n&quot;, &#x27;A&#x27; + u, &#x27;A&#x27; + v);
+            if (parent[u] != -1 &amp;&amp; low[v] &gt;= disc[u])
+                isCut[u] = 1;
+        } else if (v != parent[u]) {              /* back edge */
+            low[u] = min(low[u], disc[v]);
+        }
+    }
+    if (parent[u] == -1 &amp;&amp; children &gt;= 2)         /* root rule */
+        isCut[u] = 1;
+}
+
+int main() {
+    int e, i;
+    char u, v;
+    printf(&quot;Number of vertices: &quot;);
+    scanf(&quot;%d&quot;, &amp;n);
+    printf(&quot;Number of edges: &quot;);
+    scanf(&quot;%d&quot;, &amp;e);
+    for (i = 0; i &lt; e; i++) {
+        printf(&quot;Edge %d (u v): &quot;, i + 1);
+        scanf(&quot; %c %c&quot;, &amp;u, &amp;v);
+        adj[u - &#x27;A&#x27;][v - &#x27;A&#x27;] = adj[v - &#x27;A&#x27;][u - &#x27;A&#x27;] = 1;
+    }
+    printf(&quot;\n&quot;);
+    for (i = 0; i &lt; n; i++)
+        if (disc[i] == 0) { parent[i] = -1; dfs(i); }
+    printf(&quot;Cut vertices:&quot;);
+    for (i = 0; i &lt; n; i++) if (isCut[i]) printf(&quot; %c&quot;, &#x27;A&#x27; + i);
+    printf(&quot;\n\nVertex  disc  low\n&quot;);
+    for (i = 0; i &lt; n; i++) printf(&quot;  %c     %2d   %2d\n&quot;, &#x27;A&#x27; + i, disc[i], low[i]);
+    return 0;
+}</pre></div>
+<p class="lbl">Input (graph above)</p><pre class="io">7
+8
+A B
+A C
+B C
+C D
+D E
+D F
+E F
+F G</pre>
+<p class="lbl">Output</p><pre class="io">Bridge: F - G
+Bridge: C - D
+Cut vertices: C D F
+
+Vertex  disc  low
+  A      1    1
+  B      2    1
+  C      3    1
+  D      4    4
+  E      5    4
+  F      6    4
+  G      7    7</pre></div></details>
+
+<h3 id="x-scc"><span class="n">7.6</span>Strongly connected components (SCC)</h3>
+<div class="def"><span class="t">Definition</span><p>In a directed graph, a <b>strongly connected component</b> is a largest group of vertices in which <b>every vertex can reach every other</b> by following the arrows.</p></div>
+<div class="row">
+  <figure data-fig="sccg" data-nc="A=k0 B=k0 C=k0 D=k1 E=k1 F=k1 G=k2 H=k2" data-cap="Three SCCs: {A, B, C}, {D, E, F}, {G, H}."></figure>
+  <figure data-fig="X>Y Z>Y" data-pos="X 40 100, Y 200 100, Z 360 100" data-dir data-nl="X=ABC Y=DEF Z=GH" data-nc="X=k0 Y=k1 Z=k2" data-cap="Shrink each SCC to one dot: the result (the <b>condensation</b>) is always a DAG."></figure>
+</div>
+<p><b>Kosaraju's algorithm</b> — two DFS passes:</p>
+<pre class="algo">KOSARAJU(G)
+1. Run DFS on G. When a vertex FINISHES, push it on a stack.
+2. Build Gᵀ: reverse every edge.
+3. While the stack is not empty:
+     u = POP()
+     If u is not visited in pass 2:
+         DFS(Gᵀ, u)  — every vertex reached is ONE SCC</pre>
+<div class="lab" data-play="scc" data-g="sccg" data-title="Kosaraju: pass 1 on G, pass 2 on the reversed graph"></div>
+<div class="easy"><span class="t">Why reverse the edges?</span><p>The vertex that finishes last sits in a "source" SCC. In the reversed graph, that SCC has no way out, so DFS from it stays inside and collects exactly that one SCC. Then the next one, and so on.</p></div>
+<p><b>Tarjan's SCC algorithm</b> does the same job in a single DFS using the low[] idea of 7.5. Both are O(n + e). Uses: finding groups of web pages that link to each other, circular dependencies in software, 2-SAT.</p>
+<details class="prog"><summary>Program 13 — Strongly connected components (Kosaraju)</summary><div class="inner">
+<div class="code-wrap"><pre class="c">/* Strongly connected components with Kosaraju&#x27;s algorithm, O(V + E)
+   Pass 1: DFS on G, push each vertex when it finishes.
+   Pass 2: DFS on the reversed graph in reverse finish order. */
+#include &lt;stdio.h&gt;
+#define MAX 20
+
+int adj[MAX][MAX], visited[MAX], stack[MAX], top = -1;
+int n;
+
+void dfs1(int u) {
+    int v;
+    visited[u] = 1;
+    for (v = 0; v &lt; n; v++)
+        if (adj[u][v] &amp;&amp; !visited[v]) dfs1(v);
+    stack[++top] = u;                       /* finished: push */
+}
+
+void dfs2(int u) {                          /* uses reversed edges: adj[v][u] */
+    int v;
+    visited[u] = 1;
+    printf(&quot; %c&quot;, &#x27;A&#x27; + u);
+    for (v = 0; v &lt; n; v++)
+        if (adj[v][u] &amp;&amp; !visited[v]) dfs2(v);
+}
+
+int main() {
+    int e, i, count = 0;
+    char u, v;
+    printf(&quot;Number of vertices: &quot;);
+    scanf(&quot;%d&quot;, &amp;n);
+    printf(&quot;Number of directed edges: &quot;);
+    scanf(&quot;%d&quot;, &amp;e);
+    for (i = 0; i &lt; e; i++) {
+        printf(&quot;Edge %d (u v): &quot;, i + 1);
+        scanf(&quot; %c %c&quot;, &amp;u, &amp;v);
+        adj[u - &#x27;A&#x27;][v - &#x27;A&#x27;] = 1;
+    }
+    for (i = 0; i &lt; n; i++)
+        if (!visited[i]) dfs1(i);
+    printf(&quot;\nFinish order:&quot;);
+    for (i = 0; i &lt;= top; i++) printf(&quot; %c&quot;, &#x27;A&#x27; + stack[i]);
+    printf(&quot;\n&quot;);
+    for (i = 0; i &lt; n; i++) visited[i] = 0;
+    while (top &gt;= 0) {
+        int x = stack[top--];
+        if (!visited[x]) {
+            printf(&quot;SCC %d:&quot;, ++count);
+            dfs2(x);
+            printf(&quot;\n&quot;);
+        }
+    }
+    printf(&quot;Number of SCCs = %d\n&quot;, count);
+    return 0;
+}</pre></div>
+<p class="lbl">Input (graph above)</p><pre class="io">8
+10
+A B
+B C
+C A
+B D
+D E
+E F
+F D
+G F
+G H
+H G</pre>
+<p class="lbl">Output</p><pre class="io">Finish order: C F E D B A H G
+SCC 1: G H
+SCC 2: A C B
+SCC 3: D F E
+Number of SCCs = 3</pre></div></details>
+
+<h3 id="x-eh"><span class="n">7.7</span>Euler and Hamiltonian paths</h3>
+<p>In 1736 the city of Königsberg had 7 bridges joining 4 land areas. People asked: can you walk across <b>every bridge exactly once</b>? Euler proved it is impossible — and invented graph theory.</p>
+<div class="row">
+  <figure data-fig="konig" data-nl="A=5 B=3 C=3 D=3" data-nc="A=oddv B=oddv C=oddv D=oddv" data-cap="Königsberg as a multigraph. All 4 vertices have <b>odd</b> degree → no Euler path."></figure>
+  <figure data-fig="house" data-nl="A=4 B=4 C=3 D=3 E=2" data-nc="C=oddv D=oddv" data-cap="“Draw the house without lifting your pen.” Only C and D are odd → possible, starting at C and ending at D."></figure>
+</div>
+<div class="tbl"><table class="t">
+<thead><tr><th>Connected graph</th><th>Euler circuit (start = end)</th><th>Euler path (start ≠ end)</th></tr></thead>
+<tbody>
+<tr><td>Undirected</td><td><b>Every</b> vertex has even degree</td><td><b>Exactly 2</b> vertices have odd degree (start at one, end at the other)</td></tr>
+<tr><td>Directed</td><td>in(v) = out(v) for every v</td><td>One vertex out = in + 1 (start), one in = out + 1 (end), all others equal</td></tr>
+</tbody></table></div>
+<div class="lab" data-play="euler" data-g="house" data-s="C" data-title="Hierholzer's method on the house graph"></div>
+<p>Hierholzer's method is O(e). The older <b>Fleury's method</b> also works: at each step take any unused edge, but <b>never cross a bridge</b> of the remaining graph unless you have no other choice.</p>
+
+<h4>Hamiltonian path and cycle</h4>
+<div class="def"><span class="t">Definition</span><p>A <b>Hamiltonian path</b> visits every <b>vertex</b> exactly once. A <b>Hamiltonian cycle</b> also returns to the start.</p></div>
+<div class="row">
+  <figure data-fig="cube" data-ec="A-B=tree B-C=tree C-D=tree D-H=tree G-H=tree F-G=tree E-F=tree A-E=tree" data-cap="The cube graph has a Hamiltonian cycle A B C D H G F E A. It has <b>no</b> Euler path: all 8 vertices have degree 3."></figure>
+  <div>
+  <div class="tbl"><table class="t">
+  <thead><tr><th></th><th>Euler</th><th>Hamiltonian</th></tr></thead>
+  <tbody>
+  <tr><td>Uses every…</td><td>edge once</td><td>vertex once</td></tr>
+  <tr><td>Easy test?</td><td>Yes — count odd degrees</td><td>No known fast test (NP-complete)</td></tr>
+  <tr><td>Find it</td><td class="num">O(e)</td><td>Backtracking, O(n!) worst case</td></tr>
+  <tr><td>Real problem</td><td>Postman route, drawing puzzles</td><td>Travelling salesman, tours</td></tr>
+  </tbody></table></div>
+  <p><b>Sufficient conditions</b> (if true, a Hamiltonian cycle surely exists, n ≥ 3):</p>
+  <ul><li><b>Dirac:</b> every vertex has degree ≥ n/2.</li><li><b>Ore:</b> deg(u) + deg(v) ≥ n for every non-adjacent pair u, v.</li><li>K<sub>n</sub> always has one.</li></ul>
+  </div>
+</div>
+
+<h3 id="x-col"><span class="n">7.8</span>Graph colouring</h3>
+<div class="def"><span class="t">Definition</span><p>A <b>proper colouring</b> gives each vertex a colour so that <b>no edge joins two vertices of the same colour</b>. The smallest number of colours needed is the <b>chromatic number χ(G)</b>.</p></div>
+<div class="tbl"><table class="t">
+<thead><tr><th>Graph</th><th>χ(G)</th></tr></thead>
+<tbody>
+<tr><td>No edges (null graph)</td><td class="num">1</td></tr>
+<tr><td>Bipartite with at least one edge (trees, even cycles)</td><td class="num">2</td></tr>
+<tr><td>Odd cycle C<sub>2k+1</sub></td><td class="num">3</td></tr>
+<tr><td>Complete graph K<sub>n</sub></td><td class="num">n</td></tr>
+<tr><td>Any planar graph (map)</td><td class="num">≤ 4 (Four Colour Theorem)</td></tr>
+<tr><td>Any graph with largest degree Δ</td><td class="num">≤ Δ + 1 (greedy always achieves this)</td></tr>
+</tbody></table></div>
+<pre class="algo">WELSH-POWELL(G)
+1. Sort the vertices by degree, largest first.
+2. For each vertex v in this order:
+     Give v the smallest colour number not used by any coloured neighbour.</pre>
+<div class="lab" data-play="colour" data-g="colg" data-title="Greedy (Welsh–Powell) colouring"></div>
+<p>This graph is a <b>wheel</b>: hub C joined to the 5-cycle A–B–E–F–D. The rim is an odd cycle (needs 3 colours) and the hub touches all of it (one more), so χ = <b>4</b> and greedy found the best answer here. On other graphs greedy can use more colours than needed — finding χ exactly is NP-hard.</p>
+<div class="easy"><span class="t">Real use: exam timetable</span><p>Each subject is a vertex. Join two subjects if <b>some student takes both</b>. A colouring = a timetable: same colour = same time slot, and no student has two exams at once. χ(G) = the fewest slots. The same idea assigns CPU registers, radio frequencies and Sudoku digits.</p></div>
+<details class="prog"><summary>Program 14 — Greedy colouring (Welsh–Powell)</summary><div class="inner">
+<div class="code-wrap"><pre class="c">/* Greedy graph colouring (Welsh-Powell order: highest degree first) */
+#include &lt;stdio.h&gt;
+#define MAX 20
+
+int adj[MAX][MAX], deg[MAX], order[MAX], color[MAX];
+int n;
+
+int main() {
+    int e, i, j, k, c, used[MAX], maxc = 0;
+    char u, v;
+    printf(&quot;Number of vertices: &quot;);
+    scanf(&quot;%d&quot;, &amp;n);
+    printf(&quot;Number of edges: &quot;);
+    scanf(&quot;%d&quot;, &amp;e);
+    for (i = 0; i &lt; e; i++) {
+        printf(&quot;Edge %d (u v): &quot;, i + 1);
+        scanf(&quot; %c %c&quot;, &amp;u, &amp;v);
+        adj[u - &#x27;A&#x27;][v - &#x27;A&#x27;] = adj[v - &#x27;A&#x27;][u - &#x27;A&#x27;] = 1;
+    }
+    for (i = 0; i &lt; n; i++) {
+        deg[i] = 0;
+        for (j = 0; j &lt; n; j++) deg[i] += adj[i][j];
+        order[i] = i;
+        color[i] = -1;
+    }
+    for (i = 0; i &lt; n - 1; i++)               /* sort by degree, largest first (stable) */
+        for (j = 0; j &lt; n - 1 - i; j++)
+            if (deg[order[j]] &lt; deg[order[j + 1]]) {
+                int t = order[j]; order[j] = order[j + 1]; order[j + 1] = t;
+            }
+    printf(&quot;\nOrder:&quot;);
+    for (i = 0; i &lt; n; i++) printf(&quot; %c(%d)&quot;, &#x27;A&#x27; + order[i], deg[order[i]]);
+    printf(&quot;\n&quot;);
+    for (k = 0; k &lt; n; k++) {
+        int x = order[k];
+        for (c = 0; c &lt; n; c++) used[c] = 0;
+        for (j = 0; j &lt; n; j++)               /* colours taken by neighbours */
+            if (adj[x][j] &amp;&amp; color[j] != -1) used[color[j]] = 1;
+        for (c = 0; used[c]; c++);            /* smallest free colour */
+        color[x] = c;
+        if (c + 1 &gt; maxc) maxc = c + 1;
+        printf(&quot;%c gets colour %d\n&quot;, &#x27;A&#x27; + x, c + 1);
+    }
+    printf(&quot;Colours used = %d\n&quot;, maxc);
+    return 0;
+}</pre></div>
+<p class="lbl">Input (graph above)</p><pre class="io">6
+10
+A B
+A C
+A D
+B C
+B E
+C D
+C E
+C F
+D F
+E F</pre>
+<p class="lbl">Output</p><pre class="io">Order: C(5) A(3) B(3) D(3) E(3) F(3)
+C gets colour 1
+A gets colour 2
+B gets colour 3
+D gets colour 3
+E gets colour 2
+F gets colour 4
+Colours used = 4</pre></div></details>
+
+<h3 id="x-lab"><span class="n">7.9</span>Advanced lab</h3>
+<p>Pick any algorithm from this part. Choose a ready graph or open <b>Edit the graph</b> to draw your own (tap two vertices to join them, set a weight for new edges). Your exam question? Type its edges and watch the answer step by step.</p>
+<div class="lab" data-lab="adv"></div>
+
+<h3 id="x-sheet"><span class="n">7.10</span>Which algorithm when?</h3>
+<div class="tbl"><table class="t">
+<thead><tr><th>Question</th><th>Algorithm</th><th>Key idea</th><th>Time</th></tr></thead>
+<tbody>
+<tr><td>Fewest edges from s</td><td>BFS</td><td>Queue, level by level</td><td class="num">O(n + e)</td></tr>
+<tr><td>Shortest path, weights ≥ 0</td><td>Dijkstra</td><td>Fix the closest vertex</td><td class="num">O((n + e) log n)</td></tr>
+<tr><td>Shortest path, negative weights</td><td>Bellman–Ford</td><td>Relax all edges n − 1 times</td><td class="num">O(n · e)</td></tr>
+<tr><td>Shortest path, every pair</td><td>Floyd–Warshall</td><td>Try every k as a middle stop</td><td class="num">O(n³)</td></tr>
+<tr><td>Shortest path in a DAG</td><td>Topological order + relax</td><td>Relax edges in topo order</td><td class="num">O(n + e)</td></tr>
+<tr><td>Cheapest network (MST)</td><td>Prim / Kruskal</td><td>Greedy safe edge</td><td class="num">O(e log n)</td></tr>
+<tr><td>Is there a cycle?</td><td>DFS (parent / grey)</td><td>Back edge = cycle</td><td class="num">O(n + e)</td></tr>
+<tr><td>Order tasks</td><td>Topological sort</td><td>Remove in-degree 0</td><td class="num">O(n + e)</td></tr>
+<tr><td>How many pieces?</td><td>BFS / DFS / union-find</td><td>New search = new component</td><td class="num">O(n + e)</td></tr>
+<tr><td>Two groups possible?</td><td>BFS 2-colouring</td><td>No odd cycle</td><td class="num">O(n + e)</td></tr>
+<tr><td>Weak links in a network</td><td>Tarjan (disc / low)</td><td>low[v] vs disc[u]</td><td class="num">O(n + e)</td></tr>
+<tr><td>Groups that reach each other</td><td>Kosaraju / Tarjan SCC</td><td>DFS, reverse, DFS</td><td class="num">O(n + e)</td></tr>
+<tr><td>Use every edge once</td><td>Euler (Hierholzer)</td><td>0 or 2 odd vertices</td><td class="num">O(e)</td></tr>
+<tr><td>Visit every vertex once</td><td>Hamiltonian (backtracking)</td><td>Try and undo</td><td class="num">O(n!)</td></tr>
+<tr><td>Fewest time slots / colours</td><td>Greedy colouring</td><td>Smallest free colour</td><td class="num">O(n + e) after sort</td></tr>
+</tbody></table></div>
+
+<div class="recap"><p class="t">Remember from Part 7</p><ul>
+<li>Bellman–Ford: n − 1 passes over all edges; an n-th improvement means a negative cycle. O(n · e).</li>
+<li>Floyd–Warshall: D[i][j] = min(D[i][j], D[i][k] + D[k][j]) with k outermost. O(n³).</li>
+<li>Cycle: undirected → visited non-parent; directed → grey vertex.</li>
+<li>Bipartite ⇔ no odd cycle ⇔ χ ≤ 2.</li>
+<li>Bridge: low[v] &gt; disc[u]. Cut vertex: low[v] ≥ disc[u] (root: 2+ children).</li>
+<li>SCC (Kosaraju): DFS for finish order, reverse edges, DFS in reverse finish order.</li>
+<li>Euler: 0 odd vertices → circuit, 2 → path. Hamiltonian: no easy test.</li>
+</ul></div>
+<div class="quiz" data-quiz="adv"></div>
+</section>

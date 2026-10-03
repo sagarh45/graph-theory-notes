@@ -12,13 +12,14 @@ Simple-English notes for **Data Structures, Unit V (Graphs)**, with a visual for
 | 4. Representation | adjacency matrix, adjacency list, incidence matrix, edge list, comparison | representation lab (edit graph, all 4 forms update) |
 | 5. Traversal | BFS with queue, DFS with stack/recursion, discovery/finish time, edge types, dry-run tables | step-by-step players, traversal lab |
 | 6. MST & Shortest Path | Prim, Kruskal (union-find), Dijkstra, topological sort (Kahn) | step-by-step players, algorithm lab |
-| 7. Revision & Exam | formula sheet, exam questions, mixed quiz | quiz |
+| 7. Advanced Algorithms | Bellman–Ford, Floyd–Warshall, cycle detection, components, bipartite check, bridges & cut vertices (Tarjan), SCC (Kosaraju), Euler & Hamiltonian paths, graph colouring | step players for all 9, advanced lab |
+| 8. Revision & Exam | formula sheet, exam questions, mixed quiz | quiz |
 
 Every graph editor accepts edges like `A-B` (undirected), `A>B` (directed), `A-B:4` (weight 4).
 
 ## C programs
 
-`c/` has 8 tested C programs (adjacency matrix, adjacency list, BFS, DFS, Prim, Kruskal, Dijkstra, topological sort). Their real outputs are shown in the notes.
+`c/` has 14 tested C programs: adjacency matrix, adjacency list, BFS, DFS, Prim, Kruskal, Dijkstra, topological sort, Bellman–Ford, Floyd–Warshall, cycle detection, bridges & cut vertices, Kosaraju SCC and greedy colouring. Their real outputs are shown in the notes.
 
 ```bash
 gcc -Wall c/03_bfs.c -o bfs && ./bfs

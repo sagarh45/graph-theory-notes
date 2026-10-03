@@ -4,7 +4,7 @@ import { mountQuiz } from './quiz.js';
 import { esc } from './render.js';
 import { REDUCED } from './player.js';
 
-const UNITS = ['basics', 'terms', 'types', 'repr', 'traversal', 'algos', 'revision'];
+const UNITS = ['basics', 'terms', 'types', 'repr', 'traversal', 'algos', 'advanced', 'revision'];
 const mounted = {};
 function mountUnit(id) {
   if (mounted[id]) return; mounted[id] = 1;

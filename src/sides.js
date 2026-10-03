@@ -46,3 +46,57 @@ export function topoSide(s) {
   <div class="sb"><span class="lbl">Queue (in-degree 0)</span><div class="stackv">${cells(s.queue)}</div></div>
   <div class="sb"><span class="lbl">Topological order</span><div class="outv">${cells(s.out)}</div></div>`;
 }
+
+/* ---------- Part 7 side panels ---------- */
+const sw = (c) => `<i class="sw k${c % 6}"></i>`;
+export function bellmanSide(s) {
+  return `<div class="sb"><span class="lbl">Pass ${s.pass || 0} of ${s.V.length - 1} · edge order</span><div class="elist">${s.E.map((e, i) =>
+    `<span class="ei ${s.cur === i ? 'now' : ''}">${esc(e.u)}→${esc(e.v)}<b>${e.w}</b></span>`).join('')}</div></div>
+  <div class="sb"><span class="lbl">Distance table</span><table class="t mini"><thead><tr><th>Vertex</th><th>dist</th><th>prev</th></tr></thead><tbody>${s.V.map((v) =>
+    `<tr class="${s.hot === v ? 'hot' : ''} ${s.bad && s.bad.includes(v) ? 'badrow' : ''}"><td><b>${esc(v)}</b></td><td>${inf(s.dist[v])}</td><td>${s.prev[v] == null ? '–' : esc(s.prev[v])}</td></tr>`).join('')}</tbody></table></div>`;
+}
+export function floydSide(s) {
+  const V = s.V;
+  return `<div class="sb"><span class="lbl">Distance matrix D${s.k ? ' · k = ' + esc(s.k) : ''}</span><table class="fw"><thead><tr><th></th>${V.map((j) => `<th class="${j === s.k ? 'kk' : ''}">${esc(j)}</th>`).join('')}</tr></thead><tbody>${V.map((i) =>
+    `<tr><th class="${i === s.k ? 'kk' : ''}">${esc(i)}</th>${V.map((j) => {
+      const c = [i === s.k || j === s.k ? 'kline' : '', s.changed[i + '|' + j] ? 'chg' : '', s.i === i && s.j === j ? 'now' : '', i === j ? 'dg' : ''].join(' ');
+      return `<td class="${c}">${inf(s.D[i][j])}</td>`;
+    }).join('')}</tr>`).join('')}</tbody></table>
+  <p class="hint">Grey band = row and column k (they are the “via” values). Shaded = improved in this round.</p></div>`;
+}
+export function cycleSide(s) {
+  const nm = s.directed ? ['W', 'G', 'B'] : ['0', '1', '1'];
+  return `<div class="sb"><span class="lbl">${s.directed ? 'Colour: W white · G grey · B black' : 'visited[ ] and parent[ ]'}</span><table class="arr"><tr class="ix"><th></th>${s.V.map((v) => `<td>${esc(v)}</td>`).join('')}</tr><tr><th>${s.directed ? 'colour' : 'visited'}</th>${s.V.map((v) => `<td><span class="cell ${s.col[v] === 1 ? 'gry' : s.col[v] === 2 ? 'on' : ''}">${nm[s.col[v]]}</span></td>`).join('')}</tr>
+  <tr><th>parent</th>${s.V.map((v) => `<td><span class="cell">${s.par[v] == null ? '–' : esc(s.par[v])}</span></td>`).join('')}</tr></table></div>
+  <div class="sb"><span class="lbl">Current DFS path <small>(grey vertices)</small></span><div class="stackv">${cells(s.stack)}</div></div>
+  ${s.cyc ? `<div class="sb bad"><span class="lbl">Cycle</span><div class="outv">${cells(s.cyc.concat(s.cyc[0]))}</div></div>` : ''}`;
+}
+export function bipSide(s) {
+  const X = s.V.filter((v) => s.side[v] === 0), Y = s.V.filter((v) => s.side[v] === 1);
+  return `<div class="sb"><span class="lbl">Queue</span><div class="stackv">${cells(s.queue)}</div></div>
+  <div class="sb"><span class="lbl">Group X (white)</span><div class="outv xg">${cells(X)}</div></div>
+  <div class="sb"><span class="lbl">Group Y (dark)</span><div class="outv yg">${cells(Y)}</div></div>`;
+}
+export function compSide(s) {
+  return `<div class="sb"><span class="lbl">Components found: ${s.comps.length}</span><div class="sets">${s.comps.map((c, i) => `<span>${sw(i)}C${i + 1} = { ${c.map(esc).join(', ')} }</span>`).join('') || '<em>none yet</em>'}</div></div>`;
+}
+export function bridgeSide(s) {
+  return `<div class="sb"><span class="lbl">disc / low / parent</span><table class="t mini"><thead><tr><th>Vertex</th><th>disc</th><th>low</th><th>parent</th></tr></thead><tbody>${s.V.map((v) =>
+    `<tr class="${s.hot === v ? 'hot' : ''} ${s.cut.includes(v) ? 'badrow' : ''}"><td><b>${esc(v)}</b></td><td>${s.disc[v] ?? '–'}</td><td>${s.low[v] ?? '–'}</td><td>${s.par[v] == null ? '–' : esc(s.par[v])}</td></tr>`).join('')}</tbody></table></div>
+  <div class="sb"><span class="lbl">Bridges</span><div class="outv">${cells(s.bridges.map((x) => x.join('–')))}</div></div>
+  <div class="sb"><span class="lbl">Cut vertices</span><div class="outv">${cells(s.cut)}</div></div>`;
+}
+export function sccSide(s) {
+  return `<div class="sb"><span class="lbl">${s.phase === 1 ? 'Pass 1 · DFS on G' : 'Pass 2 · DFS on Gᵀ (reversed edges)'}</span><p class="hint" style="margin:0">${s.phase === 1 ? 'Record finish order.' : 'Pop from the finish stack (right end first).'}</p></div>
+  <div class="sb"><span class="lbl">Finish stack <small>(top on the right)</small></span><div class="stackv">${cells(s.fin)}</div></div>
+  <div class="sb"><span class="lbl">SCCs</span><div class="sets">${s.comps.map((c, i) => `<span>${sw(i)}S${i + 1} = { ${c.map(esc).join(', ')} }</span>`).join('') || '<em>none yet</em>'}</div></div>`;
+}
+export function eulerSide(s) {
+  return `<div class="sb"><span class="lbl">Degrees <small>(red ring = odd)</small></span><table class="arr"><tr class="ix"><th></th>${s.V.map((v) => `<td>${esc(v)}</td>`).join('')}</tr><tr><th>deg</th>${s.V.map((v) => `<td><span class="cell ${s.deg[v] % 2 ? 'oddc' : ''}">${s.deg[v]}</span></td>`).join('')}</tr></table></div>
+  <div class="sb"><span class="lbl">Stack <small>(top on the right)</small></span><div class="stackv">${cells(s.stack)}</div></div>
+  <div class="sb"><span class="lbl">Answer (built from the back)</span><div class="outv">${cells(s.circ)}</div></div>`;
+}
+export function colourSide(s) {
+  return `<div class="sb"><span class="lbl">Order (highest degree first)</span><div class="outv">${s.order.map((v) => `<span class="${s.cur === v ? 'nowc' : ''}">${esc(v)}<small>${s.deg[v]}</small></span>`).join('')}</div></div>
+  <div class="sb"><span class="lbl">Colour of each vertex</span><table class="arr"><tr class="ix"><th></th>${s.V.map((v) => `<td>${esc(v)}</td>`).join('')}</tr><tr><th>colour</th>${s.V.map((v) => `<td><span class="cell ${s.col[v] != null ? 'kc k' + (s.col[v] % 6) : ''}">${s.col[v] != null ? 'c' + (s.col[v] + 1) : '–'}</span></td>`).join('')}</tr></table></div>`;
+}
