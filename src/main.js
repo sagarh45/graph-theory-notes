@@ -1,5 +1,5 @@
 import './style.css';
-import { mountFig, mountPlay, mountLab, mountRepr, mountExplorer, mountKn, mountChecker, mountHandshake, mountCode, mountRep, mountDry, mountEdgeCheck } from './widgets.js';
+import { mountFig, mountPlay, mountLab, mountRepr, mountExplorer, mountKn, mountChecker, mountHandshake, mountCode, mountRep, mountDry, mountEdgeCheck, mountProgRun } from './widgets.js';
 import { mountQuiz } from './quiz.js';
 import { esc } from './render.js';
 import { REDUCED } from './player.js';
@@ -23,6 +23,7 @@ function mountUnit(id) {
   run('[data-dry]', mountDry);
   run('[data-quiz]', mountQuiz);
   run('pre.c', mountCode);
+  run('details.prog', mountProgRun);
 }
 function buildToc(id) {
   const sec = document.getElementById(id), toc = document.getElementById('toc');

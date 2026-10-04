@@ -32,7 +32,13 @@
          If visited[v] == 0:
              visited[v] = 1;  ENQUEUE(v)
 4. Stop.</pre>
-<p>Press <b>Play</b> or use <b>Next</b>. The label under each vertex is its <b>level</b> — the number of edges from the start. The side panel shows the queue with its front (F) and rear (R), the visited array and the output.</p>
+<p>Press <b>Run</b>. The queue is drawn as boxes, with front and rear labelled. The program line updates as each vertex is printed. The label under each vertex is its <b>level</b> — the number of edges from the start. The side panel shows the queue with its front (F) and rear (R), the visited array and the output.</p>
+
+<div class="draw-demo">
+  <p class="lbl">How to draw the queue</p>
+  <div class="qdraw"><span class="qop">dequeue</span><div class="qboxes"><span class="qbox">B<i class="f">front</i></span><span class="qbox">C</span><span class="qbox">D<i class="r">rear</i></span></div><span class="qop">enqueue</span></div>
+  <p>Boxes in a row. <b>Front</b> is the left end — that vertex leaves next (dequeue). <b>Rear</b> is the right end — a new vertex joins there (enqueue). This picture is the queue after A has left and B, C, D are waiting.</p>
+</div>
 <div class="lab" data-play="bfs" data-g="trav" data-s="A" data-title="BFS from A"></div>
 <h4>Dry run table (write this in the exam)</h4>
 <div data-dry="bfs" data-g="trav" data-s="A"></div>
@@ -69,6 +75,12 @@
 
 <h4>DFS with a stack you can see</h4>
 <p>The player above uses recursion. This one uses an array as a stack, which is what you write in a dry-run table. Rule used here: pop the top; if it is new, print it and <b>push its unvisited neighbours from Z down to A</b>, so A comes out first. On this graph the order is the same as the recursive DFS: <b>A B D E F C G</b>.</p>
+
+<div class="draw-demo">
+  <p class="lbl">How to draw the stack</p>
+  <div class="sdraw"><div class="sbox">C</div><div class="sbox">E</div><div class="sbox top">D<i>← top</i></div></div>
+  <p>Boxes in a column. The <b>top</b> is the last vertex pushed, and the first one popped. Bottom of the pile was pushed earlier. Here D is on top, so the next pop is D.</p>
+</div>
 <div class="lab" data-play="dfsstack" data-g="trav" data-s="A" data-title="DFS with an explicit stack from A"></div>
 
 <h4>Dry run table (stack version)</h4>

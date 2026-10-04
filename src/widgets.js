@@ -511,3 +511,33 @@ export function mountDry(el) {
   }
   el.innerHTML = `<div class="tbl"><table class="t dry"><thead><tr>${head.map((h) => `<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map((r) => `<tr>${r.map((c, i) => `<td${i === r.length - 1 ? ' class="o"' : ''}>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
 }
+
+export function mountProgRun(details) {
+  details.querySelectorAll('p.lbl').forEach((lbl) => {
+    if (!/^Output/i.test(lbl.textContent) || lbl.dataset.sim) return;
+    const pre = lbl.nextElementSibling;
+    if (!pre || pre.tagName !== 'PRE') return;
+    lbl.dataset.sim = '1';
+    const text = pre.textContent.replace(/\s+$/, '');
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'primary sim-run';
+    btn.textContent = 'Run';
+    let timer = null;
+    btn.onclick = () => {
+      clearInterval(timer);
+      const lines = text.split('\n');
+      let i = 0;
+      pre.textContent = '';
+      btn.disabled = true;
+      btn.textContent = 'Running…';
+      timer = setInterval(() => {
+        pre.textContent += (i ? '\n' : '') + lines[i];
+        i += 1;
+        pre.scrollTop = pre.scrollHeight;
+        if (i >= lines.length) { clearInterval(timer); btn.disabled = false; btn.textContent = 'Run again'; }
+      }, 70);
+    };
+    lbl.insertAdjacentElement('afterend', btn);
+  });
+}

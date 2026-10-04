@@ -7,7 +7,7 @@ export function Player(host, frames, render, opts = {}) {
   let i = 0, timer = null, speed = 1;
   host.classList.add('player');
   host.innerHTML = `<div class="pl-grid${opts.sideFirst ? ' side-first' : ''}"><div class="stage"></div><div class="side"></div></div>
-  <div class="ctrl"><button type="button" class="b-first" aria-label="First step">⏮</button><button type="button" class="b-prev">◀ Prev</button><button type="button" class="b-play primary">▶ Play</button><button type="button" class="b-next">Next ▶</button><button type="button" class="b-last" aria-label="Last step">⏭</button><button type="button" class="b-all" hidden>▦ All steps</button>
+  <div class="ctrl"><button type="button" class="b-first" aria-label="First step">⏮</button><button type="button" class="b-prev">◀ Prev</button><button type="button" class="b-play primary">▶ Run</button><button type="button" class="b-next">Next ▶</button><button type="button" class="b-last" aria-label="Last step">⏭</button><button type="button" class="b-all" hidden>▦ All steps</button>
   <label class="spd">Speed <select aria-label="Animation speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option></select></label><span class="count"></span></div>
   <div class="progress"><span></span></div>
   <div class="msg" aria-live="polite"></div><div class="allsteps" hidden></div>`;
@@ -33,7 +33,7 @@ export function Player(host, frames, render, opts = {}) {
     bar.style.width = (frames.length > 1 ? (i / (frames.length - 1)) * 100 : 100) + '%';
     if (opts.onFrame) opts.onFrame(f, i);
   }
-  function stop() { clearInterval(timer); timer = null; play.textContent = '▶ Play'; }
+  function stop() { clearInterval(timer); timer = null; play.textContent = '▶ Run'; }
   function go(n) { i = Math.max(0, Math.min(frames.length - 1, n)); draw(); }
   function start() {
     if (timer) return stop();

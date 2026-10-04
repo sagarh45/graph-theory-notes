@@ -394,3 +394,28 @@ table.mx td.hit.on{background:var(--accent);color:#fff;box-shadow:inset 0 0 0 3p
 .ec-msg{margin:12px 0 0;padding:12px 14px;border-radius:10px;font-weight:700}
 .ec-msg.yes{background:var(--accent-soft);color:var(--accent)}
 .ec-msg.no{background:var(--sunk);color:var(--ink2)}
+
+/* separate term / type blocks */
+.term-body{display:grid;gap:14px;align-items:start}
+@media(min-width:760px){.term-body{grid-template-columns:minmax(180px,250px) minmax(0,1fr)}}
+.term-body figure{margin:0}
+#terms h3,#types h3{margin-top:28px}
+
+/* exam-style queue and stack */
+.qdraw{display:flex;align-items:center;gap:8px;padding:22px 0 20px;overflow-x:auto}
+.qboxes{display:flex;flex:0 0 auto}
+.qbox{position:relative;min-width:46px;height:46px;margin-left:-2.5px;border:2.5px solid var(--teal);display:grid;place-items:center;background:var(--teal-soft);font:700 16px var(--f-mono);color:var(--ink)}
+.qbox:first-child{margin-left:0}
+.qbox i{position:absolute;left:0;right:0;text-align:center;font:700 10px var(--f-body);font-style:normal;color:var(--teal);letter-spacing:.04em;text-transform:uppercase}
+.qbox i.f{top:-16px}
+.qbox i.r{bottom:-16px;color:var(--amber)}
+.qop{flex:0 0 auto;font:700 11px var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.qempty,.sempty{border:2px dashed var(--line);border-radius:8px;padding:8px 12px;color:var(--muted);font-size:14px}
+.sdraw{display:flex;flex-direction:column-reverse;align-items:flex-start;width:max-content;min-height:40px;margin:4px 0 8px}
+.sbox{position:relative;width:68px;height:36px;border:2.5px solid var(--ink);border-top-width:0;display:grid;place-items:center;background:#fff;font:700 16px var(--f-mono)}
+.sbox.top{background:var(--amber-soft);border-color:var(--amber);border-top:2.5px solid var(--amber)}
+.sbox i{position:absolute;left:76px;font:700 12px var(--f-body);font-style:normal;color:var(--amber);white-space:nowrap}
+pre.runline{margin:0;padding:8px 10px;font:700 13.5px/1.5 var(--f-mono);background:#F4F5FC;color:#22306E;border:1px solid var(--line);border-radius:8px;white-space:pre-wrap}
+.sim-run{margin:8px 0}
+.draw-demo{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--sunk);margin:12px 0 16px}
+.draw-demo .qdraw,.draw-demo .sdraw{margin-left:4px}

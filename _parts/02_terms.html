@@ -2,163 +2,302 @@
 <div class="unit-head">
   <p class="eyebrow">Unit V · Part 2</p>
   <h2>Graph Terminology</h2>
-  <p class="lede">The words every graph question uses. Each term comes with a picture and a one-line meaning you can write in the exam.</p>
-  <p class="syl"><b>Syllabus:</b> Graph terminology — adjacent vertices and edges, degree, in-degree, out-degree, path, cycle, loop, multiple edges, connected graph.</p>
+  <p class="lede">Each term is its own section, with one definition and one example. Do not mix them. The picture is the example you can redraw in the exam.</p>
+  <p class="syl"><b>Syllabus:</b> vertex, edge, adjacent vertices and edges, incident, neighbour, degree, in-degree, out-degree, isolated, pendant, source, sink, loop, multiple edges, walk, trail, path, closed walk, circuit, cycle, length, distance, connected, component, subgraph, spanning subgraph, reachable, predecessor, successor, weight, bridge, cut vertex.</p>
 </div>
+<h3 id="t-ve"><span class="n">2.1</span>Vertex and edge</h3>
+<article class="term"><div class="term-body">
+<figure data-fig="A-B A-C B-C B-D C-E D-E D-F E-F" data-pos="A 40 70, B 150 30, C 150 130, D 260 30, E 260 130, F 360 80" data-cap="G has 6 vertices and 8 edges."></figure>
+<div>
+<div class="def"><span class="t">Definition</span><p>A <b>vertex</b> (node) is a point of the graph. An <b>edge</b> (link) joins two vertices. A directed edge is called an <b>arc</b>.</p></div>
+<p><b>Example.</b> In G, the vertices are A, B, C, D, E, F. One edge is (B, D). Order = |V| = 6. Size = |E| = 8.</p>
+</div>
+</div></article>
 
-<h3 id="t-adj"><span class="n">2.1</span>Adjacent, incident, neighbour</h3>
-<div class="terms-grid">
-  <figure data-fig="intro" data-nc="B=cur A=front C=front D=front" data-ec="A-B=cand B-C=cand B-D=cand" data-cap="Neighbours of B (green) and the edges incident on B (dashed)."></figure>
-  <div>
-    <p><b>Adjacent vertices:</b> two vertices joined by an edge. A and B are adjacent. A and D are not.</p>
-    <p><b>Neighbours</b> of v: all vertices adjacent to v. Neighbours of B = {A, C, D}.</p>
-    <p><b>Incident edge:</b> an edge is incident on the two vertices at its ends. Edge (B, D) is incident on B and on D.</p>
-    <p><b>Adjacent edges:</b> two edges that share a common vertex. (A, B) and (B, D) are adjacent because both touch B.</p>
-  </div>
+<h3 id="t-adjv"><span class="n">2.2</span>Adjacent vertices</h3>
+<article class="term"><div class="term-body">
+<figure data-fig="A-B A-C B-C B-D C-E D-E D-F E-F" data-pos="A 40 70, B 150 30, C 150 130, D 260 30, E 260 130, F 360 80" data-cap="A and B are adjacent. A and D are not." data-nc="A=cur B=front" data-ec="A-B=tree"></figure>
+<div>
+<div class="def"><span class="t">Definition</span><p>Two vertices are <b>adjacent</b> if one edge joins them directly.</p></div>
+<p><b>Example.</b> A is adjacent to B and to C. A is <b>not</b> adjacent to D, E or F — you cannot go there in one edge.</p>
 </div>
+</div></article>
 
-<h3 id="t-deg"><span class="n">2.2</span>Degree, in-degree and out-degree</h3>
-<div class="row">
-  <figure data-fig="A-B A-C B-C B-D C-E D-E E-F G" data-pos="A 40 60, B 140 30, C 120 150, D 250 50, E 240 170, F 340 190, G 350 60" data-nl="A=2 B=3 C=3 D=2 E=3 F=1 G=0" data-cap="Undirected: the label under each vertex is its degree. F is <b>pendant</b>, G is <b>isolated</b>."></figure>
-  <figure data-fig="A>B A>C B>C C>D D>B D>E F>E" data-pos="A 40 100, B 150 40, C 150 170, D 260 100, E 360 100, F 360 200" data-nl="A=0/2 B=2/1 C=2/1 D=1/2 E=2/0 F=0/1" data-cap="Directed: label = in / out. A and F are <b>sources</b>, E is a <b>sink</b>."></figure>
+<h3 id="t-adje"><span class="n">2.3</span>Adjacent edges</h3>
+<article class="term"><div class="term-body">
+<figure data-fig="A-B A-C B-C B-D C-E D-E D-F E-F" data-pos="A 40 70, B 150 30, C 150 130, D 260 30, E 260 130, F 360 80" data-cap="(A, B) and (B, D) share vertex B." data-ec="A-B=tree B-D=tree"></figure>
+<div>
+<div class="def"><span class="t">Definition</span><p>Two edges are <b>adjacent</b> if they share a common vertex.</p></div>
+<p><b>Example.</b> (A, B) and (B, D) are adjacent edges. (A, B) and (E, F) are not — they share no vertex.</p>
 </div>
+</div></article>
+
+<h3 id="t-inc"><span class="n">2.4</span>Incident</h3>
+<article class="term"><div class="term-body">
+<figure data-fig="A-B A-C B-C B-D C-E D-E D-F E-F" data-pos="A 40 70, B 150 30, C 150 130, D 260 30, E 260 130, F 360 80" data-cap="Edge (D, F) is incident on D and on F." data-nc="D=cur F=cur" data-ec="D-F=hot"></figure>
+<div>
+<div class="def"><span class="t">Definition</span><p>An edge is <b>incident</b> on the vertices at its two ends. A vertex is incident on every edge that touches it.</p></div>
+<p><b>Example.</b> Edge (D, F) is incident on D and on F. It is not incident on A.</p>
+</div>
+</div></article>
+
+<h3 id="t-nb"><span class="n">2.5</span>Neighbour</h3>
+<article class="term"><div class="term-body">
+<figure data-fig="A-B A-C B-C B-D C-E D-E D-F E-F" data-pos="A 40 70, B 150 30, C 150 130, D 260 30, E 260 130, F 360 80" data-cap="Neighbours of B are A, C and D." data-nc="B=cur A=front C=front D=front" data-ec="A-B=cand B-C=cand B-D=cand"></figure>
+<div>
+<div class="def"><span class="t">Definition</span><p>The <b>neighbours</b> of v are the vertices adjacent to v.</p></div>
+<p><b>Example.</b> Neighbours of B = {A, C, D}. Neighbours of F = {D, E}.</p>
+</div>
+</div></article>
+
+<h3 id="t-deg"><span class="n">2.6</span>Degree</h3>
+<article class="term"><div class="term-body">
+<figure data-fig="A-B A-C B-C B-D C-E D-E E-F G" data-pos="A 40 50, B 140 20, C 120 130, D 250 40, E 240 150, F 340 170, G 350 50" data-cap="The number under each vertex is its degree." data-nl="A=2 B=3 C=3 D=2 E=3 F=1 G=0"></figure>
+<div>
+<div class="def"><span class="t">Definition</span><p><b>Degree</b> of v, written deg(v), is the number of edges touching v. A self-loop counts <b>2</b>. The degree of the graph, Δ(G), is the largest degree.</p></div>
+<p><b>Example.</b> deg(B) = 3, deg(F) = 1, deg(G) = 0. Sum of degrees = 2+3+3+2+3+1+0 = 14 = 2 × 7 edges.</p>
+</div>
+</div></article>
+
+<h3 id="t-in"><span class="n">2.7</span>In-degree</h3>
+<article class="term"><div class="term-body">
+<figure data-fig="A>B A>C B>C C>D D>B D>E F>E" data-pos="A 40 90, B 150 30, C 150 160, D 270 90, E 370 90, F 370 180" data-cap="Arrows into E come from D and from F, so in(E) = 2." data-nl="A=0 B=2 C=2 D=1 E=2 F=0" data-nc="E=cur"></figure>
+<div>
+<div class="def"><span class="t">Definition</span><p>In a directed graph, <b>in-degree</b> in(v) is the number of arrows that enter v.</p></div>
+<p><b>Example.</b> in(E) = 2 (from D and F). in(A) = 0. Sum of all in-degrees = number of arrows = 7.</p>
+</div>
+</div></article>
+
+<h3 id="t-out"><span class="n">2.8</span>Out-degree</h3>
+<article class="term"><div class="term-body">
+<figure data-fig="A>B A>C B>C C>D D>B D>E F>E" data-pos="A 40 90, B 150 30, C 150 160, D 270 90, E 370 90, F 370 180" data-cap="Two arrows leave A, so out(A) = 2." data-nl="A=2 B=1 C=1 D=2 E=0 F=1" data-nc="A=cur"></figure>
+<div>
+<div class="def"><span class="t">Definition</span><p><b>Out-degree</b> out(v) is the number of arrows that leave v. In a digraph, deg(v) = in(v) + out(v).</p></div>
+<p><b>Example.</b> out(A) = 2, out(E) = 0. Sum of all out-degrees = 7, the same as the sum of in-degrees.</p>
+</div>
+</div></article>
+
+<h3 id="t-iso"><span class="n">2.9</span>Isolated vertex</h3>
+<article class="term"><div class="term-body">
+<figure data-fig="A-B A-C B-C D" data-pos="A 40 40, B 140 40, C 90 130, D 250 80" data-cap="D has no edge. D is isolated." data-nc="D=bad" data-nl="D=0"></figure>
+<div>
+<div class="def"><span class="t">Definition</span><p>An <b>isolated</b> vertex has degree 0. No edge touches it.</p></div>
+<p><b>Example.</b> D is isolated. A, B and C are not.</p>
+</div>
+</div></article>
+
+<h3 id="t-pen"><span class="n">2.10</span>Pendant vertex</h3>
+<article class="term"><div class="term-body">
+<figure data-fig="A-B B-C C-D" data-pos="A 30 70, B 120 70, C 210 70, D 300 70" data-cap="A and D have degree 1. They are pendant." data-nc="A=cur D=cur" data-nl="A=1 B=2 C=2 D=1"></figure>
+<div>
+<div class="def"><span class="t">Definition</span><p>A <b>pendant</b> vertex (leaf) has degree exactly 1.</p></div>
+<p><b>Example.</b> A and D are pendant. B and C are not.</p>
+</div>
+</div></article>
+
+<h3 id="t-src"><span class="n">2.11</span>Source</h3>
+<article class="term"><div class="term-body">
+<figure data-fig="A>B A>C B>D" data-pos="A 40 80, B 180 30, C 180 140, D 300 80" data-cap="Nothing points to A. A is a source." data-nc="A=cur" data-nl="A=in 0"></figure>
+<div>
+<div class="def"><span class="t">Definition</span><p>A <b>source</b> is a vertex with in-degree 0. Arrows only leave it.</p></div>
+<p><b>Example.</b> A is a source. B is not, because the arrow A → B enters B.</p>
+</div>
+</div></article>
+
+<h3 id="t-sink"><span class="n">2.12</span>Sink</h3>
+<article class="term"><div class="term-body">
+<figure data-fig="A>B B>D C>D" data-pos="A 40 30, B 160 30, C 40 140, D 200 90" data-cap="Nothing leaves D. D is a sink." data-nc="D=cur" data-nl="D=out 0"></figure>
+<div>
+<div class="def"><span class="t">Definition</span><p>A <b>sink</b> is a vertex with out-degree 0. Arrows only enter it.</p></div>
+<p><b>Example.</b> D is a sink. in(D) = 2, out(D) = 0.</p>
+</div>
+</div></article>
+
+<h3 id="t-loop"><span class="n">2.13</span>Loop (self-loop)</h3>
+<article class="term"><div class="term-body">
+<figure data-fig="A-B B-C C-C" data-pos="A 40 90, B 160 40, C 280 100" data-cap="The edge at C starts and ends at C." data-ec="#2=back" data-nl="C=3"></figure>
+<div>
+<div class="def"><span class="t">Definition</span><p>A <b>loop</b> is an edge from a vertex to itself. In an undirected graph it adds <b>2</b> to the degree.</p></div>
+<p><b>Example.</b> C has a loop and the edge B–C, so deg(C) = 2 + 1 = 3.</p>
+</div>
+</div></article>
+
+<h3 id="t-multi"><span class="n">2.14</span>Multiple (parallel) edges</h3>
+<article class="term"><div class="term-body">
+<figure data-fig="A-B A-B A-B B-C" data-pos="A 40 90, B 180 90, C 300 90" data-cap="Three different edges join the same pair A, B." data-ec="#0=hot #1=hot #2=hot"></figure>
+<div>
+<div class="def"><span class="t">Definition</span><p><b>Multiple edges</b> are two or more edges with the same two end vertices. Each one is a separate edge.</p></div>
+<p><b>Example.</b> There are 3 edges between A and B, so they add 3 to deg(A) and 3 to deg(B).</p>
+</div>
+</div></article>
+
+<h3 id="t-walk"><span class="n">2.15</span>Walk</h3>
+<article class="term"><div class="term-body">
+<figure data-fig="A-B A-C B-C B-D C-E D-E D-F E-F" data-pos="A 40 70, B 150 30, C 150 130, D 260 30, E 260 130, F 360 80" data-cap="A walk may repeat vertices and edges." data-ec="A-B=tree B-C=tree A-C=tree"></figure>
+<div>
+<div class="def"><span class="t">Definition</span><p>A <b>walk</b> is a sequence of vertices where each next vertex is adjacent to the one before. Vertices and edges <b>may repeat</b>.</p></div>
+<p><b>Example.</b> A–B–C–A–B–D is a walk from A to D. It repeats A, B and the edge A–B, so it is not a path.</p>
+</div>
+</div></article>
+
+<h3 id="t-trail"><span class="n">2.16</span>Trail</h3>
+<article class="term"><div class="term-body">
+<figure data-fig="A-B A-C B-C B-D C-E D-E D-F E-F" data-pos="A 40 70, B 150 30, C 150 130, D 260 30, E 260 130, F 360 80" data-cap="A trail repeats no edge. Vertices may repeat." data-ec="A-B=tree B-D=tree D-E=tree C-E=tree B-C=tree"></figure>
+<div>
+<div class="def"><span class="t">Definition</span><p>A <b>trail</b> is a walk that repeats <b>no edge</b>. A vertex may still repeat.</p></div>
+<p><b>Example.</b> A–B–D–E–C–B is a trail: no edge is used twice, but B appears twice, so it is not a path.</p>
+</div>
+</div></article>
+
+<h3 id="t-path"><span class="n">2.17</span>Path</h3>
+<article class="term"><div class="term-body">
+<figure data-fig="A-B A-C B-C B-D C-E D-E D-F E-F" data-pos="A 40 70, B 150 30, C 150 130, D 260 30, E 260 130, F 360 80" data-cap="Path A–B–D–F. No vertex repeats. Length 3." data-nc="A=cur B=path D=path F=cur" data-ec="A-B=tree B-D=tree D-F=tree"></figure>
+<div>
+<div class="def"><span class="t">Definition</span><p>A <b>path</b> (simple path) is a walk with <b>no repeated vertex</b>.</p></div>
+<p><b>Example.</b> A–B–D–F is a path. A–B–C–A–B–D is not, because A and B repeat.</p>
+</div>
+</div></article>
+
+<h3 id="t-closed"><span class="n">2.18</span>Closed walk</h3>
+<article class="term"><div class="term-body">
+<figure data-fig="A-B A-C B-C B-D C-E D-E D-F E-F" data-pos="A 40 70, B 150 30, C 150 130, D 260 30, E 260 130, F 360 80" data-cap="A–B–C–A starts and ends at A." data-ec="A-B=tree B-C=tree A-C=tree" data-nc="A=cur"></figure>
+<div>
+<div class="def"><span class="t">Definition</span><p>A <b>closed walk</b> starts and ends at the same vertex. It may repeat vertices and edges.</p></div>
+<p><b>Example.</b> A–B–C–A is a closed walk of length 3. A–B–D is not closed: it starts at A and ends at D.</p>
+</div>
+</div></article>
+
+<h3 id="t-circuit"><span class="n">2.19</span>Circuit</h3>
+<article class="term"><div class="term-body">
+<figure data-fig="A-B A-C B-C B-D C-E D-E D-F E-F" data-pos="A 40 70, B 150 30, C 150 130, D 260 30, E 260 130, F 360 80" data-cap="B–C–E–D–B uses no edge twice and returns to B." data-ec="B-C=back C-E=back D-E=back B-D=back"></figure>
+<div>
+<div class="def"><span class="t">Definition</span><p>A <b>circuit</b> is a closed trail: it returns to the start and repeats <b>no edge</b>.</p></div>
+<p><b>Example.</b> B–C–E–D–B is a circuit of length 4. A–B–C–A–B–A is a closed walk, not a circuit, because A–B is used twice.</p>
+</div>
+</div></article>
+
+<h3 id="t-cycle"><span class="n">2.20</span>Cycle</h3>
+<article class="term"><div class="term-body">
+<figure data-fig="A-B A-C B-C B-D C-E D-E D-F E-F" data-pos="A 40 70, B 150 30, C 150 130, D 260 30, E 260 130, F 360 80" data-cap="Cycle D–E–F–D. Length 3." data-nc="D=cur E=path F=path" data-ec="D-E=back E-F=back D-F=back"></figure>
+<div>
+<div class="def"><span class="t">Definition</span><p>A <b>cycle</b> is a closed path of length at least 3: no vertex repeats except that the first vertex is also the last.</p></div>
+<p><b>Example.</b> D–E–F–D is a cycle. A loop is not called a cycle here. A cycle of length 3 is a triangle.</p>
+</div>
+</div></article>
+
+<h3 id="t-len"><span class="n">2.21</span>Length</h3>
+<article class="term"><div class="term-body">
+<figure data-fig="A-B A-C B-C B-D C-E D-E D-F E-F" data-pos="A 40 70, B 150 30, C 150 130, D 260 30, E 260 130, F 360 80" data-cap="Four vertices, three edges. Length = 3, not 4." data-ec="A-B=tree B-D=tree D-F=tree"></figure>
+<div>
+<div class="def"><span class="t">Definition</span><p>The <b>length</b> of a walk, path or cycle is the number of <b>edges</b> in it, not the number of vertices.</p></div>
+<p><b>Example.</b> A–B–D–F has 4 vertices and length 3. The cycle D–E–F–D has length 3.</p>
+</div>
+</div></article>
+
+<h3 id="t-dist"><span class="n">2.22</span>Distance</h3>
+<article class="term"><div class="term-body">
+<figure data-fig="A-B A-C B-C B-D C-E D-E D-F E-F" data-pos="A 40 70, B 150 30, C 150 130, D 260 30, E 260 130, F 360 80" data-cap="Shortest A to F uses 3 edges, so distance = 3." data-ec="A-B=tree B-D=tree D-F=tree" data-nl="A=0 B=1 D=2 F=3"></figure>
+<div>
+<div class="def"><span class="t">Definition</span><p>The <b>distance</b> from u to v is the length of the shortest path from u to v. If no path exists, the distance is infinite.</p></div>
+<p><b>Example.</b> Distance from A to F is 3. A–C–E–F is also length 3. No shorter path exists. BFS finds this.</p>
+</div>
+</div></article>
+
+<h3 id="t-conn"><span class="n">2.23</span>Connected graph</h3>
+<article class="term"><div class="term-body">
+<figure data-fig="A-B A-C B-C B-D C-E D-E D-F E-F" data-pos="A 40 70, B 150 30, C 150 130, D 260 30, E 260 130, F 360 80" data-cap="A path exists between every pair. G is connected."></figure>
+<div>
+<div class="def"><span class="t">Definition</span><p>An undirected graph is <b>connected</b> if there is a path between every pair of vertices.</p></div>
+<p><b>Example.</b> G is connected. From F you can reach A by F–D–B–A.</p>
+</div>
+</div></article>
+
+<h3 id="t-comp"><span class="n">2.24</span>Disconnected graph and component</h3>
+<article class="term"><div class="term-body">
+<figure data-fig="A-B B-C A-C D-E F" data-pos="A 40 40, B 140 40, C 90 130, D 230 40, E 230 130, F 330 80" data-cap="Three components: {A,B,C}, {D,E}, {F}." data-nc="A=k0 B=k0 C=k0 D=k1 E=k1 F=k2"></figure>
+<div>
+<div class="def"><span class="t">Definition</span><p>A graph is <b>disconnected</b> if some pair of vertices has no path between them. A <b>component</b> is one largest connected piece.</p></div>
+<p><b>Example.</b> This graph has 3 components. F is a component by itself. A connected graph has exactly 1 component.</p>
+</div>
+</div></article>
+
+<h3 id="t-sub"><span class="n">2.25</span>Subgraph</h3>
+<article class="term"><div class="term-body">
+<figure data-fig="A-B A-C B-C B-D C-E D-E D-F E-F" data-pos="A 40 70, B 150 30, C 150 130, D 260 30, E 260 130, F 360 80" data-cap="The triangle D–E–F is a subgraph of G." data-nc="D=cur E=cur F=cur" data-ec="D-E=tree E-F=tree D-F=tree"></figure>
+<div>
+<div class="def"><span class="t">Definition</span><p>A <b>subgraph</b> uses some of the vertices and some of the edges of G. Every chosen edge must join two chosen vertices.</p></div>
+<p><b>Example.</b> Vertices {D, E, F} with edges D–E, E–F, D–F form a subgraph. It is a triangle.</p>
+</div>
+</div></article>
+
+<h3 id="t-span"><span class="n">2.26</span>Spanning subgraph</h3>
+<article class="term"><div class="term-body">
+<figure data-fig="A-B A-C B-C B-D C-E D-E D-F E-F" data-pos="A 40 70, B 150 30, C 150 130, D 260 30, E 260 130, F 360 80" data-cap="A spanning tree keeps all 6 vertices and 5 edges." data-ec="A-B=tree A-C=tree B-D=tree C-E=tree D-F=tree"></figure>
+<div>
+<div class="def"><span class="t">Definition</span><p>A <b>spanning subgraph</b> keeps <b>every</b> vertex of G. A spanning tree is a spanning subgraph that is a tree (n − 1 edges, no cycle).</p></div>
+<p><b>Example.</b> The thick edges form a spanning tree of G: 6 vertices, 5 edges, no cycle.</p>
+</div>
+</div></article>
+
+<h3 id="t-reach"><span class="n">2.27</span>Reachable</h3>
+<article class="term"><div class="term-body">
+<figure data-fig="A>B B>C C>D E>D" data-pos="A 30 80, B 120 80, C 210 80, D 300 80, E 300 170" data-cap="C is reachable from A. A is not reachable from C." data-nc="A=cur C=front"></figure>
+<div>
+<div class="def"><span class="t">Definition</span><p>In a directed graph, v is <b>reachable</b> from u if a directed path goes from u to v.</p></div>
+<p><b>Example.</b> C is reachable from A (A → B → C). A is not reachable from C: no arrow leads back. E can reach D, but D cannot reach E.</p>
+</div>
+</div></article>
+
+<h3 id="t-pred"><span class="n">2.28</span>Predecessor and successor</h3>
+<article class="term"><div class="term-body">
+<figure data-fig="A>B B>C A>C" data-pos="A 40 90, B 180 30, C 180 150" data-cap="A is a predecessor of B. B is a successor of A." data-nc="A=cur B=front" data-ec="A>B=tree"></figure>
+<div>
+<div class="def"><span class="t">Definition</span><p>If the arrow u → v exists, u is a <b>predecessor</b> of v and v is a <b>successor</b> of u.</p></div>
+<p><b>Example.</b> Predecessors of C are A and B. Successors of A are B and C. E has no successor in the earlier digraph, so E is a sink.</p>
+</div>
+</div></article>
+
+<h3 id="t-wt"><span class="n">2.29</span>Weight</h3>
+<article class="term"><div class="term-body">
+<figure data-fig="A-B:4 A-C:2 B-D:5" data-pos="A 40 90, B 170 30, C 170 150, D 300 90" data-cap="The number on an edge is its weight, not a second edge."></figure>
+<div>
+<div class="def"><span class="t">Definition</span><p>A <b>weight</b> is a number on an edge: distance, cost or time. A graph with weights is a weighted graph.</p></div>
+<p><b>Example.</b> Weight of A–B is 4. The path A–B–D has total weight 4 + 5 = 9. Length of that path is still 2 (two edges).</p>
+</div>
+</div></article>
+
+<h3 id="t-bridge"><span class="n">2.30</span>Bridge and cut vertex</h3>
+<article class="term"><div class="term-body">
+<figure data-fig="A-B A-C B-C C-D D-E" data-pos="A 30 30, B 30 140, C 130 85, D 240 85, E 340 85" data-cap="C–D is a bridge. C and D are cut vertices." data-ec="C-D=hot" data-nc="C=cutv D=cutv"></figure>
+<div>
+<div class="def"><span class="t">Definition</span><p>A <b>bridge</b> is an edge whose removal increases the number of components. A <b>cut vertex</b> is a vertex whose removal does the same.</p></div>
+<p><b>Example.</b> Delete C–D and the graph splits. So C–D is a bridge. Delete C and {A, B} is cut off from {D, E}. C is a cut vertex. A–B is not a bridge: A–C–B remains.</p>
+</div>
+</div></article>
+
+<h3 id="t-cmp"><span class="n">2.31</span>Walk, trail, path, cycle — side by side</h3>
 <div class="tbl"><table class="t">
-<thead><tr><th>Term</th><th>Meaning</th><th>Example above</th></tr></thead>
+<thead><tr><th>Term</th><th>Vertex may repeat?</th><th>Edge may repeat?</th><th>Back to start?</th><th>Example in G</th></tr></thead>
 <tbody>
-<tr><td><b>Degree</b> deg(v)</td><td>Number of edges touching v. A self-loop counts <b>2</b>.</td><td>deg(B) = 3</td></tr>
-<tr><td><b>In-degree</b> in(v)</td><td>Number of arrows coming <b>into</b> v (directed graph)</td><td>in(E) = 2</td></tr>
-<tr><td><b>Out-degree</b> out(v)</td><td>Number of arrows going <b>out of</b> v</td><td>out(D) = 2</td></tr>
-<tr><td><b>Isolated vertex</b></td><td>Degree 0 — no edges at all</td><td>G</td></tr>
-<tr><td><b>Pendant vertex</b> (leaf)</td><td>Degree exactly 1</td><td>F</td></tr>
-<tr><td><b>Source</b></td><td>In-degree 0 — nothing points to it</td><td>A, F (directed)</td></tr>
-<tr><td><b>Sink</b></td><td>Out-degree 0 — it points to nothing</td><td>E (directed)</td></tr>
-<tr><td><b>Degree of a graph</b></td><td>Maximum degree of any vertex, written Δ(G)</td><td>3 (undirected)</td></tr>
+<tr><td><b>Walk</b></td><td>Yes</td><td>Yes</td><td>No</td><td>A–B–C–A–B–D</td></tr>
+<tr><td><b>Trail</b></td><td>Yes</td><td>No</td><td>No</td><td>A–B–D–E–C–B</td></tr>
+<tr><td><b>Path</b></td><td>No</td><td>No</td><td>No</td><td>A–B–D–F</td></tr>
+<tr><td><b>Closed walk</b></td><td>Yes</td><td>Yes</td><td>Yes</td><td>A–B–C–A–B–A</td></tr>
+<tr><td><b>Circuit</b></td><td>Only start = end</td><td>No</td><td>Yes</td><td>B–C–E–D–B</td></tr>
+<tr><td><b>Cycle</b></td><td>Only start = end</td><td>No</td><td>Yes, length ≥ 3</td><td>D–E–F–D</td></tr>
 </tbody></table></div>
-<div class="exam"><b>Quick check:</b> deg(v) = in(v) + out(v) in a directed graph. Total in-degrees = total out-degrees = number of edges. In the digraph above both add up to 7.</div>
+<div class="trap"><b>Common mistake:</b> calling the length the number of vertices. A–B–D–F has 4 vertices and length <b>3</b>.</div>
 
-<h3 id="t-path"><span class="n">2.3</span>Walk, path and cycle</h3>
-<div class="row">
-  <figure data-fig="intro" data-nc="A=cur B=path D=path F=cur" data-ec="A-B=tree B-D=tree D-F=tree" data-cap="<b>Path</b> A → B → D → F. Length = 3 edges."></figure>
-  <figure data-fig="intro" data-nc="B=cur C=path E=path D=path" data-ec="B-C=back C-E=back D-E=back B-D=back" data-cap="<b>Cycle</b> B → C → E → D → B. Length 4."></figure>
-</div>
-<div class="tbl"><table class="t">
-<thead><tr><th>Term</th><th>Rule</th><th>Example (Figure 1)</th></tr></thead>
-<tbody>
-<tr><td><b>Walk</b></td><td>Any sequence of vertices where each next vertex is adjacent. Vertices and edges may repeat.</td><td>A B C A B D</td></tr>
-<tr><td><b>Trail</b></td><td>A walk with <b>no repeated edge</b> (vertices may repeat)</td><td>A B C E D B</td></tr>
-<tr><td><b>Path</b> (simple path)</td><td>A walk with <b>no repeated vertex</b></td><td>A B D F</td></tr>
-<tr><td><b>Length</b> of a path</td><td>Number of <b>edges</b> on it (one less than the number of vertices)</td><td>A B D F has length 3</td></tr>
-<tr><td><b>Closed walk</b></td><td>Starts and ends at the same vertex</td><td>A B C A</td></tr>
-<tr><td><b>Cycle</b> (circuit)</td><td>A closed path: no repeated vertex except first = last, length ≥ 3</td><td>B C E D B</td></tr>
-<tr><td><b>Shortest path</b></td><td>The path with the fewest edges (or the least total weight)</td><td>A to F: A B D F (3)</td></tr>
-</tbody></table></div>
-<div class="trap"><b>Common mistake:</b> Counting vertices as the length. The path A → B → D → F has 4 vertices but length <b>3</b>. Length is always the number of edges.</div>
-
-<h3 id="t-loop"><span class="n">2.4</span>Loops and multiple edges</h3>
-<div class="terms-grid">
-  <figure data-fig="A-B A-B B-C C-C A-C" data-pos="A 40 120, B 160 40, C 280 120" data-ec="#0=hot #1=hot #3=back" data-cap="Two parallel edges A–B (red) and a self-loop on C (dashed)."></figure>
-  <div>
-    <p><b>Self-loop:</b> an edge that starts and ends at the <b>same</b> vertex, like (C, C). In an undirected graph a loop adds <b>2</b> to the degree, so deg(C) = 4 here.</p>
-    <p><b>Multiple (parallel) edges:</b> two or more edges between the <b>same pair</b> of vertices, like the two A–B edges.</p>
-    <p>A graph with no loops and no multiple edges is called <b>simple</b>. Most algorithms in this unit assume a simple graph.</p>
-  </div>
-</div>
-
-<h3 id="t-conn"><span class="n">2.5</span>Connected, components, subgraph</h3>
-<div class="row">
-  <figure data-fig="comps" data-nc="A=done B=done C=done D=front E=front F=cur" data-cap="Not connected. <b>3 components</b>: {A, B, C}, {D, E}, {F}."></figure>
-  <figure data-fig="A-B B-C A-C C-D D-E E-F D-F" data-pos="A 30 40, B 30 170, C 130 105, D 240 105, E 340 40, F 340 170" data-nc="C=cur D=cur" data-ec="C-D=hot" data-cap="Edge C–D is a <b>bridge</b>. C and D are <b>cut vertices</b>."></figure>
-</div>
-<div class="tbl"><table class="t">
-<thead><tr><th>Term</th><th>Meaning</th></tr></thead>
-<tbody>
-<tr><td><b>Connected graph</b></td><td>There is a path between <b>every</b> pair of vertices. You can reach anyone from anyone.</td></tr>
-<tr><td><b>Disconnected graph</b></td><td>At least one pair of vertices has no path between them.</td></tr>
-<tr><td><b>Connected component</b></td><td>A largest connected piece of the graph. A connected graph has exactly one component.</td></tr>
-<tr><td><b>Subgraph</b></td><td>A graph made from some of the vertices and some of the edges of G (every edge must join chosen vertices).</td></tr>
-<tr><td><b>Spanning subgraph</b></td><td>A subgraph that keeps <b>all</b> vertices of G. A spanning tree is a spanning subgraph that is a tree.</td></tr>
-<tr><td><b>Bridge</b> (cut edge)<span class="adv-tag">Advanced</span></td><td>An edge whose removal increases the number of components.</td></tr>
-<tr><td><b>Cut vertex</b> (articulation point)<span class="adv-tag">Advanced</span></td><td>A vertex whose removal (with its edges) increases the number of components.</td></tr>
-</tbody></table></div>
-<p>Why care? In a computer network a bridge is a single cable whose failure splits the network. Network engineers find bridges with a DFS-based algorithm and add backup links.</p>
-
-<h3 id="t-lab"><span class="n">2.6</span>Term explorer</h3>
-<p>Tap a vertex to see its degree, neighbours and incident edges. Tap a second vertex to see every simple path between them, with the shortest one drawn thick. Switch to <b>Directed</b> to explore in-degree, out-degree, source and sink.</p>
+<h3 id="t-lab"><span class="n">2.32</span>Term explorer</h3>
+<p>Tap a vertex to see its degree, neighbours and incident edges. Tap a second vertex to see every simple path between them. Switch to <b>Directed</b> for in-degree, out-degree, source and sink.</p>
 <div class="lab" data-explorer></div>
 
-<h3 id="t-all"><span class="n">2.7</span>All terms at a glance</h3>
-<div class="tbl"><table class="t">
-<thead><tr><th>Term</th><th>One-line definition</th></tr></thead>
-<tbody>
-<tr><td><b>Vertex</b> (node)</td><td>A point of the graph; stores one item of data.</td></tr>
-<tr><td><b>Edge</b> (arc, link)</td><td>A connection between two vertices.</td></tr>
-<tr><td><b>Order</b> / <b>size</b></td><td>Number of vertices |V| / number of edges |E|.</td></tr>
-<tr><td><b>Adjacent</b></td><td>Two vertices joined by an edge, or two edges sharing a vertex.</td></tr>
-<tr><td><b>Incident</b></td><td>An edge is incident on its two end vertices.</td></tr>
-<tr><td><b>Degree</b></td><td>Number of edges touching a vertex (loop counts 2).</td></tr>
-<tr><td><b>In / out-degree</b></td><td>Arrows entering / leaving a vertex.</td></tr>
-<tr><td><b>Path</b></td><td>Sequence of adjacent vertices with no vertex repeated.</td></tr>
-<tr><td><b>Cycle</b></td><td>A path that comes back to its start.</td></tr>
-<tr><td><b>Loop</b></td><td>An edge from a vertex to itself.</td></tr>
-<tr><td><b>Multiple edges</b></td><td>More than one edge between the same two vertices.</td></tr>
-<tr><td><b>Connected</b></td><td>A path exists between every pair of vertices.</td></tr>
-<tr><td><b>Weight</b></td><td>A number on an edge: distance, cost or time.</td></tr>
-<tr><td><b>Distance</b></td><td>Length of the shortest path between two vertices.</td></tr>
-<tr><td><b>Reachable</b></td><td>v is reachable from u if some directed path goes from u to v.</td></tr>
-<tr><td><b>Predecessor / successor</b></td><td>In a digraph, u is a predecessor of v if the arrow u → v exists. Then v is a successor of u.</td></tr>
-</tbody></table></div>
-
-
-<h3 id="t-ex"><span class="n">2.8</span>Many worked examples</h3>
-<p>Every example below uses this one graph, called <b>G</b>. Write the answer in words first, then check the picture.</p>
-<figure data-fig="intro" data-cap="Example graph G. Edges: A–B, A–C, B–C, B–D, C–E, D–E, D–F, E–F."></figure>
-<div class="tbl"><table class="t">
-<thead><tr><th>#</th><th>Question</th><th>Answer</th></tr></thead>
-<tbody>
-<tr><td>1</td><td>Which vertices are adjacent to B?</td><td>A, C and D. A–E is not an edge, so A and E are not adjacent.</td></tr>
-<tr><td>2</td><td>Name two adjacent edges, and two edges that are not adjacent.</td><td>(A, B) and (B, D) are adjacent — they share B. (A, B) and (E, F) are not adjacent — no common vertex.</td></tr>
-<tr><td>3</td><td>Which edges are incident on D?</td><td>(B, D), (D, E) and (D, F). So deg(D) = 3.</td></tr>
-<tr><td>4</td><td>Write the degree of every vertex. Check the handshake rule.</td><td>A2, B3, C3, D3, E3, F2. Sum = 16 = 2 × 8 edges.</td></tr>
-<tr><td>5</td><td>Give a walk from A to F that is not a path.</td><td>A–B–C–A–B–D–F. Vertex A and edge A–B repeat, so it is only a walk.</td></tr>
-<tr><td>6</td><td>Give a trail that is not a path.</td><td>A–B–D–E–C–B: no edge repeats, but B repeats, so it is a trail and not a path. It does not have to end at F.</td></tr>
-<tr><td>7</td><td>Give two different simple paths from A to F, and their lengths.</td><td>A–B–D–F, length 3. A–C–E–F, length 3. Length counts edges, not vertices.</td></tr>
-<tr><td>8</td><td>List three cycles and their lengths.</td><td>A–B–C–A (length 3). B–D–E–C–B (length 4). D–E–F–D (length 3).</td></tr>
-<tr><td>9</td><td>What is the distance from A to F?</td><td>3. No path uses fewer than 3 edges. BFS from A finds this.</td></tr>
-<tr><td>10</td><td>Is G connected? How many components?</td><td>Yes, one component. There is a path between every pair.</td></tr>
-<tr><td>11</td><td>Name a subgraph that is not spanning, and one that is spanning.</td><td>Vertices {D, E, F} with their three edges is a subgraph (a triangle). Any spanning tree of G keeps all 6 vertices and 5 edges.</td></tr>
-<tr><td>12</td><td>Is (D, E) a bridge?</td><td>No. After deleting D–E, D–F–E still joins D and E, so the graph stays in one piece.</td></tr>
-</tbody></table></div>
-
-<h4>Example 13 — a loop adds 2</h4>
-<div class="terms-grid">
-  <figure data-fig="A-B A-B B-C C-C" data-pos="A 40 110, B 160 40, C 280 120" data-nl="A=2 B=3 C=3" data-cap="Two parallel edges A–B, and a loop at C."></figure>
-  <div>
-    <p>deg(A) = 2, because both parallel edges touch A. deg(B) = 3 (two A–B edges plus B–C). The loop at C counts <b>twice</b>, plus B–C, so deg(C) = 3.</p>
-    <p>Sum of degrees = 2 + 3 + 3 = 8. Edges = 2 parallel + B–C + 1 loop = 4. And 2 × 4 = 8. The rule still holds.</p>
-  </div>
-</div>
-
-<h4>Example 14 — directed: in-degree and out-degree</h4>
-<figure data-fig="A>B A>C B>C C>D D>B D>E F>E" data-pos="A 40 100, B 150 40, C 150 170, D 260 100, E 360 100, F 360 200" data-nl="A=0/2 B=2/1 C=2/1 D=1/2 E=2/0 F=0/1" data-cap="Label = in / out. Compute both before you add them."></figure>
-<div class="tbl"><table class="t">
-<thead><tr><th>Vertex</th><th>in</th><th>out</th><th>What to call it</th></tr></thead>
-<tbody>
-<tr><td>A</td><td class="num">0</td><td class="num">2</td><td>Source. Edges leave A; none enter.</td></tr>
-<tr><td>B</td><td class="num">2</td><td class="num">1</td><td>deg = 3. Predecessor of C, successor of A and D.</td></tr>
-<tr><td>E</td><td class="num">2</td><td class="num">0</td><td>Sink. Arrows come in from D and F; nothing leaves.</td></tr>
-<tr><td>F</td><td class="num">0</td><td class="num">1</td><td>Also a source.</td></tr>
-</tbody></table></div>
-<p>Sum of in-degrees = 0+2+2+1+2+0 = 7. Sum of out-degrees = 2+1+1+2+0+1 = 7. Both equal the number of arrows.</p>
-<div class="exam"><b>Exam habit:</b> On any terminology question, draw the graph, label degrees on the vertices, and only then write the definition. One labelled picture is worth more than a paragraph with no example.</div>
-
 <div class="recap"><p class="t">Remember from Part 2</p><ul>
-<li>Degree counts edges at a vertex; a loop adds 2.</li>
-<li>Path = no repeated vertex. Length = number of edges.</li>
-<li>Cycle = path that returns to its start.</li>
-<li>Isolated = degree 0, pendant = degree 1, source = in-degree 0, sink = out-degree 0.</li>
-<li>Connected = one piece. Each piece of a disconnected graph is a component.</li>
+<li>Adjacent = joined by an edge. Incident = the edge touches that vertex.</li>
+<li>Degree counts edges. A loop adds 2. Isolated = 0, pendant = 1.</li>
+<li>Source = in-degree 0. Sink = out-degree 0.</li>
 <li>Walk may repeat. Trail repeats no edge. Path repeats no vertex. Length = number of edges.</li>
+<li>Cycle = closed path, length at least 3. Connected = one component.</li>
 </ul></div>
 <div class="quiz" data-quiz="terms"></div>
 </section>
-

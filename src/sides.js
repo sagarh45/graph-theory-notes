@@ -8,18 +8,29 @@ function visRow(V, vis) {
   return `<table class="arr"><tr class="ix"><th></th>${V.map((v) => `<td>${esc(v)}</td>`).join('')}</tr><tr><th>visited[ ]</th>${V.map((v) => `<td><span class="cell ${vis[v] ? 'on' : ''}">${vis[v] ? 1 : 0}</span></td>`).join('')}</tr></table>`;
 }
 
+function queueDraw(items) {
+  if (!items.length) return '<div class="qdraw"><div class="qempty">empty</div></div>';
+  return `<div class="qdraw"><span class="qop">dequeue</span><div class="qboxes">${items.map((x, i) => {
+    const tags = (i === 0 ? '<i class="f">front</i>' : '') + (i === items.length - 1 ? '<i class="r">rear</i>' : '');
+    return `<span class="qbox">${esc(x)}${tags}</span>`;
+  }).join('')}</div><span class="qop">enqueue</span></div>`;
+}
+function stackDraw(items) {
+  if (!items.length) return '<div class="sdraw"><div class="sempty">empty</div></div>';
+  return `<div class="sdraw">${items.map((x, i) => `<div class="sbox${i === items.length - 1 ? ' top' : ''}">${esc(x)}${i === items.length - 1 ? '<i>← top</i>' : ''}</div>`).join('')}</div>`;
+}
 export function bfsSide(s) {
-  const all = s.qlog, f = s.front;
-  const q = all.length ? `<div class="queue">${all.map((x, j) => `<span class="${j < f ? 'gone' : 'in'}">${esc(x)}${j === f && f < all.length ? '<i class="ptr f">F</i>' : ''}${j === all.length - 1 && f < all.length ? '<i class="ptr r">R</i>' : ''}</span>`).join('')}</div>` : '<div class="queue"><em>empty</em></div>';
-  return `<div class="sb"><span class="lbl">Queue <small>(front → rear; grey = already removed)</small></span>${q}</div>
+  const all = s.qlog || [], f = s.front || 0;
+  const live = all.slice(f), left = all.slice(0, f);
+  return `<div class="sb"><span class="lbl">Queue <small>front leaves · rear joins</small></span>${queueDraw(live)}${left.length ? `<p class="hint">Already dequeued: ${left.map(esc).join(' ')}</p>` : ''}</div>
   <div class="sb"><span class="lbl">Visited</span>${visRow(s.V, s.vis)}</div>
-  <div class="sb"><span class="lbl">Output (BFS order)</span><div class="outv">${cells(s.out)}</div></div>`;
+  <div class="sb"><span class="lbl">What the program prints</span><pre class="runline">BFS order: ${esc((s.out || []).join(' '))}${(s.out || []).length ? ' ▍' : ''}</pre></div>`;
 }
 
 export function dfsSide(s) {
-  return `<div class="sb"><span class="lbl">Call stack <small>(top on the right)</small></span><div class="stackv">${cells(s.stack)}${s.stack.length ? '<i class="top">← top</i>' : ''}</div></div>
+  return `<div class="sb"><span class="lbl">Stack <small>top is popped first</small></span>${stackDraw(s.stack || [])}</div>
   <div class="sb"><span class="lbl">Visited</span>${visRow(s.V, s.vis)}</div>
-  <div class="sb"><span class="lbl">Output (DFS order)</span><div class="outv">${cells(s.out)}</div></div>`;
+  <div class="sb"><span class="lbl">What the program prints</span><pre class="runline">DFS order: ${esc((s.out || []).join(' '))}${(s.out || []).length ? ' ▍' : ''}</pre></div>`;
 }
 
 export function primSide(s) {
